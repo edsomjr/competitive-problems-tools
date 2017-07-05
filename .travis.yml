@@ -18,8 +18,8 @@ compiler: g++
 dist: trusty
 
 script:
-    - build.sh
-    - ejproblem2
+    - ./build.sh
+    - src/ejproblem2
 
 after_sucess:
     - echo "Success"
