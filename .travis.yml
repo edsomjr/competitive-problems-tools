@@ -7,6 +7,12 @@ before_install:
 install:
     - sudo apt-get install -qq g++-5
 
+addons:
+    apt:
+        packages:
+            - cmake-data
+            - cmake
+
 language: cpp
 compiler: g++
 dist: trusty
