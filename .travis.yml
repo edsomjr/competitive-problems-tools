@@ -1,0 +1,22 @@
+sudo: true
+
+before_install:
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo apt-get update -qq
+
+install:
+    - sudo apt-get install -qq g++-5
+
+language: cpp
+compiler: g++
+dist: trusty
+
+script:
+    - build.sh
+    - ejproblem2
+
+after_sucess:
+    - echo "Success"
+
+after_failure:
+    - echo "Failure"

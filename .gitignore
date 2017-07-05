@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Project generated files
+ejproblem2
+*.swp
+*.deb
+build
