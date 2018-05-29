@@ -7,19 +7,13 @@
 #install:
 #    - sudo apt-get install -qq g++-5
 
-addons:
-    apt:
-        packages:
-            - cmake-data
-            - cmake
-
 language: cpp
 compiler: g++
 dist: trusty
 
 script:
-    - ./build.sh
-    - src/ejproblem2
+    - make
+    - cp-tools
 
 after_sucess:
     - echo "Success"
