@@ -13,7 +13,7 @@ dist: trusty
 
 script:
     - make
-    - cp-tools
+    - ./cp-tools
 
 after_sucess:
     - echo "Success"
