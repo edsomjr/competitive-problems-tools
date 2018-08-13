@@ -1,13 +1,18 @@
 #include <iostream>
-#include "ini.h"
+#include <fstream>
 
 using namespace std;
 
-int main()
+int main(int argc, char *argv[])
 {
-    Ini ini = Ini::load("teste.ini");
+    for (int i = 0; i < argc; ++i)
+        cout << "Arg = " << argv[i] << endl;
 
-    cout << "Hello World\n";
+    ofstream out("spec.txt");
+
+    out << "Hello World\n";
+
+    out.close();
 
     return 0;
 }

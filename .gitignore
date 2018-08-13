@@ -36,3 +36,7 @@ cp-tools
 *.swp
 *.deb
 build
+
+# Python
+__py-cache__
+*.pyc
