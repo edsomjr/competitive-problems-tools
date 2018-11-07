@@ -1,18 +1,19 @@
 #include <iostream>
-#include <fstream>
 
-using namespace std;
+#include "defs.h"
 
-int main(int argc, char *argv[])
+std::string usage()
 {
-    for (int i = 0; i < argc; ++i)
-        cout << "Arg = " << argv[i] << endl;
+    return "Usage: " NAME " [-h] [-v] action";
+}
 
-    ofstream out("spec.txt");
-
-    out << "Hello World\n";
-
-    out.close();
+int main(int argc, const char* [])
+{
+    if (argc < 2)
+    {
+        std::cout << usage() << '\n';
+        return -1;
+    }
 
     return 0;
 }
