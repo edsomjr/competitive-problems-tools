@@ -1,6 +1,6 @@
 # Compiler setup
-export CC=g++
-export CFLAGS=-W -Wall -Werror -std=c++11
+export CC=g++-7
+export CFLAGS=-W -Wall -Werror -std=c++17
 
 RELEASE_CFLAGS=-O2
 DEBUG_CFLAGS=-g -O0
@@ -35,6 +35,10 @@ OBJ_EXTENSION=.o
 
 # Directories
 SRC_DIR=src
+SCRIPTS_DIR=scripts
+
+INSTALL_BIN_DIR=/usr/local/bin
+INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
 # Project targets
 PROJECT=cp-tools
@@ -45,6 +49,7 @@ LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)
 # Project source files
 SOURCES=${wildcard $(SRC_DIR)/*.cpp}
 OBJECTS=$(SOURCES:.cpp=$(OBJ_EXTENSION))
+COMPLETION_SCRIPT=$(PROJECT)-completion.sh
 
 .SUFFIXES: .cpp .$(OBJ_EXTENSION) 
 
@@ -59,6 +64,14 @@ $(LIBRARY): $(OBJECTS)
 
 $(PROJECT): $(COMPONENTS) $(OBJECTS)
 	$(LINKER) $(OUTPUT_FLAG)$@ $(LDFLAGS) $(LIBRARY) $(LIBS) $(EXTRA_LIBS)
+
+install: $(PROJECT)
+	@cp -i $(PROJECT) $(INSTALL_BIN_DIR)
+	@cp -i $(SCRIPTS_DIR)/$(COMPLETION_SCRIPT) $(INSTALL_COMPLETION_DIR)
+
+uninstall:
+	@rm -f $(INSTALL_COMPLETION_DIR)/$(COMPLETION_SCRIPT)
+	@rm -f $(INSTALL_BIN_DIR)/$(PROJECT)
 
 clean:
 	@rm -f *~ $(LIBRARY) $(PROJECT)
