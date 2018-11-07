@@ -5,7 +5,7 @@
 #    - sudo apt-get update -qq
 
 #install:
-#    - sudo apt-get install -qq g++-5
+#    - sudo apt-get install -qq g++-7
 
 language: cpp
 compiler: g++
