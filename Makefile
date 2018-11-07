@@ -1,6 +1,6 @@
 # Compiler setup
-export CC=g++
-export CFLAGS=-W -Wall -Werror -std=c++17
+CC=g++-7
+CFLAGS=-W -Wall -Werror -std=c++17
 
 RELEASE_CFLAGS=-O2
 DEBUG_CFLAGS=-g -O0

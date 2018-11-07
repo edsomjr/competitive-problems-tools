@@ -1,19 +1,17 @@
-#sudo: true
-
-#before_install:
-#    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-#    - sudo apt-get update -qq
-
-#install:
-#    - sudo apt-get install -qq g++-7
-
 language: cpp
 compiler: g++
-dist: trusty
+
+os: linux
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-7
 
 script:
     - make
-    - ./cp-tools
+    - ./cp-tools -v
 
 after_sucess:
     - echo "Success"
