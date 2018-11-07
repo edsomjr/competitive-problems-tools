@@ -1,5 +1,5 @@
 # Compiler setup
-CC=g++
+CC=g++-7
 CFLAGS=-W -Wall -Werror -std=c++17
 
 RELEASE_CFLAGS=-O2
