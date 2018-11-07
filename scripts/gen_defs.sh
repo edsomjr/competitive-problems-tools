@@ -6,6 +6,7 @@ function increment_release_number()
 {
     filepath="$METADATA_DIR/release_number"
     number=`cat $filepath`
+    echo $((number + 1)) > $filepath
 }
 
 function version_number()
@@ -17,7 +18,7 @@ function version_number()
     release_number=`cat $filepath`
 
     version="$major_minor_path-r$release_number"
-    echo "#define VERSION $version"
+    echo "#define VERSION \"$version\""
 }
 
 function name()

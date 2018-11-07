@@ -1,2 +1,2 @@
 #define NAME "cp-tools"
-#define VERSION 0.1.0-r0
+#define VERSION "0.1.0-r1"
