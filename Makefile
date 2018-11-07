@@ -5,10 +5,10 @@ export CFLAGS=-W -Wall -Werror -std=c++17
 RELEASE_CFLAGS=-O2
 DEBUG_CFLAGS=-g -O0
 
-ifeq ($(MODE),debug)
-    CFLAGS+=$(DEBUG_CFLAGS)
-else
+ifeq ($(MAKECMDGOALS),release)
     CFLAGS+=$(RELEASE_CFLAGS)
+else
+    CFLAGS+=$(DEBUG_CFLAGS)
 endif
 
 LDFLAGS=
@@ -57,13 +57,18 @@ COMPLETION_SCRIPT=$(PROJECT)-completion.sh
 .cpp$(OBJ_EXTENSION):
 	$(CC) $(GEN_OBJECT_FLAG) $< $(OBJ_OUTPUT_FLAG) $@ $(CFLAGS) $(INCLUDES)
 
-all: $(LIBRARY) $(PROJECT) 
+all: $(LIBRARY) $(PROJECT)
 
 $(LIBRARY): $(OBJECTS)
 	$(AR) $(AR_FLAGS) $(AR_OUTPUT_FLAG) $@ $(OBJECTS) 
 
 $(PROJECT): $(COMPONENTS) $(OBJECTS)
 	$(LINKER) $(OUTPUT_FLAG)$@ $(LDFLAGS) $(LIBRARY) $(LIBS) $(EXTRA_LIBS)
+
+update_release:
+	@./scripts/gen_defs.sh
+
+release: update_release $(LIBRARY) $(PROJECT)
 
 install: $(PROJECT)
 	@cp $(PROJECT) $(INSTALL_BIN_DIR)
