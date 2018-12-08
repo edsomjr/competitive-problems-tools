@@ -1,14 +1,24 @@
+#include <functional>
 #include <iostream>
+#include <map>
+
 #include <unistd.h>
 
 #include "defs.h"
+#include "init.h"
 
-std::string usage()
+
+std::map<std::string, std::function<int(int, char *const [])>> commands {
+    { "init", init },
+};
+
+
+static std::string usage()
 {
     return "Usage: " NAME " [-h] [-v] action";
 }
 
-std::string help()
+static std::string help()
 {
     const std::string message {
 R"message(
@@ -44,6 +54,14 @@ int main(int argc, char* const argv[])
         return -1;
     }
 
+    auto command = argv[1];
+
+    for (const auto& [cmd, exec] : commands)
+    {
+        if (cmd == command)
+            return exec(argc, argv);
+    }
+
     int option = -1;
 
     while ((option = getopt(argc, argv, "hv")) != -1)
@@ -53,6 +71,10 @@ int main(int argc, char* const argv[])
             std::cout << version() << '\n';
             return 0;
         
+        case 'h':
+            std::cout << help() << '\n';
+            return 0;
+
         default:
             std::cout << help() << '\n';
             return -1;
@@ -61,4 +83,3 @@ int main(int argc, char* const argv[])
 
     return 0;
 }
-
