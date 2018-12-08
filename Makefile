@@ -1,3 +1,5 @@
+PROJECT=cp-tools
+
 # Compiler setup
 CC=g++-7
 CFLAGS=-W -Wall -Werror -std=c++17
@@ -36,12 +38,13 @@ OBJ_EXTENSION=.o
 # Directories
 SRC_DIR=src
 SCRIPTS_DIR=scripts
+TEMPLATE_DIR=templates
 
 INSTALL_BIN_DIR=/usr/local/bin
+INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
 # Project targets
-PROJECT=cp-tools
 LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)
 
 .PHONY: all clean
@@ -72,10 +75,13 @@ release: update_release $(LIBRARY) $(PROJECT)
 
 install: $(PROJECT)
 	@cp $(PROJECT) $(INSTALL_BIN_DIR)
+	@mkdir -p $(INSTALL_TEMPLATE_DIR)/$(PROJECT)
+	@cp -r $(TEMPLATE_DIR) $(INSTALL_TEMPLATE_DIR)/$(PROJECT)/
 	@cp $(SCRIPTS_DIR)/$(COMPLETION_SCRIPT) $(INSTALL_COMPLETION_DIR)
 
 uninstall:
 	@rm -f $(INSTALL_COMPLETION_DIR)/$(COMPLETION_SCRIPT)
+	@rm -rf $(INSTALL_TEMPLATE_DIR)/$(PROJECT)
 	@rm -f $(INSTALL_BIN_DIR)/$(PROJECT)
 
 clean:
