@@ -2,7 +2,7 @@
 
 ![Travis](https://travis-ci.org/edsomjr/competitive-problems-tools.svg?branch=master)
 
-A problem formatter tool. 
+A competitive programming problem formatter tool. 
 
 ## Instalation
 
