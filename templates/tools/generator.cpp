@@ -18,6 +18,10 @@ int main(int argc, char* argv[]) {
     // Escolhe uma entre as 3 string abaixo
     cout << rnd.next("Abacaxi|Banana|Caju") << endl;
 
+    /**
+     * Segue mais uma série de exemplos. Estão comentados para que entradas válidas
+     * menores possam ser usadas no template.
+
     // Gera uma string com tamanho de 1 a 20 caracteres maísculos, minúsculos ou dígitos
     cout << rnd.next("[A-Za-z0-9]{1,20}") << endl;
 
@@ -42,8 +46,11 @@ int main(int argc, char* argv[]) {
         cout << ns[i] << (i + 1 == ns.size() ? "\n" : " ");
 
     // Escolhe um dentre os elementos do contêiner (vector ou string funcionam)
-    string symbols { "+-/*" };
+    string symbols { "+*-/" };
     cout << rnd.any(symbols.begin(), symbols.end()) << endl;
+
+    *
+    **/
 
     return 0;
 }
