@@ -4,6 +4,7 @@
 
 #include "defs.h"
 #include "init.h"
+#include "error.h"
 
 
 static std::string usage()
@@ -27,21 +28,26 @@ int copy_template_files()
 
     for (const auto& p : std::filesystem::directory_iterator(templates_dir))
     {
-        if (std::filesystem::is_directory(p.symlink_status()))
-        {
-            auto dir = p.path().filename();
+        auto name = p.path().filename();
 
-            std::filesystem::create_directory(dir);
-            std::filesystem::copy(p.path(), dir, std::filesystem::copy_options::recursive);
-            std::cout << p.path() << "é diretório\n";
-        } else
+        try {
+            if (std::filesystem::exists(name))
+                continue;
+
+            if (std::filesystem::is_directory(p.symlink_status()))
+            {
+                std::filesystem::create_directory(name);
+                std::filesystem::copy(p.path(), name, std::filesystem::copy_options::recursive);
+            } else
+                std::filesystem::copy(p.path(), ".");
+        } catch (const std::exception& e)
         {
-            std::cout << p.path() << "é arquivo\n";
-            std::filesystem::copy(p.path(), ".");
+            std::cerr << e.what() << '\n';
+            return CP_TOOLS_ERROR_INIT_COPY_FILES;
         }
     }
 
-    return 0;
+    return CP_TOOLS_OK;
 }
 
 int init(int argc, char * const argv[])
@@ -57,7 +63,7 @@ int init(int argc, char * const argv[])
 
         default:
             std::cout << help() << '\n';
-            return -1;
+            return CP_TOOLS_ERROR_INIT_INVALID_OPTION;
         }
     }
 
