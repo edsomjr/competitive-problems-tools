@@ -7,7 +7,26 @@ int main(int argc, char* argv[]) {
     registerGen(argc, argv, 1);
     ios::sync_with_stdio(false);
 
+    // O primeiro parâmetro é definido na linha de comando da execução do gerador
     auto N = atoi(argv[1]);
+    auto M = rnd.next(0.0, 20.0);
+
+    ensuref(0 <= N and N <= 100, "N must be in range [0, 100]");
+
+    cout << N << ' ' << M << '\n';
+
+    for (int i = 0; i < N; ++i)
+    {
+        if (i)
+            cout << ' ';
+
+        auto x = rnd.next(0.0, 10.0);
+        cout << x;
+    }
+    cout << '\n';
+
+    /**
+     * Segue mais uma série de exemplos de geração de entradas como referência. 
 
     // Sorteia um número inteiro aleatório entre 1 e N
     cout << rnd.next(1, N) << endl;
@@ -17,10 +36,6 @@ int main(int argc, char* argv[]) {
 
     // Escolhe uma entre as 3 string abaixo
     cout << rnd.next("Abacaxi|Banana|Caju") << endl;
-
-    /**
-     * Segue mais uma série de exemplos. Estão comentados para que entradas válidas
-     * menores possam ser usadas no template.
 
     // Gera uma string com tamanho de 1 a 20 caracteres maísculos, minúsculos ou dígitos
     cout << rnd.next("[A-Za-z0-9]{1,20}") << endl;

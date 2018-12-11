@@ -8,7 +8,26 @@ int main(int argc, char* argv[])
 {
     registerValidation(argc, argv);
 
-    // Exemplo de leitura de uma entrada gerada pelo gerador do exemplo
+    auto N = inf.readInt(1, 100, "N must be in range [1, 100]");
+    inf.readSpace();
+
+    inf.readStrictDouble(0.0, 20.0, 1, 1, "M must be in range [0.0, 20.0] with just one decimal place");
+    inf.readEoln();
+
+    for (int i = 0; i < N; ++i)
+    {
+        if (i)
+            inf.readSpace();
+
+        inf.readStrictDouble(0.0, 10.0, 1, 1, "x must be in range [0.0, 10.0] with just one decimal place");
+    }
+
+    inf.readEoln();
+    inf.readEof();
+
+    /**
+     * Validação das entradas comentadas do generator
+
     inf.readInt(1, 1000000, "Primeiro valor: inteiro entre [1, 10^6]");
     inf.readEoln();
 
@@ -17,9 +36,6 @@ int main(int argc, char* argv[])
 
     auto token = inf.readToken("Abacaxi|Banana|Caju", "Lê um dos três tokens possível, diferenciando maiúsculas e minúsculas");
     inf.readEoln();
-
-    /**
-     * Validação das entradas comentadas do generator
 
     auto s = inf.readString("[A-Za-z0-9]{1,20}", "Lê uma string dê acordo com a regex dada e lê também o caractere de fim de linha");
 
@@ -43,11 +59,10 @@ int main(int argc, char* argv[])
     auto symbol = inf.readString("[+/-*]{1,1}", "Lê um dos símbolos listados");
 
     inf.readEoln();
+    inf.readEof();
 
     *
     **/
-
-    inf.readEof();
 
     return 0;
 }
