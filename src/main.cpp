@@ -1,14 +1,25 @@
+#include <functional>
 #include <iostream>
+#include <map>
+
 #include <unistd.h>
 
 #include "defs.h"
+#include "init.h"
+#include "error.h"
 
-std::string usage()
+
+std::map<std::string, std::function<int(int, char *const [])>> commands {
+    { "init", init },
+};
+
+
+static std::string usage()
 {
     return "Usage: " NAME " [-h] [-v] action";
 }
 
-std::string help()
+static std::string help()
 {
     const std::string message {
 R"message(
@@ -41,7 +52,15 @@ int main(int argc, char* const argv[])
     if (argc < 2)
     {
         std::cout << usage() << '\n';
-        return -1;
+        return CP_TOOLS_ERROR_MISSING_ARGUMENT;
+    }
+
+    auto command = argv[1];
+
+    for (const auto& [cmd, exec] : commands)
+    {
+        if (cmd == command)
+            return exec(argc, argv);
     }
 
     int option = -1;
@@ -51,14 +70,17 @@ int main(int argc, char* const argv[])
         switch (option) {
         case 'v':
             std::cout << version() << '\n';
-            return 0;
+            return CP_TOOLS_OK;
         
+        case 'h':
+            std::cout << help() << '\n';
+            return CP_TOOLS_OK;
+
         default:
             std::cout << help() << '\n';
-            return -1;
+            return CP_TOOLS_ERROR_INVALID_PARAMETER;
         }
     }
 
-    return 0;
+    return CP_TOOLS_OK;
 }
-

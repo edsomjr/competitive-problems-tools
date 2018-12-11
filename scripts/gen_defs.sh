@@ -30,5 +30,11 @@ function name()
 }
 
 increment_release_number
-name > include/defs.h
+echo "#ifndef DEFS_H" > include/defs.h
+echo >> include/defs.h
+
+name >> include/defs.h
 version_number >> include/defs.h
+
+echo >> include/defs.h
+echo "#endif" >> include/defs.h

@@ -1,0 +1,28 @@
+{
+    "author": {
+        "name": "Nome do Autor",
+        "e-mail": "emaildoautor@email.com",
+        "school": "Universidade/Escola do autor do problema",
+        "country": "Brazil"
+    },
+
+    "problem": {
+        "timelimit": 1000,
+        "memory_limit": 256,
+        "tags": [ "greedy", "sorting", "ad-hoc" ],
+        "contest": "Evento onde o problema foi aplicado pela primeira vez"
+    },
+
+    "translations": {
+        "pt_BR": "problem.md",
+        "us_EN": null
+    },
+
+    "PDF": {
+        "row_size": 6.0,
+        "column_size": 8.0,
+        "include_email:": false,
+        "include_author": true,
+        "include_contest:": true
+    }
+}
