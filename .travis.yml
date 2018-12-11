@@ -12,6 +12,7 @@ addons:
 script:
     - make
     - ./cp-tools -v
+    - ./cp-tools init
 
 after_sucess:
     - echo "Success"
