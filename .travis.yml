@@ -11,6 +11,7 @@ addons:
 
 script:
     - make
+    - sudo make install
     - ./cp-tools -v
     - ./cp-tools init
 
