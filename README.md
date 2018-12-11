@@ -2,7 +2,7 @@
 
 ![Travis](https://travis-ci.org/edsomjr/competitive-problems-tools.svg?branch=master)
 
-A problem formatter tool. 
+A competitive programming problem formatter tool. 
 
 ## Instalation
 
@@ -38,5 +38,5 @@ $ cp-tools init
 For more information, use the flag `h`, as shown below:
 
 ```
-$ cp-tools -v
+$ cp-tools -h
 ```
