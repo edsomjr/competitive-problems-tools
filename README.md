@@ -38,5 +38,5 @@ $ cp-tools init
 For more information, use the flag `h`, as shown below:
 
 ```
-$ cp-tools -v
+$ cp-tools -h
 ```
