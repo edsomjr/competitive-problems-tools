@@ -1,7 +1,7 @@
 PROJECT=cp-tools
 
 # Compiler setup
-CC=g++-7
+CC=g++-8
 CFLAGS=-W -Wall -Werror -std=c++17
 
 RELEASE_CFLAGS=-O2
@@ -19,7 +19,7 @@ INCLUDES=-Iinclude
 # Tools
 AR=ar
 AR_FLAGS=rcs
-LINKER=g++
+LINKER=$(CC)
 
 # Environment variables
 INCLUDES_FLAG=-I
@@ -34,6 +34,9 @@ GEN_OBJECT_FLAG=-c
 STATIC_LIB_SUFFIX=.a
 STATIC_LIB_PREFIX=lib
 OBJ_EXTENSION=.o
+
+# External libraries
+LIBS=-lstdc++fs
 
 # Directories
 SRC_DIR=src
