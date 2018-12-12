@@ -18,6 +18,13 @@
         "us_EN": null
     },
 
+    "solutions": {
+        "default": "solution.cpp",
+        "ac": [ "AC.java", "ac.py" ],
+        "wa": [ "wa.cpp" ],
+        "tle": [ "tle.cpp" ]
+    },
+
     "PDF": {
         "row_size": 6.0,
         "column_size": 8.0,
