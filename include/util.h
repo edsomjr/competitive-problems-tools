@@ -1,5 +1,5 @@
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef CP_TOOLS_UTIL_H
+#define CP_TOOLS_UTIL_H
 
 #include <string>
 #include <vector>

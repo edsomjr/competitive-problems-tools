@@ -1,5 +1,5 @@
-#ifndef INIT_H
-#define INIT_H
+#ifndef CP_TOOLS_INIT_H
+#define CP_TOOLS_INIT_H
 
 extern int init(int argc, char * const argv[]);
 
