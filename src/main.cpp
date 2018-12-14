@@ -6,11 +6,13 @@
 
 #include "defs.h"
 #include "init.h"
+#include "clean.h"
 #include "error.h"
 
 
 std::map<std::string, std::function<int(int, char *const [])>> commands {
     { "init", init },
+    { "clean", clean },
 };
 
 
