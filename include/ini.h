@@ -1,5 +1,5 @@
-#ifndef INI_H
-#define INI_H
+#ifndef CP_TOOLS_INI_H
+#define CP_TOOLS_INI_H
 
 #include <string>
 #include <map>
