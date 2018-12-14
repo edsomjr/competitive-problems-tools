@@ -30,7 +30,8 @@ function name()
 }
 
 increment_release_number
-echo "#ifndef DEFS_H" > include/defs.h
+echo "#ifndef CP_TOOLS_DEFS_H" > include/defs.h
+echo "#define CP_TOOLS_DEFS_H" >> include/defs.h
 echo >> include/defs.h
 
 name >> include/defs.h
