@@ -3,6 +3,7 @@
 #include <map>
 
 #include <unistd.h>
+#include <getopt.h>
 
 #include "defs.h"
 #include "init.h"
@@ -16,6 +17,12 @@ std::map<std::string, std::function<int(int, char *const [])>> commands {
     { "init", init },
     { "clean", clean },
     { "gentex", gentex },
+};
+
+struct option longopts[] = {
+   { "help", no_argument, NULL, 'f' },
+   { "version", no_argument, NULL, 'v' },
+   { 0, 0, 0, 0 }
 };
 
 
@@ -70,7 +77,7 @@ int main(int argc, char* const argv[])
 
     int option = -1;
 
-    while ((option = getopt(argc, argv, "hv")) != -1)
+    while ((option = getopt_long(argc, argv, "hv", longopts, NULL)) != -1)
     {
         switch (option) {
         case 'v':
