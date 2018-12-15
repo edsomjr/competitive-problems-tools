@@ -96,4 +96,4 @@ uninstall:
 
 clean:
 	@rm -f *~ $(MD4C_LIBRARY) $(LIBRARY) $(PROJECT)
-	@find . -name *.o -exec rm -f {}  \;
+	@find . -name '*.o' -exec rm -f {}  \;
