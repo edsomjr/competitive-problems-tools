@@ -16,7 +16,7 @@ static std::string help()
 {
     const std::string message {
 R"message(
-Generate a LaTeX file from a problem description. The options are:
+Generate a LaTeX file from the problem description. The options are:
 
     -h              Display this help.
     --help                  
