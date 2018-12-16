@@ -12,6 +12,7 @@
 static struct option longopts[] = {
    { "help", no_argument, NULL, 'h' },
    { "input", required_argument, NULL, 'i' },
+   { "output", required_argument, NULL, 'o' },
    { 0, 0, 0, 0 }
 };
 
@@ -50,9 +51,9 @@ std::string generate_latex()
 int gentex(int argc, char * const argv[])
 {
     int option = -1;
-    std::string infile { "problem.md" };
+    std::string infile { "problem.md" }, outfile;
 
-    while ((option = getopt_long(argc, argv, "hi:", longopts, NULL)) != -1)
+    while ((option = getopt_long(argc, argv, "hi:o:", longopts, NULL)) != -1)
     {
         switch (option) {
         case 'h':
@@ -63,6 +64,10 @@ int gentex(int argc, char * const argv[])
             infile = std::string(optarg);
             break;
 
+        case 'o':
+            outfile = std::string(optarg);
+            break;
+
         default:
             std::cout << help() << '\n';
             return CP_TOOLS_ERROR_GENTEX_INVALID_OPTION;
@@ -70,6 +75,7 @@ int gentex(int argc, char * const argv[])
     }
 
 //    std::cout << "infile = [" << infile << "]\n";
+//    std::cout << "outfile = [" << outfile << "]\n";
 
     auto tex = generate_latex();
 
