@@ -19,7 +19,7 @@ std::map<std::string, std::function<int(int, char *const [])>> commands {
     { "gentex", gentex },
 };
 
-struct option longopts[] = {
+static struct option longopts[] = {
    { "help", no_argument, NULL, 'f' },
    { "version", no_argument, NULL, 'v' },
    { 0, 0, 0, 0 }
