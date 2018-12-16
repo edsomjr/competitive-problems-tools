@@ -42,7 +42,7 @@ the command
 $ cp-tools clean
 ```
 
-For more information, use the flag `h`, as shown below:
+For more information, use the option `-h` (or `--help`), as shown below:
 
 ```
 $ cp-tools -h

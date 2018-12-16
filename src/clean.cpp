@@ -1,10 +1,18 @@
 #include <iostream>
-#include <unistd.h>
 #include <filesystem>
+
+#include <unistd.h>
+#include <getopt.h>
 
 #include "defs.h"
 #include "clean.h"
 #include "error.h"
+
+
+static struct option longopts[] = {
+   { "help", no_argument, NULL, 'h' },
+   { 0, 0, 0, 0 }
+};
 
 
 static std::string usage()
@@ -44,7 +52,7 @@ int clean(int argc, char * const argv[])
 {
     int option = -1;
 
-    while ((option = getopt(argc, argv, "h")) != -1)
+    while ((option = getopt_long(argc, argv, "h", longopts, NULL)) != -1)
     {
         switch (option) {
         case 'h':

@@ -20,7 +20,7 @@ std::map<std::string, std::function<int(int, char *const [])>> commands {
 };
 
 static struct option longopts[] = {
-   { "help", no_argument, NULL, 'f' },
+   { "help", no_argument, NULL, 'h' },
    { "version", no_argument, NULL, 'v' },
    { 0, 0, 0, 0 }
 };
