@@ -17,12 +17,13 @@ static struct option longopts[] = {
    { "input", required_argument, NULL, 'i' },
    { "class", required_argument, NULL, 'c' },
    { "output", required_argument, NULL, 'o' },
+   { "metadata", required_argument, NULL, 'm' },
    { 0, 0, 0, 0 }
 };
 
 static std::string usage()
 {
-    return "Usage: " NAME " gentex [-h] [-i infile] [-o outfile] [-c doc_class] [-l list]";
+    return "Usage: " NAME " gentex [-h] [-i infile] [-o outfile] [-c doc_class] [-l list] [-m metadata]";
 }
 
 static std::string help()
@@ -40,11 +41,14 @@ Generate a LaTeX file from the problem description. The options are:
     -o              Output file. If omitted, the output will be written on
     --output        stdout.
 
-    -c              Selected the document class that will be used. The default value is TEP.
+    -c              Selected the document class that will be used. The default value is 'TEP'.
     --class
 
     -l              List all available document classes.
     --list
+
+    -m              Metadata file. The default value is 'config.json'.
+    --metadata
 )message" };
 
     return usage() + message;
@@ -115,9 +119,10 @@ std::string generate_latex()
 int gentex(int argc, char * const argv[])
 {
     int option = -1;
-    std::string infile { "problem.md" }, outfile, document_class { "TEP" };
+    std::string infile { "problem.md" }, document_class { "TEP" }, metadata { "config.json" },
+        outfile;
 
-    while ((option = getopt_long(argc, argv, "hi:o:c:l", longopts, NULL)) != -1)
+    while ((option = getopt_long(argc, argv, "hi:o:c:lm:", longopts, NULL)) != -1)
     {
         switch (option) {
         case 'h':
@@ -136,6 +141,10 @@ int gentex(int argc, char * const argv[])
             document_class = std::string(optarg);
             break;
 
+        case 'm':
+            metadata = std::string(optarg);
+            break;
+
         case 'l':
             return list_document_classes();
 
@@ -148,6 +157,7 @@ int gentex(int argc, char * const argv[])
 //    std::cout << "infile = [" << infile << "]\n";
 //    std::cout << "outfile = [" << outfile << "]\n";
 //    std::cout << "document_class = [" << document_class << "]\n";
+    std::cout << "metadata = [" << metadata << "]\n";
 
     auto tex = generate_latex();
 
