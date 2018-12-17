@@ -33,6 +33,7 @@
 
 # Project generated files
 cp-tools
+cp-run_tests
 *.swp
 *.deb
 build

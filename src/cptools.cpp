@@ -52,18 +52,18 @@ namespace cptools {
     };
 
 
-    // Local functions
-    static std::string usage()
+    // Auxiliary routines
+    std::string usage()
     {
         return "Usage: " NAME " [-h] [-v] action";
     }
 
-    static std::string help()
+    std::string help()
     {
         return usage() + help_message;
     }
 
-    static std::string version()
+    std::string version()
     {
         return version_header + version_body;
     }

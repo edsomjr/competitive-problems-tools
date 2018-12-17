@@ -5,6 +5,5 @@
 
 int main(int argc, char* const argv[])
 {
-    //return cptools::run(argc, argv, std::cout, std::cerr);
     return cptools::run(argc, argv, std::cout, std::cerr);
 }
