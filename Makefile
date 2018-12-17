@@ -39,10 +39,12 @@ OBJ_EXTENSION=.o
 # Directories
 SRC_DIR=src
 LIBS_DIR=libs
+CLASSES_DIR=classes
 SCRIPTS_DIR=scripts
 TEMPLATE_DIR=templates
 
 INSTALL_BIN_DIR=/usr/local/bin
+INSTALL_CLASSES_DIR=/usr/local/lib
 INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
@@ -87,6 +89,8 @@ install: $(PROJECT)
 	@cp $(PROJECT) $(INSTALL_BIN_DIR)
 	@mkdir -p $(INSTALL_TEMPLATE_DIR)/$(PROJECT)
 	@cp -r $(TEMPLATE_DIR) $(INSTALL_TEMPLATE_DIR)/$(PROJECT)/
+	@mkdir -p $(INSTALL_CLASSES_DIR)/$(PROJECT)
+	@cp -r $(CLASSES_DIR) $(INSTALL_CLASSES_DIR)/$(PROJECT)/
 	@cp $(SCRIPTS_DIR)/$(COMPLETION_SCRIPT) $(INSTALL_COMPLETION_DIR)
 
 uninstall:

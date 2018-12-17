@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <filesystem>
 
@@ -6,20 +7,22 @@
 
 #include "defs.h"
 #include "init.h"
+#include "util.h"
 #include "error.h"
 
 
 static struct option longopts[] = {
    { "help", no_argument, NULL, 'h' },
+   { "list", no_argument, NULL, 'l' },
    { "input", required_argument, NULL, 'i' },
-   { "output", required_argument, NULL, 'o' },
    { "class", required_argument, NULL, 'c' },
+   { "output", required_argument, NULL, 'o' },
    { 0, 0, 0, 0 }
 };
 
 static std::string usage()
 {
-    return "Usage: " NAME " gentex [-h] [-i input_file] [-o output_file] [-c document_class]";
+    return "Usage: " NAME " gentex [-h] [-i infile] [-o outfile] [-c doc_class] [-l list]";
 }
 
 static std::string help()
@@ -47,6 +50,63 @@ Generate a LaTeX file from the problem description. The options are:
     return usage() + message;
 }
 
+static int list_document_classes()
+{
+    const std::string document_classes_dir { "/usr/local/lib/" NAME "/classes" };
+
+    std::cout << '\n';
+
+    try {
+        for (const auto& it : std::filesystem::directory_iterator(document_classes_dir))
+        {
+            if (not it.is_regular_file())
+                continue;
+
+            auto filename = it.path().filename(); 
+            auto tokens = split(filename, '.');
+
+            if (tokens.size() < 2)
+                continue;
+
+            auto name = strip(tokens[0], '"');
+            auto ext = strip(tokens[1], '"');
+
+            if (ext != "cls" or name.empty())
+                continue;
+
+            std::ifstream in(it.path().string());
+            std::string line;
+
+            if (!in)
+                continue;
+
+            getline(in, line);
+
+            if (line.empty())
+                continue;
+
+            // % is the LaTeX line comment char
+            auto pos = line.find('%');
+
+            if (pos == std::string::npos)
+                continue;
+
+            line = strip(line.substr(pos + 1));
+
+            std::cout << "    " << name;
+            std::cout << (name.size() < 8 ? "\t\t" : "\t") << line << '\n';
+        }
+    } catch (const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES;
+    }
+
+    std::cout << '\n';
+
+    return CP_TOOLS_OK;
+}
+
 std::string generate_latex()
 {
     return "LaTeX test";
@@ -57,7 +117,7 @@ int gentex(int argc, char * const argv[])
     int option = -1;
     std::string infile { "problem.md" }, outfile, document_class { "TEP" };
 
-    while ((option = getopt_long(argc, argv, "hi:o:c:", longopts, NULL)) != -1)
+    while ((option = getopt_long(argc, argv, "hi:o:c:l", longopts, NULL)) != -1)
     {
         switch (option) {
         case 'h':
@@ -75,6 +135,9 @@ int gentex(int argc, char * const argv[])
         case 'c':
             document_class = std::string(optarg);
             break;
+
+        case 'l':
+            return list_document_classes();
 
         default:
             std::cout << help() << '\n';

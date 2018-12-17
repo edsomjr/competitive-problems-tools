@@ -32,7 +32,7 @@ Initialize an empty directory with template files. If a file already exists, it 
 
 int copy_template_files()
 {
-    static const std::string templates_dir { "/usr/local/lib/cp-tools/templates/" };
+    static const std::string templates_dir { "/usr/local/lib/" NAME "/templates/" };
 
     for (const auto& p : std::filesystem::directory_iterator(templates_dir))
     {
