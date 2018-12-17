@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
-vector<string> split(const string& s, char delim = ' ');
-string strip(const string& s);
+std::vector<std::string> split(const std::string& s, char delim = ' ');
+std::string strip(const std::string& s);
+std::string strip(const std::string& s, char c);
 
 #endif

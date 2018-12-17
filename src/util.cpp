@@ -1,14 +1,13 @@
 #include "util.h"
 
-vector<string>
-split(const string& s, char delim)
+std::vector<std::string> split(const std::string& s, char delim)
 {
     enum State { NONE, ESCAPED, TOKEN };
     enum State state = NONE;
 
-    string temp = s + delim;
+    std::string temp = s + delim;
     int start = -1, count = 0;
-    vector<string> tokens;
+    std::vector<std::string> tokens;
 
     for (size_t i = 0; i < temp.size(); ++i)
     {
@@ -58,8 +57,7 @@ split(const string& s, char delim)
     return tokens;
 }
 
-string
-strip(const string& s)
+std::string strip(const std::string& s)
 {
     int size = s.size();
 
@@ -70,6 +68,21 @@ strip(const string& s)
 
     while (i < size and isspace(s[++i]));
     while (j > 0 and isspace(s[--j]));
+
+    return j < i ? "" : s.substr(i, j - i + 1);
+}
+
+std::string strip(const std::string& s, char c)
+{
+    int size = s.size();
+
+    if (size < 1)
+        return "";
+
+    int i = -1, j = size;
+
+    while (i < size and s[++i] == c);
+    while (j > 0 and s[--j] == c);
 
     return j < i ? "" : s.substr(i, j - i + 1);
 }
