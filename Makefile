@@ -15,7 +15,7 @@ else
 endif
 
 LDFLAGS=
-INCLUDES=-Iinclude
+INCLUDES=-Iinclude -Ilibs
 
 # Tools
 AR=ar
