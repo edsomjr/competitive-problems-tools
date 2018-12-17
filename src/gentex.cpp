@@ -111,10 +111,16 @@ static int list_document_classes()
     return CP_TOOLS_OK;
 }
 
-std::string generate_latex()
+/*std::variant<std::string, GentexError>
+generate_latex(const string& problem, const json& config);
 {
     return "LaTeX test";
 }
+
+static std::string load_problem(const string& infile)
+{
+}
+*/
 
 int gentex(int argc, char * const argv[])
 {
@@ -154,12 +160,19 @@ int gentex(int argc, char * const argv[])
         }
     }
 
-//    std::cout << "infile = [" << infile << "]\n";
-//    std::cout << "outfile = [" << outfile << "]\n";
-//    std::cout << "document_class = [" << document_class << "]\n";
-    std::cout << "metadata = [" << metadata << "]\n";
+/*    string problem;
+    json config;
+
+    try {
+        std::ifstream in(problem);
+
+    } catch (const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return CP_TOOLS_ERROR_INIT_COPY_FILES;
+    }
 
     auto tex = generate_latex();
-
+*/
     return CP_TOOLS_OK;
 }

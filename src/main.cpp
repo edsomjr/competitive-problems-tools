@@ -16,7 +16,7 @@
 std::map<std::string, std::function<int(int, char *const [])>> commands {
     { "init", init },
     { "clean", clean },
-    { "gentex", gentex },
+//    { "gentex", gentex },
 };
 
 static struct option longopts[] = {
