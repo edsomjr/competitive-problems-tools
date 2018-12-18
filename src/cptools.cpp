@@ -104,7 +104,6 @@ namespace cptools {
             }
         }
 
-        out << "no options = " << argv[1] << "\n";
         return CP_TOOLS_OK;
     }
 }

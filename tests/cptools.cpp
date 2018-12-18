@@ -1,4 +1,5 @@
 #include <sstream>
+#include <getopt.h>
 
 #include "catch.hpp"
 #include "cptools.h"
@@ -63,25 +64,59 @@ SCENARIO("Command line options", "[cptools]")
             }
         }
 
-
-/*
-        WHEN("The option -v is used")
+        WHEN("The option is invalid")
         {
             int argc = 2;
-            char * const argv[] { (char *) "cp-tools", (char *) "-h" };
+            char * const argv[] { (char *) "cp-tools", (char *) "-p" };
 
-            THEN("The output is the version message")
+            // getopt library must be reseted between tests
+            optind = 1;
+
+            THEN("The error output is the help message")
             {
                 std::ostringstream out, err;
 
                 auto rc = cptools::run(argc, argv, out, err);
 
-                REQUIRE(rc == CP_TOOLS_OK);
-                REQUIRE(err.str().empty());
-                REQUIRE(out.str() == (cptools::version() + '\n'));
+                REQUIRE(rc == CP_TOOLS_ERROR_INVALID_PARAMETER);
+                REQUIRE(out.str().empty());
+                REQUIRE(err.str() == (cptools::help() + '\n'));
             }
         }
-*/
 
+        WHEN("The both options are passed")
+        {
+
+            THEN("The the first one prevails")
+            {
+                {
+                    int argc = 3;
+                    char * const argv[] { (char *) "cp-tools", (char *) "-h", (char *) "-v" };
+                    optind = 1;
+
+                    std::ostringstream out, err;
+
+                    auto rc = cptools::run(argc, argv, out, err);
+
+                    REQUIRE(rc == CP_TOOLS_OK);
+                    REQUIRE(err.str().empty());
+                    REQUIRE(out.str() == (cptools::help() + '\n'));
+                }
+
+                {
+                    int argc = 3;
+                    char * const argv[] { (char *) "cp-tools", (char *) "-v", (char *) "-h" };
+                    optind = 1;
+
+                    std::ostringstream out, err;
+
+                    auto rc = cptools::run(argc, argv, out, err);
+
+                    REQUIRE(rc == CP_TOOLS_OK);
+                    REQUIRE(err.str().empty());
+                    REQUIRE(out.str() == (cptools::version() + '\n'));
+                }
+            }
+        }
     }
 }
