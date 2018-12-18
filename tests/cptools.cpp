@@ -2,6 +2,7 @@
 #include <getopt.h>
 
 #include "catch.hpp"
+
 #include "cptools.h"
 #include "error.h"
 
@@ -86,7 +87,6 @@ SCENARIO("Command line options", "[cptools]")
 
         WHEN("The both options are passed")
         {
-
             THEN("The the first one prevails")
             {
                 {
