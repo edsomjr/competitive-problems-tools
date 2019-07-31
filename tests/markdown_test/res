@@ -1,0 +1,57 @@
+narrow = [1866]
+wide = [1827]
+Type: CODE
+Elemento: [1733, 1736]
+Text = [`R`]
+Type: CODE
+Elemento: [1660, 1663]
+Text = [`t`]
+Type: CODE
+Elemento: [1649, 1652]
+Text = [`R`]
+Type: CODE
+Elemento: [1644, 1647]
+Text = [`t`]
+Type: CODE
+Elemento: [1272, 1286]
+Text = [`(T \leq 100)`]
+Type: CODE
+Elemento: [1268, 1271]
+Text = [`T`]
+Type: CODE
+Elemento: [561, 588]
+Text = [```LaTeX
+Teste de Latex
+```]
+Italico
+Type: EMPH
+Elemento: [202, 216]
+Text = [_Deep Space 9_]
+Type: EMPH
+Elemento: [180, 190]
+Text = [*Saturn 3*]
+Type: EMPH
+Elemento: [93, 121]
+Text = [*The
+Lizard-Spock Expansion*]
+Bold
+Type: LIST_ENUMERATOR
+Elemento: [651, 653]
+Text = [1.]
+Type: LIST_ENUMERATOR
+Elemento: [623, 625]
+Text = [1.]
+Header
+Type: H2
+Elemento: [1572, 1581]
+Text = [## Saída
+]
+Type: H2
+Elemento: [1161, 1172]
+Text = [## Entrada
+]
+Type: H2
+Elemento: [0, 20]
+Text = [Bazinga!
+----------
+]
