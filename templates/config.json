@@ -7,22 +7,46 @@
     },
 
     "problem": {
+        "title": {
+            "pt_BR": "Título do problema, time limit em ms, memory limit em MB",
+            "en_US": "Title"
+        },
+
         "timelimit": 1000,
         "memory_limit": 256,
         "tags": [ "greedy", "sorting", "ad-hoc" ],
         "contest": "Evento onde o problema foi aplicado pela primeira vez"
     },
 
-    "translations": {
-        "pt_BR": "problem.md",
-        "us_EN": null
-    },
-
     "solutions": {
         "default": "solution.cpp",
         "ac": [ "AC.java", "ac.py" ],
+        "pe": [ "pe.cpp" ],
         "wa": [ "wa.cpp" ],
         "tle": [ "tle.cpp" ]
+    },
+
+    "tools": {
+        "checker" : "tools/checker.cpp",
+        "generator" : "tools/generator.cpp",
+        "validator" : "tools/validator.cpp"
+    },
+
+    "tests": {
+        "samples": [ "tests/1", "tests/2", "tests/3" ],
+        "manual": [ "tests/1", "tests/2", "tests/3" ],
+        "random": [ "10 10", "100 100", "50 1000" ],
+
+        "validator": { 
+            "tests/validator/1":  "OK",
+            "tests/validator/2":  "INVALID"
+        },
+
+        "checker": {
+            [ "tests/checker/in1":  "tests/checker/out1", "AC" ],
+            [ "tests/checker/in2":  "tests/checker/out2", "PE" ],
+            [ "tests/checker/in3":  "tests/checker/out3", "WA" ]
+        }
     },
 
     "PDF": {
@@ -30,6 +54,7 @@
         "column_size": 8.0,
         "include_email:": false,
         "include_author": true,
-        "include_contest:": true
+        "include_contest:": true,
+        "include_disclaimer:": true
     }
 }

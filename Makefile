@@ -1,7 +1,7 @@
 PROJECT=cp-tools
 
 # Compiler setup
-CC=g++-8
+CC=g++
 GCC=gcc
 CFLAGS=-W -Wall -Werror -std=c++17
 
@@ -51,11 +51,10 @@ INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
 # Project targets
 LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)
-MD4C_LIBRARY=$(STATIC_LIB_PREFIX)md4c$(STATIC_LIB_SUFFIX)
 TEST_SUIT=cp-run_tests
 
 # External libraries
-LIBS=$(MD4C_LIBRARY) -lstdc++fs
+LIBS=-lstdc++fs
 
 .PHONY: all clean
 
@@ -72,7 +71,6 @@ PROJECT_OBJECT=$(PROJECT_MAIN:.cpp=$(OBJ_EXTENSION))
 TEST_SOURCES=${wildcard $(TESTS_DIR)/*.cpp}
 TEST_OBJECTS=$(TEST_SOURCES:.cpp=$(OBJ_EXTENSION))
 
-
 # Rules
 .SUFFIXES: .cpp .$(OBJ_EXTENSION) 
 
@@ -81,16 +79,11 @@ TEST_OBJECTS=$(TEST_SOURCES:.cpp=$(OBJ_EXTENSION))
 	$(CC) $(GEN_OBJECT_FLAG) $< $(OBJ_OUTPUT_FLAG) $@ $(CFLAGS) $(INCLUDES)
 
 
-all: $(MD4C_LIBRARY) $(LIBRARY) $(PROJECT) $(TEST_SUIT)
+all: $(LIBRARY) $(PROJECT) $(TEST_SUIT)
 
 
 $(LIBRARY): $(OBJECTS)
 	$(AR) $(AR_FLAGS) $(AR_OUTPUT_FLAG) $@ $(OBJECTS) 
-
-
-$(MD4C_LIBRARY): $(LIBS_DIR)/md4c.h $(LIBS_DIR)/md4c.c
-	$(GCC) -c $(LIBS_DIR)/md4c.c
-	$(AR) $(AR_FLAGS) $(AR_OUTPUT_FLAG) $@ md4c.o
 
 
 $(PROJECT): $(OBJECTS) $(PROJECT_OBJECT)
@@ -124,5 +117,5 @@ uninstall:
 
 
 clean:
-	@rm -f *~ $(MD4C_LIBRARY) $(LIBRARY) $(PROJECT)
+	@rm -f *~ $(LIBRARY) $(PROJECT)
 	@find . -name '*.o' -exec rm -f {}  \;

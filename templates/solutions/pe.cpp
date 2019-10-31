@@ -9,7 +9,7 @@ int main()
     int x, y;
     cin >> x >> y;
 
-    cout << x + y << '\n';
+    cout << x << '\n' << y << '\n' << x + y << '\n';
 
     return 0;
 }

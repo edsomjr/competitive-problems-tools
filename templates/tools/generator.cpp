@@ -3,27 +3,19 @@
 
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     registerGen(argc, argv, 1);
     ios::sync_with_stdio(false);
 
-    // O primeiro parâmetro é definido na linha de comando da execução do gerador
+    // Os parâmetros são definidos na linha de comando da execução do gerador
     auto N = atoi(argv[1]);
-    auto M = rnd.next(0.0, 20.0);
+    auto M = atoi(argv[2]);
 
-    ensuref(0 <= N and N <= 100, "N must be in range [0, 100]");
+    auto x = rnd.next(0, N);
+    auto y = rnd.next(0, M);
 
-    cout << N << ' ' << M << '\n';
-
-    for (int i = 0; i < N; ++i)
-    {
-        if (i)
-            cout << ' ';
-
-        auto x = rnd.next(0.0, 10.0);
-        cout << x;
-    }
-    cout << '\n';
+    cout << x << ' ' << y << '\n';
 
     /**
      * Segue mais uma série de exemplos de geração de entradas como referência. 
@@ -46,11 +38,11 @@ int main(int argc, char* argv[]) {
 
     // Chamadas com mesmo parâmetro de entrada gera sempre o mesmo teste
     // Amplie o número de parâmetros de entrada na chamada para maior variabilidade da saída
-    // (mesmo que eles não sejam usandos no código do gerador
-    auto M = atoi(argv[2]);
+    // (mesmo que eles não sejam usandos no código do gerador)
+    auto P = atoi(argv[3]);
 
-    // Sorteia um número inteiro entre 0 e M
-    cout << rnd.next(M) << endl;
+    // Sorteia um número inteiro entre 0 e P
+    cout << rnd.next(P) << endl;
 
     vector<int> ns { 1, 2, 3, 4, 5 };
 
@@ -63,9 +55,8 @@ int main(int argc, char* argv[]) {
     // Escolhe um dentre os elementos do contêiner (vector ou string funcionam)
     string symbols { "+*-/" };
     cout << rnd.any(symbols.begin(), symbols.end()) << endl;
-
-    *
-    **/
+     *
+     **/
 
     return 0;
 }

@@ -45,15 +45,15 @@ SCENARIO("Command line options", "[cptools]")
             }
         }
 
-        WHEN("The option 2 -h is used")
+        WHEN("The option -v is used")
         {
             int argc = 2;
-            char * const argv[] { (char *) "cp-tools", (char *) "-h" };
+            char * const argv[] { (char *) "cp-tools", (char *) "-v" };
 
             // getopt library must be reseted between tests
             optind = 1;
 
-            THEN("The output is the help message")
+            THEN("The output is the version message")
             {
                 std::ostringstream out, err;
 
@@ -61,7 +61,7 @@ SCENARIO("Command line options", "[cptools]")
 
                 REQUIRE(rc == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
-                REQUIRE(out.str() == (cptools::help() + '\n'));
+                REQUIRE(out.str() == (cptools::version() + '\n'));
             }
         }
 
