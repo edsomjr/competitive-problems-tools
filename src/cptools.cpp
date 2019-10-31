@@ -51,7 +51,6 @@ namespace cptools {
        { 0, 0, 0, 0 }
     };
 
-
     // Auxiliary routines
     std::string usage()
     {

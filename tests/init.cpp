@@ -10,7 +10,6 @@
 #include "error.h"
 
 
-
 SCENARIO("Command init", "[init]")
 {
     GIVEN("An execution of the command init with options")

@@ -1,7 +1,7 @@
 PROJECT=cp-tools
 
 # Compiler setup
-CC=g++-8
+CC=g++
 GCC=gcc
 CFLAGS=-W -Wall -Werror -std=c++17
 
