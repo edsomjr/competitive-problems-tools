@@ -1,6 +1,19 @@
 #ifndef CP_TOOLS_CLEAN_H
 #define CP_TOOLS_CLEAN_H
 
-extern int clean(int argc, char * const argv[]);
+#include <iostream>
+
+namespace cptools {
+
+    namespace clean {
+        // Main routine
+        int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
+
+        // Auxiliary routines
+        std::string help();
+        std::string usage();
+    }
+
+}
 
 #endif

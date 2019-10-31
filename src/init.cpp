@@ -83,5 +83,4 @@ namespace cptools::init {
 
         return copy_template_files();
     }
-
 }
