@@ -8,21 +8,12 @@ int main(int argc, char* argv[])
 {
     registerValidation(argc, argv);
 
-    auto N = inf.readInt(1, 100, "N must be in range [1, 100]");
+    auto x = inf.readInt(0, 100, "x");
     inf.readSpace();
 
-    inf.readStrictDouble(0.0, 20.0, 1, 1, "M must be in range [0.0, 20.0] with just one decimal place");
+    auto y = inf.readInt(0, 100, "y");
     inf.readEoln();
 
-    for (int i = 0; i < N; ++i)
-    {
-        if (i)
-            inf.readSpace();
-
-        inf.readStrictDouble(0.0, 10.0, 1, 1, "x must be in range [0.0, 10.0] with just one decimal place");
-    }
-
-    inf.readEoln();
     inf.readEof();
 
     /**
@@ -39,12 +30,7 @@ int main(int argc, char* argv[])
 
     auto s = inf.readString("[A-Za-z0-9]{1,20}", "Lê uma string dê acordo com a regex dada e lê também o caractere de fim de linha");
 
-    // Encadeamentos de chamadas de rnd.next() num mesmo cout tem comportamento indefinido
-    // e deve ser evitado
     vector<int> xs = inf.readInts(2, 1, 2, "Lê dois inteiros separados por vírgula no intervalo [1,2]");
-    inf.readEoln();
-
-    inf.readInt(1, 1000000, "Primeiro valor: inteiro entre [1, 10^6]");
     inf.readEoln();
 
     vector<int> ns { 1, 2, 3, 4, 5 };
@@ -60,9 +46,8 @@ int main(int argc, char* argv[])
 
     inf.readEoln();
     inf.readEof();
-
-    *
-    **/
+     *
+     **/
 
     return 0;
 }

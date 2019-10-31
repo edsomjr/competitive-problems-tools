@@ -1,39 +1,23 @@
 #include "testlib.h"
 
-#include <vector>
-
-using namespace std;
-
-vector<double> xs;
-int N;
-double M;
-
 // Lê e valida a solução do participante e do juiz. 
 // Se a resposta está errada e stream = ouf (participante), então veredict deve ser _wa
 // Se a resposta está errada e stream = ans (juiz), então veredict deve ser _fail
-int readAns(InStream& stream, TResult veredict)
+int readAns(int x, int y, InStream& stream, TResult veredict)
 {
-    auto Q = stream.readInt(0, 100, "Q must be in range [1, N]");
-    auto total = 0.0;
+    stream.readInt(x, x, "x");
+    stream.readSpace();
 
-    set<int> ys;
+    stream.readInt(y, y, "y");
+    stream.readSpace();
 
-    for (int i = 0; i < Q; ++i)
-    {
-        int y = stream.readInt(1, N, "y must be in range [1, N]");
+    auto ans = stream.readInt(0, 2000, "ans");
+    stream.readEoln();
 
-        if (ys.count(y))
-            quitf(veredict, "The indexes can not have duplicates (%d)", y);
+    if (ans != x + y)
+        quitf(veredict, "%d != %d", ans, x + y);
 
-        ys.insert(y);
-
-        total += xs[y];
-    }
-    
-    if (total > M)
-        quitf(veredict, "The sum of the chosen items (%.2f) is greater than M (%.2f)", total, M);
-
-    return Q;
+    return ans;
 }
 
 int main(int argc, char* argv[])
@@ -41,12 +25,16 @@ int main(int argc, char* argv[])
     registerTestlibCmd(argc, argv);
 
     // Leitura da entrada: não é necessário validar o input: o validator o fará
-    N = inf.readInt(1, 100);
-    M = inf.readDouble(0.0, 20.0);
+    auto x = inf.readInt();
+    auto y = inf.readInt();
 
-    for (int i = 0; i < N; i++)
-        xs.push_back(inf.readDouble(0.0, 10.0));
+    readAns(x, y, ans, _fail);
+    int pans = readAns(x, y, ouf, _wa);
 
+    quitf(_ok, "answer = %d", pans);
+    /**
+     * Modelo para respostas de otimização, onde a resposta do participante pode ser
+     * melhor do que a do juiz
     int jans = readAns(ans, _fail);
     int pans = readAns(ouf, _wa);
 
@@ -56,4 +44,6 @@ int main(int argc, char* argv[])
         quitf(_ok, "answer = %d", pans);
     else // (jans < pans)
         quitf(_fail, ":( participant has the better answer: jans = %d, pans = %d", jans, pans);
+    **/
+
 }
