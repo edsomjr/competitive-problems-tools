@@ -14,7 +14,7 @@ script:
     - make
     - sudo make install
     - ./cp-tools -v
-    - sudo ./cp-run_tests
+    - ./cp-run_tests
 
 after_sucess:
     - echo "Success"

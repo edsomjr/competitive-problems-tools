@@ -15,6 +15,7 @@ SCENARIO("Command line options", "[cptools]")
         {
             int argc = 1;
             char * const argv[] { (char *) "cp-tools" };
+            optind = 1;     // getopt library must be reseted between tests
 
             THEN("The error output is the usage message")
             {
@@ -32,7 +33,8 @@ SCENARIO("Command line options", "[cptools]")
         {
             int argc = 2;
             char * const argv[] { (char *) "cp-tools", (char *) "-h" };
-
+            optind = 1;     // getopt library must be reseted between tests
+            
             THEN("The output is the help message")
             {
                 std::ostringstream out, err;
@@ -49,8 +51,6 @@ SCENARIO("Command line options", "[cptools]")
         {
             int argc = 2;
             char * const argv[] { (char *) "cp-tools", (char *) "-v" };
-
-            // getopt library must be reseted between tests
             optind = 1;
 
             THEN("The output is the version message")
@@ -69,8 +69,6 @@ SCENARIO("Command line options", "[cptools]")
         {
             int argc = 2;
             char * const argv[] { (char *) "cp-tools", (char *) "-p" };
-
-            // getopt library must be reseted between tests
             optind = 1;
 
             THEN("The error output is the help message")
@@ -117,6 +115,6 @@ SCENARIO("Command line options", "[cptools]")
                     REQUIRE(out.str() == (cptools::version() + '\n'));
                 }
             }
-        }
+        } 
     }
 }
