@@ -40,8 +40,8 @@ namespace cptools {
 
     // Global variables
     std::map<std::string, int (*)(int, char *const [], std::ostream&, std::ostream&)> commands {
-        { "init", init::run }
-    //    { "clean", clean },
+        { "init", init::run },
+        { "clean", clean::run },
     //    { "gentex", gentex },
     };
 
