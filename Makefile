@@ -117,5 +117,5 @@ uninstall:
 
 
 clean:
-	@rm -f *~ $(LIBRARY) $(PROJECT)
+	@rm -f *~ $(LIBRARY) $(PROJECT) $(TEST_SUIT)
 	@find . -name '*.o' -exec rm -f {}  \;
