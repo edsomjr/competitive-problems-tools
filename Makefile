@@ -1,8 +1,6 @@
 PROJECT=cp-tools
 
 # Compiler setup
-CC=g++
-GCC=gcc
 CFLAGS=-W -Wall -Werror -std=c++17
 
 RELEASE_CFLAGS=-O2
@@ -76,7 +74,7 @@ TEST_OBJECTS=$(TEST_SOURCES:.cpp=$(OBJ_EXTENSION))
 
 
 .cpp$(OBJ_EXTENSION):
-	$(CC) $(GEN_OBJECT_FLAG) $< $(OBJ_OUTPUT_FLAG) $@ $(CFLAGS) $(INCLUDES)
+	$(CXX) $(GEN_OBJECT_FLAG) $< $(OBJ_OUTPUT_FLAG) $@ $(CFLAGS) $(INCLUDES)
 
 
 all: $(LIBRARY) $(PROJECT) $(TEST_SUIT)

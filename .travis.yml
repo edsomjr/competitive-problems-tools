@@ -1,7 +1,8 @@
 language: cpp
 compiler: g++-8
-
 os: linux
+env: CXX=g++-8
+
 addons:
     apt:
         sources:
