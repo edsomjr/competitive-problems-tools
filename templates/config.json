@@ -35,7 +35,18 @@
     "tests": {
         "samples": [ "tests/1", "tests/2", "tests/3" ],
         "manual": [ "tests/1", "tests/2", "tests/3" ],
-        "random": [ "generator inputs 1", "generator inputs 2", "etc" ]
+        "random": [ "10 10", "100 100", "50 1000" ],
+
+        "validator": { 
+            "tests/validator/1":  "OK",
+            "tests/validator/2":  "INVALID"
+        },
+
+        "checker": {
+            [ "tests/checker/in1":  "tests/checker/out1", "AC" ],
+            [ "tests/checker/in2":  "tests/checker/out2", "PE" ],
+            [ "tests/checker/in3":  "tests/checker/out3", "WA" ]
+        }
     },
 
     "PDF": {
