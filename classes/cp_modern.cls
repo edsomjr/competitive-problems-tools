@@ -1,6 +1,6 @@
-% Document class used to format TEP problems
+% Document class used to format TEP problems.
 
-\ProvidesClass{TEP}
+\ProvidesClass{cp_modern}
 
 \LoadClass[12pt]{article}
 

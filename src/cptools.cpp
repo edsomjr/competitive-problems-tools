@@ -42,7 +42,7 @@ namespace cptools {
     std::map<std::string, int (*)(int, char *const [], std::ostream&, std::ostream&)> commands {
         { "init", init::run },
         { "clean", clean::run },
-    //    { "gentex", gentex },
+        { "gentex", gentex::run },
     };
 
     static struct option longopts[] = {
