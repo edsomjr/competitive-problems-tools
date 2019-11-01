@@ -34,7 +34,7 @@ SCENARIO("Config read and get", "[config]")
             THEN("The get method returns its string value")
             {
                 for (auto [k, v] : fields)
-                    REQUIRE(cptools::config::get(config, k, string("error")) == v);
+                    REQUIRE(cptools::config::get(config, k, std::string("error")) == v);
             }
         }
 
@@ -45,7 +45,7 @@ SCENARIO("Config read and get", "[config]")
 
             THEN("The get method returns the indicated default value")
             {
-                REQUIRE(cptools::config::get(config, field, string("error")) == "error");
+                REQUIRE(cptools::config::get(config, field, std::string("error")) == "error");
             }
         }
 
