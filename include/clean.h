@@ -3,16 +3,14 @@
 
 #include <iostream>
 
-namespace cptools {
+namespace cptools::clean
 
-    namespace clean {
-        // Main routine
-        int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
+    // Main routine
+    int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
 
-        // Auxiliary routines
-        std::string help();
-        std::string usage();
-    }
+    // Auxiliary routines
+    std::string help();
+    std::string usage();
 
 }
 

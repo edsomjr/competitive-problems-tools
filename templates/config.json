@@ -38,23 +38,23 @@
         "random": [ "10 10", "100 100", "50 1000" ],
 
         "validator": { 
-            "tests/validator/1":  "OK",
-            "tests/validator/2":  "INVALID"
+            "tests/validator/1": "OK",
+            "tests/validator/2": "INVALID"
         },
 
         "checker": {
-            [ "tests/checker/in1":  "tests/checker/out1", "AC" ],
-            [ "tests/checker/in2":  "tests/checker/out2", "PE" ],
-            [ "tests/checker/in3":  "tests/checker/out3", "WA" ]
+            "tests/checker/in1": [ "tests/checker/out1", "AC" ],
+            "tests/checker/in2": [ "tests/checker/out2", "PE" ],
+            "tests/checker/in3": [ "tests/checker/out3", "WA" ]
         }
     },
 
     "PDF": {
         "row_size": 6.0,
         "column_size": 8.0,
-        "include_email:": false,
+        "include_email": false,
         "include_author": true,
-        "include_contest:": true,
-        "include_disclaimer:": true
+        "include_contest": true,
+        "include_disclaimer": true
     }
 }
