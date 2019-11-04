@@ -30,6 +30,8 @@ SCENARIO("Config read and get", "[config]")
                 { "tools|validator", "tools/validator.cpp" },
                 { "tests|validator|tests/validator/1", "OK" },
                 { "tests|validator|tests/validator/2", "INVALID" },
+                { "PDF|first_column_size", "6cm" },
+                { "PDF|second_column_size", "8cm" },
             };
  
             THEN("The get method returns its string value")
@@ -55,8 +57,6 @@ SCENARIO("Config read and get", "[config]")
             std::map<std::string, double> fields {
                 { "problem|timelimit", 1000 },
                 { "problem|memory_limit", 256 },
-                { "PDF|row_size", 6.0 },
-                { "PDF|column_size", 8.0 },
             };
 
             THEN("The get method returns its double value")

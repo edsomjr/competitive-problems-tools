@@ -18,6 +18,7 @@
 \RequirePackage{amssymb, wrapfig}
 \RequirePackage{xcolor,colortbl}
 \RequirePackage{xcolor}
+\RequirePackage{verbatim}
 
 \ifpdf
 \RequirePackage[pdftex]{hyperref}
@@ -53,86 +54,65 @@
 \lhead{\printevent}
 \def\yes{yes}
 
-\newenvironment{problem}[3]{
+\newenvironment{problem}[4]{
 
    	\begin{center}
-		%\Large{\textbf{\iflanguage{portuguese}{Problema}{Problem} {#1} \\ {#2} }}{\\[.2cm]\footnotesize \textbf{Limite de tempo: {#3}s\\}}
 		\Large{\textbf{\translate{Problema}{Problem} {#1} \\ {#2} }}{\\[.2cm]\footnotesize 
-            \textbf{\translate{Limite de tempo}{Timelimit}: {#3}s\\}}
+            \textbf{\translate{Limite de tempo}{Timelimit}: {#3}s}}{\\[.2cm]\footnotesize 
+            \textbf{\translate{Limite de memória}{Memory limit}: {#4}MB\\}}
 	\end{center}
 }
 
-%\newcounter{problemAutor}
-%\newenvironment{ProblemaAutor}[4]{
-%	\stepcounter{problemAutor}
-%	\newpage
-%	\begin{center}
-%		\Large{\textbf{Problema {#1} \\ {#2} }}{\\[.2cm]\footnotesize \textbf{Limite de tempo: {#3}s\\}}{
-%			\footnotesize Autor: {#4}
-%		}
-%	\end{center}
-%}
-
-
-% Código-fonte
-\newcommand{\codigofonte}[1]{Nome do arquivo fonte: {#1}}
-
-% Entrada
-\newcommand{\Entrada}{
+\newenvironment{probleminput}[1]{
 	\bigskip
 	\begin{large}
-		\textbf{Entrada} \\
+		\textbf{\translate{Entrada}{Input}} \\
 	\end{large}
+
+    \input{#1}
 }
 
-% Saida
-\newcommand{\Saida}{
+\newenvironment{problemoutput}[1]{
 	\bigskip
 	\begin{large}
-		\textbf{Saída} \\
+		\textbf{\translate{Saída}{Output}} \\
 	\end{large}
+
+    \input{#1}
 }
 
-\newcommand{\Interacao}{
-	\bigskip
-	\begin{large}
-		\textbf{Interação} \\
-	\end{large}
-}
-
-\newcommand{\Notas}{
-	\bigskip
-	\begin{large}
-		\textbf{Notas} \\
-	\end{large}
-}
-
-% Exemplo
-\newenvironment{Exemplo}
+\newenvironment{samples}[2]
 {
-	
-	\tabularx{\textwidth}{XX}
-	%    {@{\extracolsep{\fill}}|l|l|}
-	%    {|l|l@{\extracolsep{\fill}|}}
+	\bigskip
+	\begin{large}
+		\textbf{\translate{Exemplos}{Samples}} \\
+	\end{large}
+
+	\tabular{p{#1}p{#2}}
 	\hline
-	Entrada & Saída \\\hline 
+	\translate{Entrada}{Input} & \translate{Saída}{Output} \\
 }
 {
 	\hline
-	\endtabularx
+	\endtabular
 }
 
-% Exemplo de Entrada
-\newenvironment{ExemploEntrada}
+\newcommand{\iosample}[4]
 {
+    \hline
+    \begin{minipage}{#1}{ \vspace{2mm} \verbatiminput{#3} }
+    \end{minipage} & 
+    \begin{minipage}{#2}{ \vspace{2mm} \verbatiminput{#4} }
+    \end{minipage} \vspace{0.5mm} \\
+}
+
+\newenvironment{problemnotes}[1]{
 	\bigskip
 	\begin{large}
-		\textbf{Exemplo} \\
+		\textbf{\translate{Notas}{Notes}} \\
 	\end{large}
+
+    \input{#1}
 }
 {
 }
-
-% Sample Output
-
-

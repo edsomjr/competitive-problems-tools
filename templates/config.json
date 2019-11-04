@@ -50,8 +50,8 @@
     },
 
     "PDF": {
-        "row_size": 6.0,
-        "column_size": 8.0,
+        "first_column_size": "6cm",
+        "second_column_size": "8cm",
         "include_email": false,
         "include_author": true,
         "include_contest": true,
