@@ -9,7 +9,7 @@
 #include "clean.h"
 #include "error.h"
 
-
+/*
 SCENARIO("Command clean", "[clean]")
 {
     GIVEN("An execution of the command clean with options")
@@ -79,3 +79,4 @@ SCENARIO("Command clean", "[clean]")
         }
     }
 }
+*/

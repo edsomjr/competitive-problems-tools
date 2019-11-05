@@ -6,13 +6,12 @@
 
 namespace cptools {
 
-    // Main routine
     int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
 
-    // Auxiliary routines
     std::string help();
     std::string usage();
     std::string version();
+
 }
 
 #endif
