@@ -23,7 +23,7 @@ SCENARIO("Command problem, action init", "[init]")
 
             THEN("The output directory is initialized with the template files")
             {
-                REQUIRE(cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR) == CP_TOOLS_OK);
+                REQUIRE(cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR) >= 0);
 
                 std::ostringstream out, err;
                 REQUIRE(cptools::init::run(argc, argv, out, err) == CP_TOOLS_OK);
