@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#include "sh.h"
+#include "dirs.h"
 #include "defs.h"
 #include "init.h"
 #include "error.h"
@@ -21,13 +23,14 @@ namespace cptools::init {
     // Global variables
     static struct option longopts[] = {
        { "help", no_argument, NULL, 'h' },
+       { "output", required_argument, NULL, 'o' },
        { 0, 0, 0, 0 }
     };
 
     // Auxiliary routines
     std::string usage()
     {
-        return "Usage: " NAME " init [-h]";
+        return "Usage: " NAME " init [-h] [-o output_dir]";
     }
 
     std::string help()
@@ -35,45 +38,32 @@ namespace cptools::init {
         return usage() + help_message;
     }
 
-    int copy_template_files()
+    int copy_template_files(const std::string& dest)
     {
-        static const std::string templates_dir { "/usr/local/lib/" NAME "/templates/" };
+        auto rc = cptools::sh::make_dir(dest);
 
-        for (const auto& p : std::filesystem::directory_iterator(templates_dir))
-        {
-            auto name = p.path().filename();
+        if (rc != CP_TOOLS_OK)
+            return rc;
 
-            try {
-                if (std::filesystem::exists(name))
-                    continue;
-
-                if (std::filesystem::is_directory(p.symlink_status()))
-                {
-                    std::filesystem::create_directory(name);
-                    std::filesystem::copy(p.path(), name, std::filesystem::copy_options::recursive);
-                } else
-                    std::filesystem::copy(p.path(), ".");
-            } catch (const std::exception& e)
-            {
-                std::cerr << e.what() << '\n';
-                return CP_TOOLS_ERROR_INIT_COPY_FILES;
-            }
-        }
-
-        return CP_TOOLS_OK;
+        return cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
     }
 
     // API functions
     int run(int argc, char* const argv[], std::ostream& out, std::ostream& err)
     {
         int option = -1;
+        std::string dest { "." };
 
-        while ((option = getopt_long(argc, argv, "h", longopts, NULL)) != -1)
+        while ((option = getopt_long(argc, argv, "ho:", longopts, NULL)) != -1)
         {
             switch (option) {
             case 'h':
                 out << help() << '\n';
                 return 0;
+
+            case 'o':
+                dest = std::string(optarg);
+                break;
 
             default:
                 err << help() << '\n';
@@ -81,6 +71,6 @@ namespace cptools::init {
             }
         }
 
-        return copy_template_files();
+        return copy_template_files(dest);
     }
 }

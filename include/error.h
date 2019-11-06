@@ -16,4 +16,7 @@
 #define CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES     -31
 #define CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE           -32
 
+#define CP_TOOLS_ERROR_SH_COPY_FILES                    -101
+#define CP_TOOLS_ERROR_SH_CREATE_DIRECTORY              -102
+
 #endif
