@@ -48,7 +48,7 @@ INSTALL_CLASSES_DIR=/usr/local/lib
 INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
-CP_TEMP_DIR=.cp-tmpdir
+CP_TEMP_DIR=.cp-tmp
 
 # Project targets
 LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)

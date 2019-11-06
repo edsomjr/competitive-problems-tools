@@ -6,37 +6,29 @@
 
 #include "catch.hpp"
 
+#include "sh.h"
+#include "dirs.h"
 #include "init.h"
 #include "error.h"
 
-/*
 SCENARIO("Command problem, action init", "[init]")
 {
     GIVEN("An execution of the command init with options")
     {
-        WHEN("There is no option")
+        WHEN("The option -o is used")
         {
-            int argc = 3;
-            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "init" };
+            int argc = 5;
+            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "init",
+                (char *) "-o", (char *) CP_TOOLS_TEMP_DIR };
 
-            THEN("The current directory is initialized with the template files")
+            THEN("The output directory is initialized with the template files")
             {
-                std::string tmp_dir { ".cp-tmpdir" };
-                std::string dir { tmp_dir + "/cp_tools_test_init" };
-                std::string templates_dir { "/usr/local/lib/cp-tools/templates" };
+                REQUIRE(cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR) == CP_TOOLS_OK);
 
-                auto command = "rm -rf " + dir;
+                std::ostringstream out, err;
+                REQUIRE(cptools::init::run(argc, argv, out, err) == CP_TOOLS_OK);
 
-                REQUIRE(std::system(command.c_str()) == 0);
-
-                command = "mkdir -p " + dir;
-                REQUIRE(std::system(command.c_str()) == 0);
-
-                command = "cd " + dir + " && cp-tools init";
-                REQUIRE(std::system(command.c_str()) == 0);
-
-                command = "diff -r " + dir + " " + templates_dir;
-                REQUIRE(std::system(command.c_str()) == 0);
+                REQUIRE(cptools::sh::compare_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR));
             }
         }
 
@@ -81,8 +73,5 @@ SCENARIO("Command problem, action init", "[init]")
                 REQUIRE(err.str() == (cptools::init::help() + '\n'));
             }
         }
-
-
     }
 }
-*/

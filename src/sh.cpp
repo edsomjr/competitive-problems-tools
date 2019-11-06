@@ -47,4 +47,22 @@ namespace cptools::sh {
         return CP_TOOLS_OK;
     }
 
+    int remove_dir(const std::string& path)
+    {
+        try {
+            std::filesystem::remove_all(path);
+        } catch (const std::exception& e)
+        {
+            return CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY;
+        }
+
+        return CP_TOOLS_OK;
+    }
+
+    bool compare_dirs(const std::string& dirA, const std::string& dirB)
+    {
+        auto command { "diff -r " + dirA + " " + dirB };
+
+        return std::system(command.c_str()) == 0;
+    }
 }

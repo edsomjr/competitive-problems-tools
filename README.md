@@ -26,6 +26,12 @@ To uninstall run
 # make uninstall
 ```
 
+## Dependencies
+
+- diff
+- pdflatex
+- GCC 8
+- Python 3
 
 ## Basic usage
 
