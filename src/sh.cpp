@@ -49,14 +49,16 @@ namespace cptools::sh {
 
     int remove_dir(const std::string& path)
     {
+        int rc;
+
         try {
-            std::filesystem::remove_all(path);
+            rc = std::filesystem::remove_all(path);
         } catch (const std::exception& e)
         {
             return CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY;
         }
 
-        return CP_TOOLS_OK;
+        return rc;
     }
 
     bool compare_dirs(const std::string& dirA, const std::string& dirB)

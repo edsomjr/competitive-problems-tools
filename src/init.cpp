@@ -15,6 +15,15 @@
 static const std::string help_message {
 R"message(
 Initialize an empty directory with template files. If a file already exists, it is not overridden.
+
+    Option          Description
+
+    -h              Generates this help message.
+    --help
+
+    -o              Directory to be initialized
+    --output
+
 )message"
 };
 

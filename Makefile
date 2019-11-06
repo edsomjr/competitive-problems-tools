@@ -49,6 +49,7 @@ INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
 CP_TEMP_DIR=.cp-tmp
+CP_BUILD_DIR=.cp-build
 
 # Project targets
 LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)
@@ -120,4 +121,4 @@ uninstall:
 clean:
 	@rm -f *~ $(LIBRARY) $(PROJECT) $(TEST_SUIT)
 	@find . -name '*.o' -exec rm -f {}  \;
-	@rm -rf *~ $(CP_TEMP_DIR)
+	@rm -rf *~ $(CP_TEMP_DIR) $(CP_BUILD_DIR)
