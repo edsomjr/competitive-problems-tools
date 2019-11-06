@@ -25,9 +25,9 @@ namespace cptools::sh {
     {
         for (const auto& p : std::filesystem::directory_iterator(src))
         {
-            std::filesystem::path name = std::filesystem::relative(dest / p.path().filename());
-
             try {
+                std::filesystem::path name = std::filesystem::relative(dest / p.path().filename());
+
                 if (std::filesystem::exists(name))
                     continue;
 
