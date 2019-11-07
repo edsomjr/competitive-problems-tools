@@ -9,12 +9,11 @@
 #include "clean.h"
 #include "error.h"
 
-/*
-SCENARIO("Command clean", "[clean]")
+SCENARIO("Command problem, action clean", "[clean]")
 {
     GIVEN("An execution of the command clean with options")
     {
-        WHEN("There is no option")
+/*        WHEN("There is no option")
         {
             int argc = 2;
             char * const argv[] { (char *) "cp-tools", (char *) "clean" };
@@ -37,11 +36,12 @@ SCENARIO("Command clean", "[clean]")
                 REQUIRE(not std::filesystem::exists(build_dir));
             }
         }
-
+*/
         WHEN("The option -h is used")
         {
-            int argc = 3;
-            char * const argv[] { (char *) "cp-tools", (char *) "clean", (char *) "-h" };
+            int argc = 4;
+            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "clean",
+                (char *) "-h" };
 
             // getopt library must be reseted between tests
             optind = 1;
@@ -60,10 +60,10 @@ SCENARIO("Command clean", "[clean]")
 
         WHEN("The an invalid option is passed")
         {
-            int argc = 3;
-            char * const argv[] { (char *) "cp-tools", (char *) "clean", (char *) "-i" };
+            int argc = 4;
+            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "clean",
+                (char *) "-i" };
 
-            // getopt library must be reseted between tests
             optind = 1;
 
             THEN("The error output is the help message")
@@ -79,4 +79,3 @@ SCENARIO("Command clean", "[clean]")
         }
     }
 }
-*/

@@ -24,7 +24,7 @@ SCENARIO("Command problem, action init", "[init]")
             // TODO: checar porque este teste quebra no Travis com SIGSEGV
             THEN("The output directory is initialized with the template files")
             {
-                //REQUIRE(cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR) >= 0);
+                REQUIRE(cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR) >= 0);
 
                 //std::ostringstream out, err;
                 //REQUIRE(cptools::init::run(argc, argv, out, err) == CP_TOOLS_OK);
