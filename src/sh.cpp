@@ -48,6 +48,8 @@ namespace cptools::sh {
 
     int remove_dir(const std::string& path)
     {
+        return std::system(std::string("rm -rf " + path).c_str());
+/*
 std::cout << "Tentado excluir o diretório [" << path << "]\n";
 std::cout.flush();
         if (not std::filesystem::exists(path))
@@ -71,6 +73,7 @@ std::cout.flush();
         }
 
         return rc;
+*/
     }
 
     bool compare_dirs(const std::string& dirA, const std::string& dirB)
