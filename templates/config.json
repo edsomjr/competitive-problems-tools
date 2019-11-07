@@ -52,7 +52,7 @@
     "PDF": {
         "first_column_size": "6cm",
         "second_column_size": "8cm",
-        "include_email": false,
+        "include_email": true,
         "include_author": true,
         "include_contest": true,
         "include_disclaimer": true

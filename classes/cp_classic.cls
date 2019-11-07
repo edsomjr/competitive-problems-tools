@@ -47,12 +47,13 @@
 }
 
 % Metadata
-\newcommand{\event}[1]{\def\printevent{#1}}
+\def\yes{yes}
 \newcommand{\translate}[2]{\ifx\portuguese\yes{#1}\else{#2}\fi}
 
 % Problem
-\lhead{\printevent}
-\def\yes{yes}
+
+\newcommand{\header}[2]{\lhead{#1}}
+\newcommand{\trailer}[2]{}
 
 \newenvironment{problem}[4]{
 
