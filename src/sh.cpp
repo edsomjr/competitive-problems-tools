@@ -48,6 +48,9 @@ namespace cptools::sh {
 
     int remove_dir(const std::string& path)
     {
+        if (std::filesystem::exists(path))
+            return 0;
+
         int rc;
 
         try {

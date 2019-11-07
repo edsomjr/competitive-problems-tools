@@ -62,6 +62,7 @@ SCENARIO("Command problem, action init", "[init]")
 
             // getopt library must be reseted between tests
             optind = 1;
+            opterr = 0;
 
             THEN("The error output is the help message")
             {

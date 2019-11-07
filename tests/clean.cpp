@@ -62,9 +62,10 @@ SCENARIO("Command problem, action clean", "[clean]")
         {
             int argc = 4;
             char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "clean",
-                (char *) "-i" };
+                (char *) "-x" };
 
             optind = 1;
+            opterr = 0;
 
             THEN("The error output is the help message")
             {
