@@ -1,5 +1,4 @@
 #include <iostream>
-#include <filesystem>
 
 #include <unistd.h>
 #include <getopt.h>
@@ -47,14 +46,22 @@ namespace cptools::init {
         return usage() + help_message;
     }
 
-    int copy_template_files(const std::string& dest)
+    int copy_template_files(const std::string& dest, std::ostream& out, std::ostream& err)
     {
         auto rc = cptools::sh::make_dir(dest);
 
         if (rc != CP_TOOLS_OK)
             return rc;
 
-        return cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
+        out << "Initializing '" << dest << "' ... ";
+        rc = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
+
+        if (rc == CP_TOOLS_OK)
+            out << "Done!\n";
+        else
+            err << "Fail! Directory " << dest << " could not be initialized!\n";
+
+        return rc;
     }
 
     // API functions
@@ -80,6 +87,6 @@ namespace cptools::init {
             }
         }
 
-        return copy_template_files(dest);
+        return copy_template_files(dest, out, err);
     }
 }

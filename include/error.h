@@ -17,7 +17,8 @@
 #define CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE           -32
 
 #define CP_TOOLS_ERROR_SH_COPY_FILES                    -101
-#define CP_TOOLS_ERROR_SH_CREATE_DIRECTORY              -102
-#define CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY              -103
+#define CP_TOOLS_ERROR_SH_COPY_DIRECTORY                -102
+#define CP_TOOLS_ERROR_SH_CREATE_DIRECTORY              -103
+#define CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY              -104
 
 #endif
