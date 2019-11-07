@@ -26,8 +26,8 @@ SCENARIO("Command problem, action init", "[init]")
             {
                 REQUIRE(cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR) >= 0);
 
-                //std::ostringstream out, err;
-                //REQUIRE(cptools::init::run(argc, argv, out, err) == CP_TOOLS_OK);
+                std::ostringstream out, err;
+                REQUIRE(cptools::init::run(argc, argv, out, err) == CP_TOOLS_OK);
 
                 // REQUIRE(cptools::sh::compare_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR));
             }
