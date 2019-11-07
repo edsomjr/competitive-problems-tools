@@ -48,13 +48,23 @@ namespace cptools::sh {
 
     int remove_dir(const std::string& path)
     {
-        if (std::filesystem::exists(path))
+std::cout << "Tentado excluir o diretório [" << path << "]\n";
+std::cout.flush();
+        if (not std::filesystem::exists(path))
+        {
+std::cout << "O diretório não existe: saindo\n";
+std::cout.flush();
             return 0;
+        }
 
+std::cout << "Diretório [" << path << "] encontrado\n";
+std::cout.flush();
         int rc;
 
         try {
             rc = std::filesystem::remove_all(path);
+std::cout << "Comando remove all executado\n";
+std::cout.flush();
         } catch (const std::exception& e)
         {
             return CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY;
