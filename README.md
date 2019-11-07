@@ -28,7 +28,7 @@ To uninstall run
 
 ## Dependencies
 
-- diff
+- Command line tools: `diff`, `mkdir`, `test`, `cp`, `rm`
 - pdflatex
 - GCC 8
 - Python 3

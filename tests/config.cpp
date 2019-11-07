@@ -7,8 +7,7 @@
 #include "catch.hpp"
 #include "config.h"
 
-/*
-SCENARIO("Config read and get", "[config]")
+SCENARIO("Configuration read() and get() functions", "[config]")
 {
     GIVEN("An JSON config file")
     {
@@ -135,4 +134,3 @@ SCENARIO("Config read and get", "[config]")
 
     }
 }
-*/
