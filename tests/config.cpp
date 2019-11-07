@@ -68,7 +68,7 @@ SCENARIO("Configuration read() and get() functions", "[config]")
         WHEN("There is a boolean field")
         {
             std::map<std::string, bool> fields {
-                { "PDF|include_email", false },
+                { "PDF|include_email", true },
                 { "PDF|include_author", true },
                 { "PDF|include_contest", true },
                 { "PDF|include_disclaimer", true },
@@ -87,8 +87,11 @@ SCENARIO("Configuration read() and get() functions", "[config]")
                 { "solutions|ac", { "AC.java", "ac.py" } },
                 { "solutions|pe", { "pe.cpp" } },
                 { "solutions|wa", { "wa.cpp" } },
-                { "solutions|tle", { "tle.cpp" } }
-            };
+                { "solutions|tle", { "tle.cpp" } },
+                { "tests|samples", { "tests/1", "tests/2", "tests/3" } },
+                { "tests|manual", { "tests/1", "tests/2", "tests/3" } },
+                { "tests|random", { "10 10", "100 100", "50 1000" } },
+            }; 
 
             THEN("The get method returns a vector of strings")
             {

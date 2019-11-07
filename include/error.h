@@ -16,9 +16,12 @@
 #define CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES     -31
 #define CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE           -32
 
-#define CP_TOOLS_ERROR_SH_COPY_FILES                    -101
+#define CP_TOOLS_ERROR_SH_COPY_FILE                     -101
 #define CP_TOOLS_ERROR_SH_COPY_DIRECTORY                -102
 #define CP_TOOLS_ERROR_SH_CREATE_DIRECTORY              -103
 #define CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY              -104
+#define CP_TOOLS_ERROR_SH_BUILD_EXT_NOT_FOUND           -105
+#define CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR         -106
+#define CP_TOOLS_ERROR_SH_PROCESS_ERROR                 -107
 
 #endif

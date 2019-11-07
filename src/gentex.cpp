@@ -7,6 +7,7 @@
 #include <getopt.h>
 #include <dirent.h>
 
+#include "task.h"
 #include "defs.h"
 #include "dirs.h"
 #include "init.h"
@@ -156,7 +157,7 @@ namespace cptools::gentex {
     }
 
     int generate_latex(const std::string& doc_class, const std::string& language, 
-        const Flags& flags, const std::string& label, std::ostream& out)
+        const Flags& flags, const std::string& label, std::ostream& out, std::ostream& err)
     {
         auto config = config::read("config.json");
 
@@ -192,9 +193,11 @@ namespace cptools::gentex {
 
         out << "\\begin{samples}{" << c1_size << "}{" << c2_size << "}\n";
 
-        for (auto io : config::get(config, "tests|samples", std::vector<std::string> {}))
+        auto io_files = cptools::task::generate_io_files("samples", out, err);
+
+        for (auto [infile, outfile] : io_files)
             out << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" 
-                << io << "}{" << io << "}\n";
+                << infile << "}{" << outfile << "}\n";
 
         out << "\\end{samples}\n\n";
 
@@ -274,10 +277,10 @@ namespace cptools::gentex {
             if (!of)
                 return CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE;
 
-            return generate_latex(document_class, language, flags, label, of);
+            return generate_latex(document_class, language, flags, label, of, err);
         }
 
-        return generate_latex(document_class, language, flags, label, out);
+        return generate_latex(document_class, language, flags, label, out, err);
     }
 
 }

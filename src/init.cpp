@@ -53,7 +53,7 @@ namespace cptools::init {
         if (rc != CP_TOOLS_OK)
             return rc;
 
-        out << "Initializing '" << dest << "' ... ";
+        out << "Initializing '" << dest << "'... ";
         rc = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
 
         if (rc == CP_TOOLS_OK)
