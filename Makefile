@@ -56,7 +56,7 @@ LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)
 TEST_SUIT=cp-run_tests
 
 # External libraries
-LIBS=-lstdc++fs
+LIBS=-static -lstdc++fs
 
 .PHONY: all clean
 
