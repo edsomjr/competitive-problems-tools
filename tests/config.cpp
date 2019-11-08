@@ -89,7 +89,7 @@ SCENARIO("Configuration read() and get() functions", "[config]")
                 { "solutions|wa", { "wa.cpp" } },
                 { "solutions|tle", { "tle.cpp" } },
                 { "tests|samples", { "tests/1", "tests/2", "tests/3" } },
-                { "tests|manual", { "tests/1", "tests/2", "tests/3" } },
+                { "tests|manual", { "tests/4", "tests/5", "tests/6" } },
                 { "tests|random", { "10 10", "100 100", "50 1000" } },
             }; 
 
