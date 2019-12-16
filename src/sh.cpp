@@ -4,6 +4,7 @@
 
 #include "sh.h"
 #include "util.h"
+#include "dirs.h"
 #include "error.h"
 
 
@@ -73,15 +74,31 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR;
     }
 
+    int build_tex(const std::string& output, const std::string& src)
+    {
+        std::string command { std::string("export TEXINPUTS=\".:") + CP_TOOLS_CLASSES_DIR 
+            + ":\" && pdflatex -output-directory=" + output + " " + src };
+
+        auto rc = std::system(command.c_str());
+
+        // Roda duas vezes para garantir que estilos que tenham referências sejam
+        // renderizados corretamente
+        if (rc == 0)
+            rc = std::system(command.c_str());
+
+        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PDFLATEX_ERROR;
+ 
+    }
+
     std::map<std::string, int (*)(const std::string&, const std::string&)> fs {
         { "cpp", compile_cpp },
+        { "tex", build_tex },
     };
 
     int build(const std::string& output, const std::string& src)
     {
         auto tokens = split(src, '.');
         auto ext = tokens.back();
-
         auto it = fs.find(ext);
 
         if (it == fs.end())
