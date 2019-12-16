@@ -1,13 +1,13 @@
 #include <filesystem>
 #include <iostream>
 #include <sstream>
+#include <vector>
 #include <map>
 
 #include "catch.hpp"
 #include "config.h"
 
-
-SCENARIO("Config read and get", "[config]")
+SCENARIO("Configuration read() and get() functions", "[config]")
 {
     GIVEN("An JSON config file")
     {
@@ -29,12 +29,14 @@ SCENARIO("Config read and get", "[config]")
                 { "tools|validator", "tools/validator.cpp" },
                 { "tests|validator|tests/validator/1", "OK" },
                 { "tests|validator|tests/validator/2", "INVALID" },
+                { "PDF|first_column_size", "6cm" },
+                { "PDF|second_column_size", "8cm" },
             };
  
             THEN("The get method returns its string value")
             {
                 for (auto [k, v] : fields)
-                    REQUIRE(cptools::config::get(config, k, string("error")) == v);
+                    REQUIRE(cptools::config::get(config, k, std::string("error")) == v);
             }
         }
 
@@ -45,7 +47,7 @@ SCENARIO("Config read and get", "[config]")
 
             THEN("The get method returns the indicated default value")
             {
-                REQUIRE(cptools::config::get(config, field, string("error")) == "error");
+                REQUIRE(cptools::config::get(config, field, std::string("error")) == "error");
             }
         }
 
@@ -54,15 +56,94 @@ SCENARIO("Config read and get", "[config]")
             std::map<std::string, double> fields {
                 { "problem|timelimit", 1000 },
                 { "problem|memory_limit", 256 },
-                { "PDF|row_size", 6.0 },
-                { "PDF|column_size", 8.0 },
             };
 
-            THEN("The get method returns its string value")
+            THEN("The get method returns its double value")
             {
                 for (auto [k, v] : fields)
                     REQUIRE(cptools::config::get(config, k, -9.99) == v);
             }
         } 
+
+        WHEN("There is a boolean field")
+        {
+            std::map<std::string, bool> fields {
+                { "PDF|include_email", true },
+                { "PDF|include_author", true },
+                { "PDF|include_contest", true },
+                { "PDF|include_disclaimer", true },
+            };
+
+            THEN("The get method returns its bool value")
+            {
+                for (auto [k, v] : fields)
+                    REQUIRE(cptools::config::get(config, k, !v) == v);
+            }
+        } 
+
+        WHEN("There is a list field")
+        {
+            std::map<std::string, std::vector<std::string>> fields {
+                { "solutions|ac", { "AC.java", "ac.py" } },
+                { "solutions|pe", { "pe.cpp" } },
+                { "solutions|wa", { "wa.cpp" } },
+                { "solutions|tle", { "tle.cpp" } },
+                { "tests|random", { "10 10", "100 100", "50 1000" } },
+            }; 
+
+            THEN("The get method returns a vector of strings")
+            {
+                for (auto [k, v] : fields)
+                    REQUIRE(cptools::config::get(config, k, std::vector<std::string> {} ) == v);
+            }
+        } 
+
+        WHEN("There is a map field")
+        {
+            std::map<std::string, std::map<std::string, std::string>> fields {
+                { "tests|samples", { 
+                    { "tests/1", "Comentário do teste 1" },
+                    { "tests/2", "Comentário do teste 2" },
+                    { "tests/3", "Comentário do teste 3" },
+                }},
+
+                { "tests|manual", { 
+                    { "tests/4", "Comentário do teste 4" },
+                    { "tests/5", "Comentário do teste 5" },
+                    { "tests/6", "Comentário do teste 6" },
+                }},
+
+                { "tests|validator", { 
+                    { "tests/validator/1", "OK" },
+                    { "tests/validator/2", "INVALID" },
+                }},
+            };
+
+            THEN("The get method returns a map of pairs of strings")
+            {
+                for (auto [k, v] : fields)
+                    REQUIRE(cptools::config::get(config, k, std::map<std::string, std::string> {} ) == v);
+            }
+        } 
+
+        WHEN("There is a map of lists field")
+        {
+            std::map<std::string, std::map<std::string, std::vector<std::string>>> fields {
+                { "tests|checker", { 
+                    { "tests/checker/in1", { "tests/checker/out1", "AC" } },
+                    { "tests/checker/in2", { "tests/checker/out2", "PE" } },
+                    { "tests/checker/in3", { "tests/checker/out3", "WA" } }
+                }},
+            };
+
+            THEN("The get method returns a map of vectors of strings")
+            {
+                for (auto [k, v] : fields)
+                    REQUIRE(cptools::config::get(config, k, std::map<std::string, std::vector<std::string>> {} ) == v);
+            }
+        } 
+
+
+
     }
 }

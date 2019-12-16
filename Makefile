@@ -48,14 +48,15 @@ INSTALL_CLASSES_DIR=/usr/local/lib
 INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
-CP_TEMP_DIR=.cp-tmpdir
+CP_TEMP_DIR=.cp-tmp
+CP_BUILD_DIR=.cp-build
 
 # Project targets
 LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)
 TEST_SUIT=cp-run_tests
 
 # External libraries
-LIBS=-lstdc++fs
+LIBS=
 
 .PHONY: all clean
 
@@ -88,7 +89,7 @@ $(LIBRARY): $(OBJECTS)
 
 
 $(PROJECT): $(OBJECTS) $(PROJECT_OBJECT)
-	$(LINKER) $(OUTPUT_FLAG)$@ $(LDFLAGS) $(PROJECT_OBJECT) $(LIBRARY) $(LIBS) $(EXTRA_LIBS)
+	$(LINKER) $(OUTPUT_FLAG)$@ $(LDFLAGS) $(PROJECT_OBJECT) $(LIBS) $(EXTRA_LIBS) $(LIBRARY) 
 
 
 $(TEST_SUIT): $(LIBRARY) $(TEST_OBJECTS)
@@ -120,4 +121,4 @@ uninstall:
 clean:
 	@rm -f *~ $(LIBRARY) $(PROJECT) $(TEST_SUIT)
 	@find . -name '*.o' -exec rm -f {}  \;
-	@rm -rf *~ $(CP_TEMP_DIR)
+	@rm -rf *~ $(CP_TEMP_DIR) $(CP_BUILD_DIR)

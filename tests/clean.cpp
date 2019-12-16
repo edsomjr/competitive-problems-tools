@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
@@ -6,42 +5,46 @@
 
 #include "catch.hpp"
 
+#include "sh.h"
+#include "dirs.h"
 #include "clean.h"
 #include "error.h"
 
-
-SCENARIO("Command clean", "[clean]")
+SCENARIO("Command problem, action clean", "[clean]")
 {
     GIVEN("An execution of the command clean with options")
     {
         WHEN("There is no option")
         {
-            int argc = 2;
-            char * const argv[] { (char *) "cp-tools", (char *) "clean" };
+            int argc = 3;
+            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "clean" };
 
-            THEN("The directory with the auto-generated files is deleted")
+            THEN("The the auto-generated files in current directory is deleted")
             {
-                std::string tmp_dir { ".cp-tmpdir" };
-                std::string build_dir { tmp_dir + "/.cp-build" };
+                std::ostringstream out, err;
+                REQUIRE(cptools::clean::run(argc, argv, out, err) == CP_TOOLS_OK);
+            }
+        }
 
-                auto command = "rm -rf " + build_dir;
 
-                REQUIRE(std::system(command.c_str()) == 0);
+        WHEN("The option -w is used")
+        {
+            int argc = 5;
+            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "clean",
+                (char *) "-w", (char *) CP_TOOLS_TEMP_DIR };
 
-                command = "mkdir -p " + build_dir;
-                REQUIRE(std::system(command.c_str()) == 0);
-
-                command = "cd " + tmp_dir + " && cp-tools clean";
-                REQUIRE(std::system(command.c_str()) == 0);
-
-                REQUIRE(not std::filesystem::exists(build_dir));
+            THEN("The subdirectory with the auto-generated files is deleted")
+            {
+                std::ostringstream out, err;
+                REQUIRE(cptools::clean::run(argc, argv, out, err) == CP_TOOLS_OK);
             }
         }
 
         WHEN("The option -h is used")
         {
-            int argc = 3;
-            char * const argv[] { (char *) "cp-tools", (char *) "clean", (char *) "-h" };
+            int argc = 4;
+            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "clean",
+                (char *) "-h" };
 
             // getopt library must be reseted between tests
             optind = 1;
@@ -60,11 +63,12 @@ SCENARIO("Command clean", "[clean]")
 
         WHEN("The an invalid option is passed")
         {
-            int argc = 3;
-            char * const argv[] { (char *) "cp-tools", (char *) "clean", (char *) "-i" };
+            int argc = 4;
+            char * const argv[] { (char *) "cp-tools", (char *) "problem", (char *) "clean",
+                (char *) "-x" };
 
-            // getopt library must be reseted between tests
             optind = 1;
+            opterr = 0;
 
             THEN("The error output is the help message")
             {

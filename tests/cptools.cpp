@@ -17,15 +17,15 @@ SCENARIO("Command line options", "[cptools]")
             char * const argv[] { (char *) "cp-tools" };
             optind = 1;     // getopt library must be reseted between tests
 
-            THEN("The error output is the usage message")
+            THEN("The output must be the usage message")
             {
                 std::ostringstream out, err;
 
                 auto rc = cptools::run(argc, argv, out, err);
 
-                REQUIRE(rc == CP_TOOLS_ERROR_MISSING_ARGUMENT);
-                REQUIRE(out.str().empty());
-                REQUIRE(err.str() == (cptools::usage() + '\n'));
+                REQUIRE(rc == CP_TOOLS_OK);
+                REQUIRE(out.str() == (cptools::usage() + '\n'));
+                REQUIRE(err.str().empty());
             }
         }
 
@@ -35,7 +35,7 @@ SCENARIO("Command line options", "[cptools]")
             char * const argv[] { (char *) "cp-tools", (char *) "-h" };
             optind = 1;     // getopt library must be reseted between tests
             
-            THEN("The output is the help message")
+            THEN("The output must be the help message")
             {
                 std::ostringstream out, err;
 
@@ -53,7 +53,7 @@ SCENARIO("Command line options", "[cptools]")
             char * const argv[] { (char *) "cp-tools", (char *) "-v" };
             optind = 1;
 
-            THEN("The output is the version message")
+            THEN("The output must be the version message")
             {
                 std::ostringstream out, err;
 
@@ -70,8 +70,9 @@ SCENARIO("Command line options", "[cptools]")
             int argc = 2;
             char * const argv[] { (char *) "cp-tools", (char *) "-p" };
             optind = 1;
+            opterr = 0;     // Suppres getopt_long error message
 
-            THEN("The error output is the help message")
+            THEN("The error output must be the help message")
             {
                 std::ostringstream out, err;
 
@@ -115,6 +116,6 @@ SCENARIO("Command line options", "[cptools]")
                     REQUIRE(out.str() == (cptools::version() + '\n'));
                 }
             }
-        } 
+        }
     }
 }
