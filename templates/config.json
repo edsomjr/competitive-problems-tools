@@ -33,8 +33,18 @@
     },
 
     "tests": {
-        "samples": [ "tests/1", "tests/2", "tests/3" ],
-        "manual": [ "tests/4", "tests/5", "tests/6" ],
+        "samples": {
+            "tests/1": "Comentário do teste 1",
+            "tests/2": "Comentário do teste 2",
+            "tests/3": "Comentário do teste 3"
+        },
+
+        "manual": {
+            "tests/4": "Comentário do teste 4",
+            "tests/5": "Comentário do teste 5",
+            "tests/6": "Comentário do teste 6"
+        },
+
         "random": [ "10 10", "100 100", "50 1000" ],
 
         "validator": { 

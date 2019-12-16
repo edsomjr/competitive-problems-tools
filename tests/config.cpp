@@ -88,8 +88,6 @@ SCENARIO("Configuration read() and get() functions", "[config]")
                 { "solutions|pe", { "pe.cpp" } },
                 { "solutions|wa", { "wa.cpp" } },
                 { "solutions|tle", { "tle.cpp" } },
-                { "tests|samples", { "tests/1", "tests/2", "tests/3" } },
-                { "tests|manual", { "tests/4", "tests/5", "tests/6" } },
                 { "tests|random", { "10 10", "100 100", "50 1000" } },
             }; 
 
@@ -103,6 +101,18 @@ SCENARIO("Configuration read() and get() functions", "[config]")
         WHEN("There is a map field")
         {
             std::map<std::string, std::map<std::string, std::string>> fields {
+                { "tests|samples", { 
+                    { "tests/1", "Comentário do teste 1" },
+                    { "tests/2", "Comentário do teste 2" },
+                    { "tests/3", "Comentário do teste 3" },
+                }},
+
+                { "tests|manual", { 
+                    { "tests/4", "Comentário do teste 4" },
+                    { "tests/5", "Comentário do teste 5" },
+                    { "tests/6", "Comentário do teste 6" },
+                }},
+
                 { "tests|validator", { 
                     { "tests/validator/1", "OK" },
                     { "tests/validator/2", "INVALID" },

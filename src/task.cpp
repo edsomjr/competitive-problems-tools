@@ -71,9 +71,9 @@ err << "Generating testes on set '" << s << "'\n";
                 // TODO gerar os tests randômicos via gerador
             } else
             {
-                auto inputs = cptools::config::get(config, "tests|" + s, std::vector<std::string> {});
+                auto inputs = cptools::config::get(config, "tests|" + s, std::map<std::string, std::string> {});
 
-                for (auto input : inputs)
+                for (auto [input, comment] : inputs)
                 {
                     std::string dest { input_dir + std::to_string(next) };
 err << "Copy " << input << " on " << dest << '\n';
