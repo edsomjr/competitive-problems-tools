@@ -55,7 +55,7 @@ namespace cptools::genpdf {
     // Global variables
     static struct option longopts[] = {
         { "help", no_argument, NULL, 'h' },
-        { "label", no_argument, NULL, 'b' },
+        { "label", required_argument, NULL, 'b' },
         { "lang", required_argument, NULL, 'g' },
         { "list", no_argument, NULL, 'l' },
         { "class", required_argument, NULL, 'c' },
@@ -68,7 +68,7 @@ namespace cptools::genpdf {
     // Auxiliary routines
     std::string usage()
     {
-        return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] [-g lang] [-l list] [--no-author] [--no-contest]";
+        return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] [-g lang] [-l] [--no-author] [--no-contest]";
     }
 
     std::string help()
