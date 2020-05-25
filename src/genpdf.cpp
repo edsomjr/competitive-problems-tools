@@ -145,7 +145,6 @@ namespace cptools::genpdf {
 
         while ((option = getopt_long(argc, argv, "ho:c:lg:b:", longopts, NULL)) != -1)
         {
-std::cout << "+++ option =  " << (char) option << "\n";
             switch (option) {
             case 'h':
                 out << help() << '\n';
@@ -169,7 +168,7 @@ std::cout << "+++ option =  " << (char) option << "\n";
             case 'g':
             {
                 language = std::string(optarg);
-std::cout << "--- Language = '" << language << "'\n";
+
                 if (not gentex::validate_language(language))
                 {
                     err << "Language " << language << " not find or supported\n";
