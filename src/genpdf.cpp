@@ -26,7 +26,7 @@ Generate a PDF file from the problem description. The options are:
     -h              Display this help.
     --help
 
-    -o              Output file. If omitted, the output will be written on stdout.
+    -o              Output file. If omitted, the output will be the file 'problem.pdf'.
     --output        
 
     -b              Define the problem label. The default value is 'A'.
@@ -56,7 +56,7 @@ namespace cptools::genpdf {
     static struct option longopts[] = {
         { "help", no_argument, NULL, 'h' },
         { "label", no_argument, NULL, 'b' },
-        { "lang", no_argument, NULL, 'g' },
+        { "lang", required_argument, NULL, 'g' },
         { "list", no_argument, NULL, 'l' },
         { "class", required_argument, NULL, 'c' },
         { "output", required_argument, NULL, 'o' },
@@ -68,7 +68,7 @@ namespace cptools::genpdf {
     // Auxiliary routines
     std::string usage()
     {
-        return "Usage: " NAME " gentex [-h] [-o outfile] [-c doc_class] [-l list]";
+        return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] [-g lang] [-l list] [--no-author] [--no-contest]";
     }
 
     std::string help()
@@ -145,6 +145,7 @@ namespace cptools::genpdf {
 
         while ((option = getopt_long(argc, argv, "ho:c:lg:b:", longopts, NULL)) != -1)
         {
+std::cout << "+++ option =  " << (char) option << "\n";
             switch (option) {
             case 'h':
                 out << help() << '\n';
@@ -168,7 +169,7 @@ namespace cptools::genpdf {
             case 'g':
             {
                 language = std::string(optarg);
-
+std::cout << "--- Language = '" << language << "'\n";
                 if (not gentex::validate_language(language))
                 {
                     err << "Language " << language << " not find or supported\n";
