@@ -14,6 +14,7 @@
 #include "util.h"
 #include "error.h"
 #include "config.h"
+#include "gentex.h"
 
 
 // Raw strings
@@ -21,27 +22,27 @@ static const std::string help_message {
 R"message(
 Generate a LaTeX file from the problem description. The options are:
 
-    -h              Display this help.
+    -h              Displays this help.
     --help
 
     -o              Output file. If omitted, the output will be written on stdout.
     --output        
 
-    -b              Define the problem label. The default value is 'A'.
+    -b              Defines the problem label. The default value is 'A'.
     --label         
 
-    -c              Selected the document class that will be used. The default value 
+    -c              Document class that will be used. The default value
     --class         is 'cp_modern'.
 
-    -g              Define the problem language. The default value is 'en_US'.
+    -g              Problem language. The default value is 'en_US'.
     --lang
 
-    -l              List all available document classes.
+    -l              Lists all available document classes.
     --list
 
-    --no_author     Don't show problem's author.
+    --no_author     Omits problem's author.
 
-    --no_contest    Don't show problem's contest.
+    --no_contest    problem's contest.
 
 )message" };
 
@@ -68,13 +69,6 @@ namespace cptools::gentex {
         { "pt_BR", "portuguese" },
     };
 
-    struct Flags {
-        bool include_author;
-        bool include_contest;
-
-        Flags() : include_author(true), include_contest(true) {}
-    };
-
     // Auxiliary routines
     std::string usage()
     {
@@ -84,6 +78,11 @@ namespace cptools::gentex {
     std::string help()
     {
         return usage() + help_message;
+    }
+
+    bool validate_language(const std::string& lang)
+    {
+        return languages.find(lang) != languages.end();
     }
 
     int list_document_classes(std::ostream& out, std::ostream& err)
@@ -157,7 +156,7 @@ namespace cptools::gentex {
     }
 
     int generate_latex(const std::string& doc_class, const std::string& language, 
-        const Flags& flags, const std::string& label, std::ostream& out, std::ostream& err)
+        int flags, const std::string& label, std::ostream& out, std::ostream& err)
     {
         auto config = config::read("config.json");
 
@@ -171,11 +170,13 @@ namespace cptools::gentex {
         auto c1_size = config::get(config, "PDF|first_column_size", std::string("6cm"));
         auto c2_size = config::get(config, "PDF|second_column_size", std::string("8cm"));
 
-        if ((not flags.include_contest) or (not config::get(config, "PDF|include_contest", false)))
-            event = "";
+        if ((not (flags & INCLUDE_CONTEST)) 
+            or (not config::get(config, "PDF|include_contest", false)))
+                event = "";
 
-        if ((not flags.include_author) or (not config::get(config, "PDF|include_author", false)))
-            author = "";
+        if ((not (flags & INCLUDE_AUTHOR)) 
+            or (not config::get(config, "PDF|include_author", false)))
+                author = "";
 
         out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
         out << "\\begin{document}\n\n";
@@ -218,7 +219,7 @@ namespace cptools::gentex {
         int option = -1;
 
         std::string document_class { "cp_modern" }, outfile, language { "en_US" }, label { "A" };
-        Flags flags;
+        int flags = INCLUDE_AUTHOR | INCLUDE_CONTEST;
 
         while ((option = getopt_long(argc, argv, "ho:c:lg:b:", longopts, NULL)) != -1)
         {
@@ -245,9 +246,8 @@ namespace cptools::gentex {
             case 'g':
             {
                 language = std::string(optarg);
-                auto it = languages.find(language);
 
-                if (it == languages.end())
+                if (not validate_language(language))
                 {
                     err << "Language " << language << " not find or supported\n";
                     return -1;
@@ -257,11 +257,11 @@ namespace cptools::gentex {
             }
 
             case NO_AUTHOR:
-                flags.include_author = false;
+                flags &= (~INCLUDE_AUTHOR);
                 break;
 
             case NO_CONTEST:
-                flags.include_contest = false;
+                flags &= (~INCLUDE_CONTEST);
                 break;
 
             default:

@@ -38,7 +38,7 @@ namespace cptools::clean {
     // Auxiliary routines
     std::string usage()
     {
-        return "Usage: " NAME " init [-h] [-w working-dir]";
+        return "Usage: " NAME " clean [-h] [-w working-dir]";
     }
 
     std::string help()

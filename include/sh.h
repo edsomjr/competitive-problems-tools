@@ -11,12 +11,17 @@ namespace cptools::sh {
     int make_dir(const std::string& path);
     int copy_dir(const std::string& dest, const std::string& src);
     int remove_dir(const std::string& path);
+    int remove_file(const std::string& path);
 
     bool compare_dirs(const std::string& dirA, const std::string& dirB);
     bool is_dir(const std::string& path);
+    bool is_file(const std::string& path);
 
     int build(const std::string& output, const std::string& src);
-    int process(const std::string& input, const std::string& program, const std::string& output);
+    int process(const std::string& input, const std::string& program, const std::string& output,
+        int timeout = 3);
+    int exec(const std::string& program, const std::string& args, const std::string& output,
+        int timeout = 3);
 }
 
 #endif

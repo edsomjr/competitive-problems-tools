@@ -16,9 +16,9 @@ A set of competitive programming tools for contests preparation.
 
     Action          Description
 
-    contest         Assembly programming contests or extract info from previous contests.
+    contest         Creates programming contests or extract info from previous contests.
     problem         Format, test and pack competitive programming problems.
-    users           Generate a LaTeX file from the problem description. 
+    users           Generates a LaTeX file from the problem description. 
 )message"
 };
 

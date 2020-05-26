@@ -2,12 +2,25 @@
 #include <vector>
 #include <map>
 
+#include <sys/stat.h>
+
 #include "sh.h"
 #include "util.h"
+#include "dirs.h"
 #include "error.h"
 
 
 namespace cptools::sh {
+
+    long int last_modified(const std::string& filepath)
+    {
+        struct stat sb;
+
+        if (lstat(filepath.c_str(), &sb) == -1)
+            return 0;
+
+        return sb.st_atime;
+    }
 
     int copy_file(const std::string& dest, const std::string& src)
     {
@@ -18,6 +31,15 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_FILE;
     }
 
+    int remove_file(const std::string& path)
+    {
+        std::string command { "rm -f " + path };
+
+        auto rc = std::system(command.c_str());
+
+        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE;
+
+    }
 
     int make_dir(const std::string& path)
     {
@@ -64,6 +86,16 @@ namespace cptools::sh {
         return rc == 0;
     }
 
+    bool is_file(const std::string& path)
+    {
+        std::string command { "test -f " + path };
+
+        auto rc = std::system(command.c_str());
+
+        return rc == 0;
+    }
+
+
     int compile_cpp(const std::string& output, const std::string& src)
     {
         std::string command { "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src };
@@ -73,16 +105,69 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR;
     }
 
+    int build_py(const std::string& output, const std::string& src)
+    {
+        std::vector<std::string> commands {
+            "echo '#!/usr/bin/python' > " + output,
+            "cat " + src + " >> " + output,
+            "chmod 755 " + output,
+         };
+
+        for (auto command : commands)
+        {
+            auto rc = std::system(command.c_str());
+
+            if (rc != CP_TOOLS_OK)
+                return CP_TOOLS_ERROR_SH_PY_BUILD_ERROR;
+        }
+
+        return CP_TOOLS_OK;
+    }
+
+
+    int build_tex(const std::string& output, const std::string& src)
+    {
+        std::string outdir { "." };
+
+        if (output.find('/') != std::string::npos)
+        {
+            auto tokens = split(output, '/');
+            outdir = tokens.front();
+        }
+
+        std::string command { std::string("export TEXINPUTS=\".:") + CP_TOOLS_CLASSES_DIR 
+            + ":\" && pdflatex -output-directory=" + outdir + " " + src };
+
+        auto rc = std::system(command.c_str());
+
+        // Roda duas vezes para garantir que estilos que tenham referências sejam
+        // renderizados corretamente
+        if (rc == 0)
+            rc = std::system(command.c_str());
+
+        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PDFLATEX_ERROR;
+ 
+    }
+
     std::map<std::string, int (*)(const std::string&, const std::string&)> fs {
         { "cpp", compile_cpp },
+        { "tex", build_tex },
+        { "py", build_py },
     };
 
     int build(const std::string& output, const std::string& src)
     {
         auto tokens = split(src, '.');
         auto ext = tokens.back();
-
         auto it = fs.find(ext);
+
+        auto x = last_modified(src);
+        auto y = last_modified(output);
+    
+        if (x <= y)
+        {
+            return CP_TOOLS_OK;
+        }
 
         if (it == fs.end())
             return CP_TOOLS_ERROR_SH_BUILD_EXT_NOT_FOUND;
@@ -90,12 +175,33 @@ namespace cptools::sh {
         return it->second(output, src); 
     }
 
-    int process(const std::string& input, const std::string& program, const std::string& output)
+    int process(const std::string& input, const std::string& program, const std::string& output,
+        int timeout)
     {
-        std::string command { program + " < " + input + " > " + output };
+        std::string command { "timeout " + std::to_string(timeout) + "s " + program + " < " 
+            + input + " > " + output };
 
         auto rc = std::system(command.c_str());
 
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PROCESS_ERROR;
+    }
+
+    int exec(const std::string& program, const std::string& args, const std::string& output,
+        int timeout)
+    {
+        std::string command;
+
+        if (timeout > 0)
+        {
+            command = "timeout " + std::to_string(timeout) + "s " + program + "  " 
+                + args + " > " + output;
+        } else
+        {
+            command = program + "  " + args + " > " + output;;
+        }
+
+        int rc = std::system(command.c_str());
+
+        return WEXITSTATUS(rc);
     }
 }
