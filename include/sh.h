@@ -16,7 +16,8 @@ namespace cptools::sh {
     bool is_dir(const std::string& path);
 
     int build(const std::string& output, const std::string& src);
-    int process(const std::string& input, const std::string& program, const std::string& output);
+    int process(const std::string& input, const std::string& program, const std::string& output,
+        int timeout = 3);
 }
 
 #endif

@@ -19,6 +19,8 @@
 #define CP_TOOLS_ERROR_GENPDF_INVALID_OPTION            -40
 #define CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE           -41
 
+#define CP_TOOLS_ERROR_CHECK_MISSING_IO_FILES           -50
+
 #define CP_TOOLS_ERROR_SH_COPY_FILE                     -101
 #define CP_TOOLS_ERROR_SH_COPY_DIRECTORY                -102
 #define CP_TOOLS_ERROR_SH_CREATE_DIRECTORY              -103

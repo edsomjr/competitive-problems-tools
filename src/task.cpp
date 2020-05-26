@@ -65,7 +65,8 @@ namespace cptools::task {
 
         for (auto s : sets)
         {
-err << "Generating testes on set '" << s << "'\n";
+            err << "[generate_io_files] Generating testes on set '" << s << "'\n";
+
             if (s == "random")
             {
                 // TODO gerar os tests randômicos via gerador
@@ -76,7 +77,9 @@ err << "Generating testes on set '" << s << "'\n";
                 for (auto [input, comment] : inputs)
                 {
                     std::string dest { input_dir + std::to_string(next) };
-err << "Copy " << input << " on " << dest << '\n';
+
+                    err << "[generate_io_fles] Copy " << input << " on " << dest << '\n';
+
                     rc = cptools::sh::copy_file(dest, input);
 
                     if (rc != CP_TOOLS_OK)
@@ -105,5 +108,4 @@ err << "Copy " << input << " on " << dest << '\n';
 
         return io_files;
     }
-
 }

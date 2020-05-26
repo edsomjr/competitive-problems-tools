@@ -107,9 +107,11 @@ namespace cptools::sh {
         return it->second(output, src); 
     }
 
-    int process(const std::string& input, const std::string& program, const std::string& output)
+    int process(const std::string& input, const std::string& program, const std::string& output,
+        int timeout)
     {
-        std::string command { program + " < " + input + " > " + output };
+        std::string command { "timeout " + std::to_string(timeout) + "s " + program + " < " 
+            + input + " > " + output };
 
         auto rc = std::system(command.c_str());
 
