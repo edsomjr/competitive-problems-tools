@@ -1,21 +1,19 @@
 #include "testlib.h"
 
-// Lê e valida a solução do participante e do juiz. 
-// Se a resposta está errada e stream = ouf (participante), então veredict deve ser _wa
-// Se a resposta está errada e stream = ans (juiz), então veredict deve ser _fail
-int readAns(int x, int y, InStream& stream, TResult veredict)
+// Lê e valida a solução 
+int readAns(int x, int y, InStream& in)
 {
-    stream.readInt(x, x, "x");
-    stream.readSpace();
+    in.readInt(x, x, "x");
+    in.readSpace();
 
-    stream.readInt(y, y, "y");
-    stream.readSpace();
+    in.readInt(y, y, "y");
+    in.readSpace();
 
-    auto ans = stream.readInt(0, 2000, "ans");
-    stream.readEoln();
+    auto ans = in.readInt(0, 2000, "ans");
+    in.readEoln();
 
     if (ans != x + y)
-        quitf(veredict, "%d != %d", ans, x + y);
+        in.quitf(veredict, "%d != %d", ans, x + y);
 
     return ans;
 }
@@ -28,8 +26,8 @@ int main(int argc, char* argv[])
     auto x = inf.readInt();
     auto y = inf.readInt();
 
-    readAns(x, y, ans, _fail);
-    int pans = readAns(x, y, ouf, _wa);
+    readAns(x, y, ans);
+    int pans = readAns(x, y, ouf);
 
     quitf(_ok, "answer = %d", pans);
     /**
