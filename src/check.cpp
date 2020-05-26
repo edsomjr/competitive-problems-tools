@@ -19,17 +19,20 @@ Verify problem files and tools.
 
     Option          Description
 
-    -a              Validate everything (default option).
+    -a              Validates everything (default option).
     --all
 
-    -h              Generate this help message.
+    -h              Generates this help message.
     --help
 
-    -s              Validate the solutions.
+    -s              Validates the solutions.
     --solutions
 
-    -t              Validate the tests.
+    -t              Validates the tests.
     --tests
+
+    -v              Validates the validator.
+    --validator
 )message"
 };
 

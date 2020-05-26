@@ -23,27 +23,27 @@ static const std::string help_message {
 R"message(
 Generate a PDF file from the problem description. The options are:
 
-    -h              Display this help.
+    -h              Displays this help.
     --help
 
     -o              Output file. If omitted, the output will be the file 'problem.pdf'.
     --output        
 
-    -b              Define the problem label. The default value is 'A'.
+    -b              Defines the problem label. The default value is 'A'.
     --label         
 
-    -c              Selected the document class that will be used. The default value 
+    -c              Document class that will be used. The default value 
     --class         is 'cp_modern'.
 
-    -g              Define the problem language. The default value is 'en_US'.
+    -g              Problem language. The default value is 'en_US'.
     --lang
 
-    -l              List all available document classes.
+    -l              Lists all available document classes.
     --list
 
-    --no_author     Don't show problem's author.
+    --no_author     Omits problem's author.
 
-    --no_contest    Don't show problem's contest.
+    --no_contest    problem's contest.
 
 )message" };
 
