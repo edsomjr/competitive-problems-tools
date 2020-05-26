@@ -44,18 +44,69 @@ namespace cptools::check {
        { "help", no_argument, NULL, 'h' },
        { "solutions", no_argument, NULL, 's' },
        { "tests", no_argument, NULL, 't' },
+       { "validator", no_argument, NULL, 'v' },
        { 0, 0, 0, 0 }
     };
 
     // Auxiliary routines
     std::string usage()
     {
-        return "Usage: " NAME " check [-h] [-a] [-s] [-t]";
+        return "Usage: " NAME " check [-h] [-a] [-s] [-t] [-v]";
     }
 
     std::string help()
     {
         return usage() + help_message;
+    }
+
+    int validate_validator(std::ostream& out, std::ostream& err)
+    {
+        auto program { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
+
+        auto config = cptools::config::read("config.json");
+        auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
+
+        if (source == "ERROR")
+        {
+            err << "[validate_validator] Default solution file not found!\n";
+            return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
+        }
+
+        auto rc = cptools::sh::build(program, source);
+
+        if (rc != CP_TOOLS_OK)
+        {
+            err << "[validate_validator] Can't compile validator '" << source << "'\n";
+            return rc;
+        }
+
+        auto tests = cptools::config::get(config, "tests|validator", 
+            std::map<std::string, std::string> {});
+
+        if (tests.empty())
+        {
+            err << "[validate_validator] There are no tests for the validator\n";
+            return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
+        }
+
+        out << "Testing the validator (" << tests.size() << " tests) ...\n";
+
+        for (auto [input, veredict] : tests)
+        {
+            auto rc = sh::process(input, program, "/dev/null");
+
+            if ((veredict == "VALID" and rc != CP_TOOLS_OK) or
+                (veredict == "INVALID" and rc == CP_TOOLS_OK))
+            {
+                err << "[validate_validator] input = '" << input << "' in invalid: expected = '" 
+                    << veredict << "'\n";
+                return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
+            }
+        }
+
+        out << "Ok!\n";
+
+        return CP_TOOLS_OK;
     }
 
     int validate_tests(std::ostream& out, std::ostream& err)
@@ -67,7 +118,7 @@ namespace cptools::check {
 
         out << "[validate_tests] source = '" << source << "'\n";
 
-        if (source == "solutions/ERROR")
+        if (source == "ERROR")
         {
             err << "[validate_tests] Default solution file not found!\n";
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
@@ -115,7 +166,7 @@ namespace cptools::check {
     {
         int option = -1;
 
-        while ((option = getopt_long(argc, argv, "ahst", longopts, NULL)) != -1)
+        while ((option = getopt_long(argc, argv, "ahstv", longopts, NULL)) != -1)
         {
             switch (option) {
             case 'h':
@@ -124,6 +175,9 @@ namespace cptools::check {
 
             case 't':
                 return validate_tests(out, err);
+
+            case 'v':
+                return validate_validator(out, err);
 
             default:
                 err << help() << '\n';
