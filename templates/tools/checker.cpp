@@ -13,7 +13,7 @@ int readAns(int x, int y, InStream& in)
     in.readEoln();
 
     if (ans != x + y)
-        in.quitf(veredict, "%d != %d", ans, x + y);
+        in.quitf("%d != %d", ans, x + y);
 
     return ans;
 }
