@@ -167,7 +167,7 @@ namespace cptools::check {
 
             auto args { input + " " + output + " " + res };
             auto expected = rcodes[veredict];
-            auto got = sh::exec(checker, args, "/dev/null", 0);
+            auto got = sh::exec(checker, args, "/dev/null");
 
             if (got != expected)
             {
