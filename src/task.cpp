@@ -9,7 +9,7 @@
 namespace cptools::task {
 
     std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string& testset,
-        std::ostream& out, std::ostream& err, bool gen_output)    
+        std::ostream&, std::ostream& err, bool gen_output)    
     {
         std::vector<std::string> sets { "samples", "manual", "random" };
 
@@ -64,8 +64,6 @@ namespace cptools::task {
 
         for (auto s : sets)
         {
-            out << "Generating testes on set '" << s << "'\n";
-
             if (s == "random")
             {
                 source = cptools::config::get(config, "tools|generator", std::string("ERROR"));
@@ -92,9 +90,6 @@ namespace cptools::task {
                 for (auto parameters : inputs)
                 {
                     std::string dest { input_dir + std::to_string(next++) };
-
-                    err << "[generate_io_files] Generating " << dest << " with parameters '" 
-                        << parameters << "'\n";
 
                     auto rc = sh::exec(generator, parameters, dest);
 

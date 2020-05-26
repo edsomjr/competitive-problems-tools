@@ -112,7 +112,7 @@ namespace cptools::genpdf {
         // Generates the PDF file 'problem.pdf' on CP_TOOLS_BUILD_DIR
         std::string pdf_file { std::string(CP_TOOLS_BUILD_DIR) + "/problem.pdf" };
 
-        rc = sh::build(CP_TOOLS_BUILD_DIR, texfile_path);
+        rc = sh::build(pdf_file, texfile_path);
 
         if (rc != CP_TOOLS_OK)
         {

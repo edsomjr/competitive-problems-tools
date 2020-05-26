@@ -77,6 +77,16 @@ namespace cptools::sh {
         return rc == 0;
     }
 
+    bool is_file(const std::string& path)
+    {
+        std::string command { "test -f " + path };
+
+        auto rc = std::system(command.c_str());
+
+        return rc == 0;
+    }
+
+
     int compile_cpp(const std::string& output, const std::string& src)
     {
         std::string command { "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src };
@@ -88,8 +98,16 @@ namespace cptools::sh {
 
     int build_tex(const std::string& output, const std::string& src)
     {
+        std::string outdir { "." };
+
+        if (output.find('/') != std::string::npos)
+        {
+            auto tokens = split(output, '/');
+            outdir = tokens.front();
+        }
+
         std::string command { std::string("export TEXINPUTS=\".:") + CP_TOOLS_CLASSES_DIR 
-            + ":\" && pdflatex -output-directory=" + output + " " + src };
+            + ":\" && pdflatex -output-directory=" + outdir + " " + src };
 
         auto rc = std::system(command.c_str());
 

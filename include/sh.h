@@ -14,6 +14,7 @@ namespace cptools::sh {
 
     bool compare_dirs(const std::string& dirA, const std::string& dirB);
     bool is_dir(const std::string& path);
+    bool is_file(const std::string& path);
 
     int build(const std::string& output, const std::string& src);
     int process(const std::string& input, const std::string& program, const std::string& output,
