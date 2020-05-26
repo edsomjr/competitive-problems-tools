@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-// Contest preparation related tasks
+// Problem preparation related tasks
 namespace cptools::task {
 
     std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string& testset,

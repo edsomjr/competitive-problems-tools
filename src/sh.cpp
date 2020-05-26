@@ -31,6 +31,15 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_FILE;
     }
 
+    int remove_file(const std::string& path)
+    {
+        std::string command { "rm -f " + path };
+
+        auto rc = std::system(command.c_str());
+
+        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE;
+
+    }
 
     int make_dir(const std::string& path)
     {
@@ -96,6 +105,26 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR;
     }
 
+    int build_py(const std::string& output, const std::string& src)
+    {
+        std::vector<std::string> commands {
+            "echo '#!/usr/bin/python' > " + output,
+            "cat " + src + " >> " + output,
+            "chmod 755 " + output,
+         };
+
+        for (auto command : commands)
+        {
+            auto rc = std::system(command.c_str());
+
+            if (rc != CP_TOOLS_OK)
+                return CP_TOOLS_ERROR_SH_PY_BUILD_ERROR;
+        }
+
+        return CP_TOOLS_OK;
+    }
+
+
     int build_tex(const std::string& output, const std::string& src)
     {
         std::string outdir { "." };
@@ -123,6 +152,7 @@ namespace cptools::sh {
     std::map<std::string, int (*)(const std::string&, const std::string&)> fs {
         { "cpp", compile_cpp },
         { "tex", build_tex },
+        { "py", build_py },
     };
 
     int build(const std::string& output, const std::string& src)

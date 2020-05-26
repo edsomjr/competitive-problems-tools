@@ -112,8 +112,6 @@ namespace cptools::task {
                 {
                     std::string dest { input_dir + std::to_string(next++) };
 
-                    err << "[generate_io_fles] Copy " << input << " on " << dest << '\n';
-
                     rc = cptools::sh::copy_file(dest, input);
 
                     if (rc != CP_TOOLS_OK)

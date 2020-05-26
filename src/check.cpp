@@ -85,7 +85,7 @@ namespace cptools::check {
 
         if (rc != CP_TOOLS_OK)
         {
-            err << "[validate_checker] Can't compile validator '" << source << "'\n";
+            err << "[judge] Can't compile validator '" << source << "'\n";
             return rc;
         }
 
