@@ -9,6 +9,7 @@
 #include "dirs.h"
 #include "check.h"
 #include "error.h"
+#include "config.h"
 
 
 // Raw strings
@@ -56,7 +57,29 @@ namespace cptools::check {
 
     int validate_tests(std::ostream& out, std::ostream& err)
     {
-        auto io_files = task::generate_io_files("all", out, err);
+        auto program { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
+
+        auto config = cptools::config::read("config.json");
+        auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
+
+        out << "[validate_tests] source = '" << source << "'\n";
+
+        if (source == "solutions/ERROR")
+        {
+            err << "[validate_tests] Default solution file not found!\n";
+            return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
+        }
+
+        auto rc = cptools::sh::build(program, source);
+
+        if (rc != CP_TOOLS_OK)
+        {
+            err << "[validate_tests] Can't compile validator '" << source << "'\n";
+            return rc;
+        }
+
+
+        auto io_files = task::generate_io_files("all", out, err, false);
 
         if (io_files.empty())
         {
@@ -64,8 +87,22 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_IO_FILES;
         }
 
-        for (auto [infile, outfile] : io_files)
-            out << "[validate_tests] " << infile << " <-> " << outfile << '\n';
+        out << "Checking " << io_files.size() << " input files...\n";
+
+        for (auto [input, _] : io_files)
+        {
+            err << "[check tests] Validating " << input << "...\n";
+
+            auto rc = cptools::sh::process(input, program, "/dev/null");
+
+            if (rc != CP_TOOLS_OK)
+            {
+                out << "Input file '" << input << "' is invalid!\n";
+                return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
+            }
+        }
+
+        out << "Ok!\n";
 
         return CP_TOOLS_OK;
     }

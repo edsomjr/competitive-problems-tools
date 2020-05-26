@@ -18,6 +18,8 @@ namespace cptools::sh {
     int build(const std::string& output, const std::string& src);
     int process(const std::string& input, const std::string& program, const std::string& output,
         int timeout = 3);
+    int exec(const std::string& program, const std::string& args, const std::string& output,
+        int timeout = 3);
 }
 
 #endif

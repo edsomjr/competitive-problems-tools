@@ -29,5 +29,9 @@
 #define CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR         -106
 #define CP_TOOLS_ERROR_SH_PROCESS_ERROR                 -107
 #define CP_TOOLS_ERROR_SH_PDFLATEX_ERROR                -108
+#define CP_TOOLS_ERROR_SH_EXEC_ERROR                    -109
+
+#define CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR          -120
+#define CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE         -121
 
 #endif

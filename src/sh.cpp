@@ -2,6 +2,8 @@
 #include <vector>
 #include <map>
 
+#include <sys/stat.h>
+
 #include "sh.h"
 #include "util.h"
 #include "dirs.h"
@@ -9,6 +11,16 @@
 
 
 namespace cptools::sh {
+
+    long int last_modified(const std::string& filepath)
+    {
+        struct stat sb;
+
+        if (lstat(filepath.c_str(), &sb) == -1)
+            return 0;
+
+        return sb.st_atime;
+    }
 
     int copy_file(const std::string& dest, const std::string& src)
     {
@@ -101,6 +113,14 @@ namespace cptools::sh {
         auto ext = tokens.back();
         auto it = fs.find(ext);
 
+        auto x = last_modified(src);
+        auto y = last_modified(output);
+    
+        if (x <= y)
+        {
+            return CP_TOOLS_OK;
+        }
+
         if (it == fs.end())
             return CP_TOOLS_ERROR_SH_BUILD_EXT_NOT_FOUND;
 
@@ -116,5 +136,16 @@ namespace cptools::sh {
         auto rc = std::system(command.c_str());
 
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PROCESS_ERROR;
+    }
+
+    int exec(const std::string& program, const std::string& args, const std::string& output,
+        int timeout)
+    {
+        std::string command { "timeout " + std::to_string(timeout) + "s " + program + "  " 
+            + args + " > " + output };
+
+        auto rc = std::system(command.c_str());
+
+        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_EXEC_ERROR;
     }
 }

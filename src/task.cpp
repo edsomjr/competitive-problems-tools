@@ -9,7 +9,7 @@
 namespace cptools::task {
 
     std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string& testset,
-        std::ostream&, std::ostream& err)    
+        std::ostream& out, std::ostream& err, bool gen_output)    
     {
         std::vector<std::string> sets { "samples", "manual", "random" };
 
@@ -21,8 +21,6 @@ namespace cptools::task {
             sets.push_back(testset);
         }
 
-        std::vector<std::pair<std::string, std::string>> io_files;
-
         auto input_dir { std::string(CP_TOOLS_BUILD_DIR) + "/input/" };
         auto output_dir { std::string(CP_TOOLS_BUILD_DIR) + "/output/" };
         auto program { std::string(CP_TOOLS_BUILD_DIR) + "/solution" };
@@ -30,14 +28,6 @@ namespace cptools::task {
         auto config = cptools::config::read("config.json");
         auto source = "solutions/" + cptools::config::get(config, "solutions|default", 
             std::string("ERROR"));
-
-        if (source == "solutions/ERROR")
-        {
-            err << "[generate_io_files] Default solution file not found!\n";
-            return { };
-        }
-
-        int next = 1;
 
         auto rc = cptools::sh::make_dir(input_dir);
 
@@ -55,6 +45,12 @@ namespace cptools::task {
             return { };
         }
 
+        if (source == "solutions/ERROR")
+        {
+            err << "[generate_io_files] Default solution file not found!\n";
+            return { };
+        }
+
         rc = cptools::sh::build(program, source);
 
         if (rc != CP_TOOLS_OK)
@@ -63,20 +59,63 @@ namespace cptools::task {
             return { };
         }
 
+        std::vector<std::pair<std::string, std::string>> io_files;
+        int next = 1;
+
         for (auto s : sets)
         {
-            err << "[generate_io_files] Generating testes on set '" << s << "'\n";
+            out << "Generating testes on set '" << s << "'\n";
 
             if (s == "random")
             {
-                // TODO gerar os tests randômicos via gerador
+                source = cptools::config::get(config, "tools|generator", std::string("ERROR"));
+
+                if (source == "tools/ERROR")
+                {
+                    err << "[generate_io_files] Generator file not found!\n";
+                    return { };
+                }
+
+                auto generator = std::string(CP_TOOLS_BUILD_DIR) + "/generator";
+
+                rc = cptools::sh::build(generator, source);
+
+                if (rc != CP_TOOLS_OK)
+                {
+                    err << "[generate_io_files] Can't compile generator '" << source << "'\n";
+                    return { };
+                }
+
+                auto inputs = cptools::config::get(config, "tests|random", 
+                    std::vector<std::string> {});
+
+                for (auto parameters : inputs)
+                {
+                    std::string dest { input_dir + std::to_string(next++) };
+
+                    err << "[generate_io_files] Generating " << dest << " with parameters '" 
+                        << parameters << "'\n";
+
+                    auto rc = sh::exec(generator, parameters, dest);
+
+                    if (rc != CP_TOOLS_OK)
+                    {
+                        err << "[generate_io_files] Error generating " << dest 
+                            << " with parameters '" << parameters << "'\n";
+
+                        return { };
+                    }
+
+                    io_files.emplace_back(std::make_pair(dest, ""));
+                }
             } else
             {
-                auto inputs = cptools::config::get(config, "tests|" + s, std::map<std::string, std::string> {});
+                auto inputs = cptools::config::get(config, "tests|" + s, 
+                    std::map<std::string, std::string> {});
 
                 for (auto [input, comment] : inputs)
                 {
-                    std::string dest { input_dir + std::to_string(next) };
+                    std::string dest { input_dir + std::to_string(next++) };
 
                     err << "[generate_io_fles] Copy " << input << " on " << dest << '\n';
 
@@ -89,20 +128,27 @@ namespace cptools::task {
                         return { };
                     }
 
-                    std::string output { output_dir + std::to_string(next) };
-
-                    rc = cptools::sh::process(input, program, output);
-
-                    if (rc != CP_TOOLS_OK)
-                    {
-                        err << "[generate_io_files] Can't generate output for input '" 
-                            << input << "'\n";
-                        return { };
-                    }
-
-                    io_files.emplace_back(std::make_pair(dest, output));
-                    next++;
+                    io_files.emplace_back(std::make_pair(dest, ""));
                 }
+            }
+        }
+
+        if (gen_output)
+        {
+            for (int i = 1; i < next; ++i)
+            {
+                std::string input { io_files[i - 1].first };
+                std::string output { output_dir + std::to_string(i) };
+
+                rc = cptools::sh::process(input, program, output);
+
+                if (rc != CP_TOOLS_OK)
+                {
+                    err << "[generate_io_files] Can't generate output for input '" << input << "'\n";
+                    return { };
+                }
+
+                io_files[i - 1].second = output;
             }
         }
 
