@@ -22,6 +22,9 @@ Verify problem files and tools.
     -a              Validates everything (default option).
     --all
 
+    -c              Validates the checker.
+    --checker
+
     -h              Generates this help message.
     --help
 
@@ -41,6 +44,7 @@ namespace cptools::check {
     // Global variables
     static struct option longopts[] = {
        { "all", no_argument, NULL, 'a' },
+       { "checker", no_argument, NULL, 'c' },
        { "help", no_argument, NULL, 'h' },
        { "solutions", no_argument, NULL, 's' },
        { "tests", no_argument, NULL, 't' },
@@ -48,16 +52,135 @@ namespace cptools::check {
        { 0, 0, 0, 0 }
     };
 
+    static std::map<std::string, int> rcodes {
+        { "AC", 4 },
+        { "WA", 6 },
+    };
+
     // Auxiliary routines
     std::string usage()
     {
-        return "Usage: " NAME " check [-h] [-a] [-s] [-t] [-v]";
+        return "Usage: " NAME " check [-h] [-a] [-c] [-s] [-t] [-v]";
     }
 
     std::string help()
     {
         return usage() + help_message;
     }
+
+    int validate_checker(std::ostream& out, std::ostream& err)
+    {
+        auto validator { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
+
+        auto config = cptools::config::read("config.json");
+        auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
+
+        if (source == "ERROR")
+        {
+            err << "[validate_validator] Validator file not found!\n";
+            return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
+        }
+
+        auto rc = cptools::sh::build(validator, source);
+
+        if (rc != CP_TOOLS_OK)
+        {
+            err << "[validate_checker] Can't compile validator '" << source << "'\n";
+            return rc;
+        }
+
+        source = cptools::config::get(config, "tools|checker", std::string("ERROR"));
+
+        if (source == "ERROR")
+        {
+            err << "[validate_checker] Checker file not found!\n";
+            return CP_TOOLS_ERROR_CHECK_MISSING_CHECKER;
+        }
+
+        auto checker { std::string(CP_TOOLS_BUILD_DIR) + "/checker" };
+
+        rc = cptools::sh::build(checker, source);
+
+        if (rc != CP_TOOLS_OK)
+        {
+            err << "[validate_checker] Can't compile checker '" << source << "'\n";
+            return rc;
+        }
+
+        source = "solutions/" + 
+            cptools::config::get(config, "solutions|default", std::string("ERROR"));
+
+        if (source == "solutions/ERROR")
+        {
+            err << "[validate_checker] Default solution file not found!\n";
+            return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
+        }
+
+        auto solution { std::string(CP_TOOLS_BUILD_DIR) + "/solution" };
+
+        rc = cptools::sh::build(solution, source);
+
+        if (rc != CP_TOOLS_OK)
+        {
+            err << "[validate_checker] Can't compile solution '" << source << "'\n";
+            return rc;
+        }
+
+        auto tests = cptools::config::get(config, "tests|checker", 
+            std::map<std::string, std::pair<std::string, std::string>> {});
+
+        if (tests.empty())
+        {
+            err << "[validate_checker] There are no tests for the validator\n";
+            return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
+        }
+
+        out << "Testing the checker (" << tests.size() << " tests) ...\n";
+
+        for (auto [input, data] : tests)
+        {
+            auto [output, veredict] = data;
+
+            if (rcodes.find(veredict) == rcodes.end())
+            {
+                err << "[validate_checker] Invalid veredict: '" << veredict << "'\n";
+                return CP_TOOLS_ERROR_CHECK_INVALID_VEREDICT;
+            }
+
+            auto rc = sh::process(input, validator, "/dev/null");
+
+            if (rc != CP_TOOLS_OK)
+            {
+                err << "[validate_checker] Input file '" << input << "' is invalid\n";
+                return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
+            }
+
+            auto res { std::string(CP_TOOLS_BUILD_DIR) + "/.res" };
+
+            rc = sh::process(input, solution, res);
+
+            if (rc != CP_TOOLS_OK)
+            {
+                err << "[validate_checker] Can't generate output for input '" << input << "'\n";
+                return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
+            }
+
+            auto args { input + " " + output + " " + res };
+            auto expected = rcodes[veredict];
+            auto got = sh::exec(checker, args, "/dev/null", 0);
+
+            if (got != expected)
+            {
+                err << "[validate_checker] Test '" << input << "' failed!\n";
+                return CP_TOOLS_ERROR_CHECK_TEST_FAILED;
+            }
+        }
+
+        out << "Ok!\n";
+
+        return CP_TOOLS_OK;
+    }
+
 
     int validate_validator(std::ostream& out, std::ostream& err)
     {
@@ -166,9 +289,12 @@ namespace cptools::check {
     {
         int option = -1;
 
-        while ((option = getopt_long(argc, argv, "ahstv", longopts, NULL)) != -1)
+        while ((option = getopt_long(argc, argv, "achstv", longopts, NULL)) != -1)
         {
             switch (option) {
+            case 'c':
+                return validate_checker(out, err);
+
             case 'h':
                 out << help() << '\n';
                 return 0;

@@ -159,11 +159,19 @@ namespace cptools::sh {
     int exec(const std::string& program, const std::string& args, const std::string& output,
         int timeout)
     {
-        std::string command { "timeout " + std::to_string(timeout) + "s " + program + "  " 
-            + args + " > " + output };
+        std::string command;
 
-        auto rc = std::system(command.c_str());
+        if (timeout > 0)
+        {
+            command = "timeout " + std::to_string(timeout) + "s " + program + "  " 
+                + args + " > " + output;
+        } else
+        {
+            command = program + "  " + args + " > " + output;;
+        }
 
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_EXEC_ERROR;
+        int rc = std::system(command.c_str());
+
+        return WEXITSTATUS(rc);
     }
 }
