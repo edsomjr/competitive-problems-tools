@@ -155,6 +155,46 @@ namespace cptools::gentex {
         return CP_TOOLS_OK;
     }
 
+    int generate_tutorial_latex(const std::string& doc_class, const std::string& language, 
+        int flags, const std::string& label, std::ostream& out, std::ostream&)
+    {
+        auto config = config::read("config.json");
+
+        auto lang { languages.at(language) };
+        auto event { config::get(config, "problem|contest", std::string()) }; 
+        auto author { config::get(config, "problem|author", std::string()) }; 
+        auto title { config::get(config, "problem|title|" + language, std::string("Título")) };
+
+        if ((not (flags & INCLUDE_CONTEST)) 
+            or (not config::get(config, "PDF|include_contest", false)))
+                event = "";
+
+        if ((not (flags & INCLUDE_AUTHOR)) 
+            or (not config::get(config, "PDF|include_author", false)))
+                author = "";
+
+        out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
+
+        out << "\\begin{document}\n\n";
+
+        out << "\\header{" << event << "}{" << author << "}\n\n";
+
+        out << "\\begin{flushleft}\n";
+        out << "\\textbf{\\Large{" << label << ". " << title << "}}\n";
+        out << "\\end{flushleft}\n";
+
+        out << "\\vspace{0.2in}\n";
+
+        out << "\\input{tex/" << language << "/tutorial}\n\n";
+
+        out << "\\trailer{" << event << "}{" << author << "}\n\n";
+
+        out << "\\end{document}\n";
+
+        return CP_TOOLS_OK;
+    }
+
+
     int generate_latex(const std::string& doc_class, const std::string& language, 
         int flags, const std::string& label, std::ostream& out, std::ostream& err)
     {
