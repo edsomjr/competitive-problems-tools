@@ -147,6 +147,10 @@ namespace cptools::judge {
                 out << "Wrong Answer!\n";
                 return WA;
 
+            case 5:
+                out << "Presentation Error\n";
+                return PE;
+
             case 4:
                 out << "Ok!\n";
                 break;
