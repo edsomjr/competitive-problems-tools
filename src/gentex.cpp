@@ -174,6 +174,7 @@ namespace cptools::gentex {
                 author = "";
 
         out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
+        out << "\\usepackage{tikz}\n\n";
 
         out << "\\begin{document}\n\n";
 
