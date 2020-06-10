@@ -108,13 +108,13 @@ namespace cptools::gentex {
                 continue;
 
             std::string filename { dir->d_name };
-            auto tokens = split(filename, '.');
+            auto tokens = util::split(filename, '.');
 
             if (tokens.size() != 2)
                 continue;
 
-            auto name = strip(tokens[0], '"');
-            auto ext = strip(tokens[1], '"');
+            auto name = util::strip(tokens[0], '"');
+            auto ext = util::strip(tokens[1], '"');
 
             if (ext != "cls" or name.empty() or name.front() == '.')
                 continue;
@@ -136,7 +136,7 @@ namespace cptools::gentex {
             if (pos == std::string::npos)
                 continue;
 
-            line = strip(line.substr(pos + 1));
+            line = util::strip(line.substr(pos + 1));
 
             out << "    " << name;
             int count = 4 + name.size();

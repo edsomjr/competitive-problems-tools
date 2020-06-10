@@ -131,7 +131,7 @@ namespace cptools::sh {
 
         if (output.find('/') != std::string::npos)
         {
-            auto tokens = split(output, '/');
+            auto tokens = util::split(output, '/');
             outdir = tokens.front();
         }
 
@@ -157,7 +157,7 @@ namespace cptools::sh {
 
     int build(const std::string& output, const std::string& src)
     {
-        auto tokens = split(src, '.');
+        auto tokens = util::split(src, '.');
         auto ext = tokens.back();
         auto it = fs.find(ext);
 

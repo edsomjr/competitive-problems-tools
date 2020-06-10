@@ -15,7 +15,7 @@ namespace cptools::config {
     template<typename T>
     T get(const json& config, const std::string& fields, T default_value)
     {
-        auto fs = split(fields, '|');
+        auto fs = util::split(fields, '|');
         auto js = config;
 
         for (const auto& f : fs)
