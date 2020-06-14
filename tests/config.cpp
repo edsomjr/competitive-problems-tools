@@ -142,8 +142,5 @@ SCENARIO("Configuration read() and get() functions", "[config]")
                     REQUIRE(cptools::config::get(config, k, std::map<std::string, std::vector<std::string>> {} ) == v);
             }
         } 
-
-
-
     }
 }

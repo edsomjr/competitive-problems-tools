@@ -2,7 +2,7 @@
 
 namespace cptools::util {
 
-    std::vector<std::string> split(const std::string& s, char delim)
+    vector<string> split(const string& s, char delim)
     {
         enum State { NONE, ESCAPED, TOKEN };
         enum State state = NONE;

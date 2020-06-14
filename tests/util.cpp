@@ -93,5 +93,37 @@ SCENARIO("Utilitary functions", "[util]")
             }
         }
 
+        WHEN("The string s has no occurrence of delimiter")
+        {
+            THEN("The split() method return just one token: s")
+            {
+                REQUIRE(cptools::util::split("abc", '.') == vector<string> { "abc" });
+                REQUIRE(cptools::util::split("a b c", '.') == vector<string> { "a b c" });
+                REQUIRE(cptools::util::split("abd", 'c') == vector<string> { "abd" });
+            }
+        }
+
+        WHEN("The string s is composed by n occurrences of delimiter")
+        {
+            THEN("The split() method return a empty token list")
+            {
+                REQUIRE(cptools::util::split(".....", '.') == vector<string> { });
+                REQUIRE(cptools::util::split("a", 'a') == vector<string> { });
+            }
+        }
+
+        WHEN("The string s has r occurrences of delimiter")
+        {
+            THEN("The split() method return a vector with (r + 1) tokens")
+            {
+                REQUIRE(cptools::util::split("a.b.c", '.') == (vector<string> { "a", "b", "c"}));
+                REQUIRE(cptools::util::split("a b", 'a') == vector<string> { " b" });
+                REQUIRE(cptools::util::split("a b", 'b') == vector<string> { "a " });
+                REQUIRE(cptools::util::split("a    b", ' ') == (vector<string> { "a", "b" }));
+                REQUIRE(cptools::util::split("  a    b  ", ' ') == (vector<string> { "a", "b" }));
+            }
+        }
+
+
     }
 }
