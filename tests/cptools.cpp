@@ -78,7 +78,7 @@ SCENARIO("Command line options", "[cptools]")
 
                 auto rc = cptools::run(argc, argv, out, err);
 
-                REQUIRE(rc == CP_TOOLS_ERROR_INVALID_PARAMETER);
+                REQUIRE(rc == CP_TOOLS_ERROR_INVALID_OPTION);
                 REQUIRE(out.str().empty());
                 REQUIRE(err.str() == (cptools::help() + '\n'));
             }

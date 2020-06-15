@@ -3,7 +3,7 @@
 
 #define CP_TOOLS_OK                                     0
 #define CP_TOOLS_ERROR_MISSING_ARGUMENT                 -1
-#define CP_TOOLS_ERROR_INVALID_PARAMETER                -2
+#define CP_TOOLS_ERROR_INVALID_OPTION                   -2
 #define CP_TOOLS_ERROR_INVALID_COMMAND                  -3
 
 #define CP_TOOLS_ERROR_INIT_INVALID_OPTION              -10
