@@ -52,7 +52,7 @@ namespace cptools::sh {
 
     int copy_dir(const std::string& dest, const std::string& src)
     {
-        std::string command { "cp -r " + src + "/* " + dest };
+        std::string command { "cp -r -n " + src + "/* " + dest };
 
         auto rc = std::system(command.c_str());
 
