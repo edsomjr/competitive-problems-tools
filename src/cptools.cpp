@@ -82,7 +82,7 @@ namespace cptools {
     {
         if (argc >= 2)
         {
-            std::string command { argv[1] };
+            string command { argv[1] };
 
             for (const auto& [cmd, exec] : commands)
                 if (cmd == command)
