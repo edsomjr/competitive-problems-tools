@@ -183,13 +183,13 @@ namespace cptools::judge {
             }
         }
 
-        if (argc < 4)
+        if (argc < 3)
         {
             err << usage() << '\n';
             return CP_TOOLS_ERROR_MISSING_ARGUMENT;
         }
 
-        auto solution_path = argv[3];
+        auto solution_path = argv[2];
 
         return judge(solution_path, out, err);
     }
