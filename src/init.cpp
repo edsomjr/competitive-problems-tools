@@ -8,10 +8,11 @@
 #include "defs.h"
 #include "init.h"
 #include "error.h"
+#include "message.h"
 
 
 // Raw strings
-static const std::string help_message {
+static const string help_message {
 R"message(
 Initialize an empty directory with template files. If a file already exists, it is not overridden.
 
@@ -36,39 +37,43 @@ namespace cptools::init {
     };
 
     // Auxiliary routines
-    std::string usage()
+    string usage()
     {
         return "Usage: " NAME " init [-h] [-o output_dir]";
     }
 
-    std::string help()
+    string help()
     {
         return usage() + help_message;
     }
 
-    int copy_template_files(const std::string& dest, std::ostream& out, std::ostream& err)
+    int copy_template_files(const string& dest, ostream& out, ostream& err)
     {
+        out << "Initializing directory '" << dest << "' ...\n";
+
         auto rc = cptools::sh::make_dir(dest);
 
         if (rc != CP_TOOLS_OK)
+        {
+            err << message::failure() << " Can't create directory '" << dest << "'!\n";
             return rc;
+        }
 
-        out << "Initializing '" << dest << "'... ";
         rc = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
 
         if (rc == CP_TOOLS_OK)
-            out << "Done!\n";
+            out << message::sucess() << "\n";
         else
-            err << "Fail! Directory " << dest << " could not be initialized!\n";
+            err << message::failure() << " Directory '" << dest << "' could not be initialized!\n";
 
         return rc;
     }
 
     // API functions
-    int run(int argc, char* const argv[], std::ostream& out, std::ostream& err)
+    int run(int argc, char* const argv[], ostream& out, ostream& err)
     {
         int option = -1;
-        std::string dest { "." };
+        string dest { "." };
 
         while ((option = getopt_long(argc, argv, "ho:", longopts, NULL)) != -1)
         {
@@ -78,7 +83,7 @@ namespace cptools::init {
                 return 0;
 
             case 'o':
-                dest = std::string(optarg);
+                dest = string(optarg);
                 break;
 
             default:
