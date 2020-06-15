@@ -2,7 +2,7 @@
 
 ![Travis](https://travis-ci.org/edsomjr/competitive-problems-tools.svg?branch=master)
 
-A set of competitive programming tools for contests preparation.
+Format, test and pack competitive programming problems.
 
 ## Installation
 
