@@ -9,13 +9,14 @@ using std::string;
 namespace cptools::sh {
 
     int copy_file(const string& dest, const string& src);
+    int remove_file(const string& path);
 
     int make_dir(const string& path);
     int copy_dir(const string& dest, const string& src);
     int remove_dir(const string& path);
-    int remove_file(const string& path);
 
     bool compare_dirs(const string& dirA, const string& dirB);
+
     bool is_dir(const string& path);
     bool is_file(const string& path);
 

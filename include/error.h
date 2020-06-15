@@ -32,6 +32,7 @@
 #define CP_TOOLS_ERROR_SH_EXEC_ERROR                    -109
 #define CP_TOOLS_ERROR_SH_REMOVE_FILE                   -110
 #define CP_TOOLS_ERROR_SH_PY_BUILD_ERROR                -111
+#define CP_TOOLS_ERROR_SH_POPEN_FAILED                  -112
 
 #define CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR          -120
 #define CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE         -121
