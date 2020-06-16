@@ -12,7 +12,9 @@
 #include "clean.h"
 #include "error.h"
 #include "judge.h"
+#include "table.h"
 #include "config.h"
+#include "message.h"
 
 using timer = std::chrono::high_resolution_clock;
 
@@ -50,6 +52,27 @@ namespace cptools::judge {
 
     int judge(const std::string& solution_path, std::ostream& out, std::ostream& err)
     {
+        table::Table t { {
+            { "#", 4, message::align::RIGHT, { message::format::BOLD } },
+            { "Veredict", 32, message::align::LEFT, { message::format::BOLD } },
+            { "Time (ms)", 12, message::align::RIGHT, { message::format::BOLD } },
+            { "Memory (KB)", 12, message::align::RIGHT, { message::format::BOLD } },
+        } };
+
+        t.add_row({ { "1", message::preset::PS_COUNTER}, { "Accepted", message::preset::PS_AC }, 
+            { "0.344", message::preset::PS_FLOAT }, { "100", message::preset::PS_INT } });
+
+        t.add_row({ { "2", message::preset::PS_COUNTER}, { "Wrong Answer", message::preset::PS_WA }, 
+            { "0.2", message::preset::PS_FLOAT }, { "60", message::preset::PS_INT } });
+
+        t.add_row({ { "3", message::preset::PS_COUNTER}, { "Presentation Error", 
+            message::preset::PS_PE }, 
+            { "0.5142", message::preset::PS_FLOAT }, { "2318", message::preset::PS_INT } });
+
+        out << t << '\n';
+
+        return CP_TOOLS_OK;
+
         auto config = cptools::config::read("config.json");
         auto timelimit = cptools::config::get(config, "problem|timelimit", 1000);
 
