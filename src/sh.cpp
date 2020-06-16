@@ -1,7 +1,7 @@
-#include <iostream>
-#include <sstream>
-#include <vector>
 #include <map>
+#include <vector>
+#include <sstream>
+#include <iostream>
 
 #include <sys/stat.h>
 
@@ -10,47 +10,48 @@
 #include "dirs.h"
 #include "error.h"
 
-using std::ostringstream;
-using std::to_string;
-using std::ostream;
-using std::vector;
 using std::map;
+using std::vector;
+using std::ostream;
+using std::to_string;
+using std::ostringstream;
 
 namespace cptools::sh {
 
-    static int execute_command(const string& command, ostream& out)
+    static int execute_command(const string& command, string& out)
     {
         auto fp = popen(command.c_str(), "r");
 
         if (fp == NULL)
             return CP_TOOLS_ERROR_SH_POPEN_FAILED;
 
+        ostringstream oss;
         char buffer[4096];
 
         while (fread(buffer, sizeof(char), 4096, fp) > 0)
         {
-            out << buffer;
+            oss << buffer;
         }
+
+        out = oss.str();
 
         return pclose(fp);
     }
 
-    int make_dir(const string& path)
+    int make_dir(const string& path, string& error)
     {
         string command { "mkdir -p " + path };
-        ostringstream out;
 
-        auto rc = execute_command(command, out); 
+        auto rc = execute_command(command, error); 
 
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CREATE_DIRECTORY;
     }
 
-    int copy_dir(const string& dest, const string& src)
+    int copy_dir(const string& dest, const string& src, string& error)
     {
         string command { "cp -r -n " + src + "/* 2>&1 " + dest };
-        ostringstream out;
 
-        auto rc = execute_command(command, out);
+        auto rc = execute_command(command, error);
 
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_DIRECTORY;
     }

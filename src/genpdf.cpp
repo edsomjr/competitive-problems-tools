@@ -85,7 +85,8 @@ namespace cptools::genpdf {
         int flags, const std::string& label, const std::string& outfile, bool tutorial,
         std::ostream& out, std::ostream& err)
     {
-        auto rc = sh::make_dir(CP_TOOLS_BUILD_DIR);
+        std::string error;
+        auto rc = sh::make_dir(CP_TOOLS_BUILD_DIR, error);
 
         if (rc != CP_TOOLS_OK)
         {

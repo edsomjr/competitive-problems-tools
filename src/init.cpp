@@ -51,20 +51,28 @@ namespace cptools::init {
     {
         out << "Initializing directory '" << dest << "' ...\n";
 
-        auto rc = cptools::sh::make_dir(dest);
+        // Cria o diretório, se necessário
+        string error;
+        auto rc = cptools::sh::make_dir(dest, error);
 
         if (rc != CP_TOOLS_OK)
         {
             err << message::failure() << " Can't create directory '" << dest << "'!\n";
+            err << message::trace(error) << '\n';
             return rc;
         }
 
-        rc = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
+        // Copia os templates para o diretório indicado
+        error = "";
+        rc = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR, error);
 
         if (rc == CP_TOOLS_OK)
             out << message::sucess() << "\n";
         else
+        {
             err << message::failure() << " Directory '" << dest << "' could not be initialized!\n";
+            err << message::trace(error) << '\n';
+        }
 
         return rc;
     }

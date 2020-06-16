@@ -11,6 +11,7 @@ namespace cptools::message {
     string failure();
     string warning();
 
+    string trace(const string& errors);
 }
 
 #endif
