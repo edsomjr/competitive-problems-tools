@@ -3,7 +3,7 @@
 
 #define CP_TOOLS_OK                                     0
 #define CP_TOOLS_ERROR_MISSING_ARGUMENT                 -1
-#define CP_TOOLS_ERROR_INVALID_PARAMETER                -2
+#define CP_TOOLS_ERROR_INVALID_OPTION                   -2
 #define CP_TOOLS_ERROR_INVALID_COMMAND                  -3
 
 #define CP_TOOLS_ERROR_INIT_INVALID_OPTION              -10
@@ -32,6 +32,7 @@
 #define CP_TOOLS_ERROR_SH_EXEC_ERROR                    -109
 #define CP_TOOLS_ERROR_SH_REMOVE_FILE                   -110
 #define CP_TOOLS_ERROR_SH_PY_BUILD_ERROR                -111
+#define CP_TOOLS_ERROR_SH_POPEN_FAILED                  -112
 
 #define CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR          -120
 #define CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE         -121

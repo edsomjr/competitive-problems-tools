@@ -23,12 +23,6 @@ static const std::string help_message {
 R"message(
 Generate a PDF file from the problem description. The options are:
 
-    -h              Displays this help.
-    --help
-
-    -o              Output file. If omitted, the output will be the file 'problem.pdf'.
-    --output        
-
     -b              Defines the problem label. The default value is 'A'.
     --label         
 
@@ -38,8 +32,17 @@ Generate a PDF file from the problem description. The options are:
     -g              Problem language. The default value is 'en_US'.
     --lang
 
+    -h              Displays this help.
+    --help
+
     -l              Lists all available document classes.
     --list
+
+    -o              Output file. If omitted, the output will be the file 'problem.pdf'.
+    --output        
+
+    -t              Generates the PDF for the problem's tutorial.
+    --tutorial
 
     --no_author     Omits problem's author.
 
@@ -60,6 +63,7 @@ namespace cptools::genpdf {
         { "list", no_argument, NULL, 'l' },
         { "class", required_argument, NULL, 'c' },
         { "output", required_argument, NULL, 'o' },
+        { "tutorial", no_argument, NULL, 't' },
         { "no_author", no_argument, NULL, NO_AUTHOR },
         { "no_contest", no_argument, NULL, NO_CONTEST },
         { 0, 0, 0, 0 }
@@ -68,7 +72,7 @@ namespace cptools::genpdf {
     // Auxiliary routines
     std::string usage()
     {
-        return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] [-g lang] [-l] [--no-author] [--no-contest]";
+        return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] [-g lang] [-l] [-t] [--no-author] [--no-contest]";
     }
 
     std::string help()
@@ -78,10 +82,11 @@ namespace cptools::genpdf {
 
 
     int generate_pdf(const std::string& doc_class, const std::string& language, 
-        int flags, const std::string& label, const std::string& outfile, 
+        int flags, const std::string& label, const std::string& outfile, bool tutorial,
         std::ostream& out, std::ostream& err)
     {
-        auto rc = sh::make_dir(CP_TOOLS_BUILD_DIR);
+        std::string error;
+        auto rc = sh::make_dir(CP_TOOLS_BUILD_DIR, error);
 
         if (rc != CP_TOOLS_OK)
         {
@@ -90,7 +95,11 @@ namespace cptools::genpdf {
         }
 
         // Generates the tex file that will be used to build the pdf file
-        std::string texfile_path { std::string(CP_TOOLS_BUILD_DIR) + "/problem.tex" };
+        std::string texfile_path { std::string(CP_TOOLS_BUILD_DIR) + 
+            (tutorial ? "/tutorial.tex" : "/problem.tex") };
+
+        sh::remove_file(texfile_path);
+
         std::ofstream tex_file(texfile_path);
 
         if (not tex_file)
@@ -99,7 +108,10 @@ namespace cptools::genpdf {
             return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
         }
 
-        rc = gentex::generate_latex(doc_class, language, flags, label, tex_file, err);
+        if (tutorial)
+            rc = gentex::generate_tutorial_latex(doc_class, language, flags, label, tex_file, err);
+        else
+            rc = gentex::generate_latex(doc_class, language, flags, label, tex_file, err);
 
         if (rc != CP_TOOLS_OK)
         {
@@ -110,7 +122,8 @@ namespace cptools::genpdf {
         tex_file.close();
 
         // Generates the PDF file 'problem.pdf' on CP_TOOLS_BUILD_DIR
-        std::string pdf_file { std::string(CP_TOOLS_BUILD_DIR) + "/problem.pdf" };
+        std::string pdf_file { std::string(CP_TOOLS_BUILD_DIR) + 
+            (tutorial ? "/tutorial.pdf" : "/problem.pdf") };
 
         rc = sh::build(pdf_file, texfile_path);
 
@@ -138,12 +151,13 @@ namespace cptools::genpdf {
     int run(int argc, char * const argv[], std::ostream& out, std::ostream& err)
     {
         int option = -1;
+        bool tutorial = false;
 
         std::string document_class { "cp_modern" }, outfile { "problem.pdf" }, 
             language { "en_US" }, label { "A" };
         int flags = gentex::Flags::INCLUDE_AUTHOR | gentex::Flags::INCLUDE_CONTEST;
 
-        while ((option = getopt_long(argc, argv, "ho:c:lg:b:", longopts, NULL)) != -1)
+        while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1)
         {
             switch (option) {
             case 'h':
@@ -178,6 +192,11 @@ namespace cptools::genpdf {
                 break;
             }
 
+            case 't':
+                tutorial = true;
+                outfile = "tutorial.pdf";
+                break;
+
             case NO_AUTHOR:
                 flags &= (~gentex::Flags::INCLUDE_AUTHOR);
                 break;
@@ -192,7 +211,7 @@ namespace cptools::genpdf {
             }
         }
 
-        return generate_pdf(document_class, language, flags, label, outfile, out, err);
+        return generate_pdf(document_class, language, flags, label, outfile, tutorial, out, err);
     }
 
 }

@@ -108,13 +108,13 @@ namespace cptools::gentex {
                 continue;
 
             std::string filename { dir->d_name };
-            auto tokens = split(filename, '.');
+            auto tokens = util::split(filename, '.');
 
             if (tokens.size() != 2)
                 continue;
 
-            auto name = strip(tokens[0], '"');
-            auto ext = strip(tokens[1], '"');
+            auto name = util::strip(tokens[0], '"');
+            auto ext = util::strip(tokens[1], '"');
 
             if (ext != "cls" or name.empty() or name.front() == '.')
                 continue;
@@ -136,7 +136,7 @@ namespace cptools::gentex {
             if (pos == std::string::npos)
                 continue;
 
-            line = strip(line.substr(pos + 1));
+            line = util::strip(line.substr(pos + 1));
 
             out << "    " << name;
             int count = 4 + name.size();
@@ -154,6 +154,50 @@ namespace cptools::gentex {
 
         return CP_TOOLS_OK;
     }
+
+    int generate_tutorial_latex(const std::string& doc_class, const std::string& language, 
+        int flags, const std::string& label, std::ostream& out, std::ostream&)
+    {
+        auto config = config::read("config.json");
+
+        auto lang { languages.at(language) };
+        auto event { config::get(config, "problem|contest", std::string()) }; 
+        auto author { config::get(config, "problem|author", std::string()) }; 
+        auto title { config::get(config, "problem|title|" + language, std::string("Título")) };
+
+        if ((not (flags & INCLUDE_CONTEST)) 
+            or (not config::get(config, "PDF|include_contest", false)))
+                event = "";
+
+        if ((not (flags & INCLUDE_AUTHOR)) 
+            or (not config::get(config, "PDF|include_author", false)))
+                author = "";
+
+        out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
+        out << "\\usepackage{amsmath}\n";
+        out << "\\usepackage{tikz}\n\n";
+
+        out << "\\newcommand{\\Mod}[1]{\\ (\\mathrm{mod}\\ #1)}\n\n";
+
+        out << "\\begin{document}\n\n";
+
+        out << "\\header{" << event << "}{" << author << "}\n\n";
+
+        out << "\\begin{flushleft}\n";
+        out << "\\textbf{\\Large{" << label << ". " << title << "}}\n";
+        out << "\\end{flushleft}\n";
+
+        out << "\\vspace{0.2in}\n";
+
+        out << "\\input{tex/" << language << "/tutorial}\n\n";
+
+        out << "\\trailer{" << event << "}{" << author << "}\n\n";
+
+        out << "\\end{document}\n";
+
+        return CP_TOOLS_OK;
+    }
+
 
     int generate_latex(const std::string& doc_class, const std::string& language, 
         int flags, const std::string& label, std::ostream& out, std::ostream& err)

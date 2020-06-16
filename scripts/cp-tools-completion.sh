@@ -1,3 +1,3 @@
 # cp-tools bash completion
 
-complete -W "problem contests users" cp-tools
+complete -W "init check clean genpdf gentex judge" cp-tools

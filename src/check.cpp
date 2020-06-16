@@ -54,6 +54,7 @@ namespace cptools::check {
 
     static std::map<std::string, int> rcodes {
         { "AC", 4 },
+        { "PE", 5 },
         { "WA", 6 },
     };
 
@@ -221,7 +222,7 @@ namespace cptools::check {
             if ((veredict == "VALID" and rc != CP_TOOLS_OK) or
                 (veredict == "INVALID" and rc == CP_TOOLS_OK))
             {
-                err << "[validate_validator] input = '" << input << "' in invalid: expected = '" 
+                err << "[validate_validator] input = '" << input << "' is invalid: expected = '" 
                     << veredict << "'\n";
                 return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
             }

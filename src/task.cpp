@@ -29,7 +29,8 @@ namespace cptools::task {
         auto source = "solutions/" + cptools::config::get(config, "solutions|default", 
             std::string("ERROR"));
 
-        auto rc = cptools::sh::make_dir(input_dir);
+        string error;
+        auto rc = cptools::sh::make_dir(input_dir, error);
 
         if (rc != CP_TOOLS_OK)
         {
@@ -37,7 +38,8 @@ namespace cptools::task {
             return { };
         }
 
-        rc = cptools::sh::make_dir(output_dir);
+        error = "";
+        rc = cptools::sh::make_dir(output_dir, error);
 
         if (rc != CP_TOOLS_OK)
         {

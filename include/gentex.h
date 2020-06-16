@@ -16,6 +16,8 @@ namespace cptools::gentex {
     int generate_latex(const std::string& doc_class, const std::string& language, 
         int flags, const std::string& label, std::ostream& out, std::ostream& err);
 
+    int generate_tutorial_latex(const std::string& doc_class, const std::string& language, 
+        int flags, const std::string& label, std::ostream& out, std::ostream& err);
     // Main routine
     int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
 
