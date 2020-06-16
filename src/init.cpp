@@ -67,7 +67,7 @@ namespace cptools::init {
         rc = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR, error);
 
         if (rc == CP_TOOLS_OK)
-            out << message::sucess() << "\n";
+            out << message::success() << "\n";
         else
         {
             err << message::failure() << " Directory '" << dest << "' could not be initialized!\n";

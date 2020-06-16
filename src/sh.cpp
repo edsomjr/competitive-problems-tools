@@ -73,6 +73,17 @@ namespace cptools::sh {
 
         return rc == 0;
     }
+
+    bool is_dir(const string& path, string& error)
+    {
+        string command { "test -d " + path };
+    
+        auto rc = execute_command(command, error);
+
+        return rc == 0;
+    }
+
+
     long int last_modified(const string& filepath)
     {
         struct stat sb;
@@ -100,15 +111,6 @@ namespace cptools::sh {
 
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE;
 
-    }
-
-    bool is_dir(const string& path)
-    {
-        string command { "test -d " + path };
-
-        auto rc = system(command.c_str());
-
-        return rc == 0;
     }
 
     bool is_file(const string& path)

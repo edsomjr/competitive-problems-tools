@@ -7,7 +7,7 @@ using std::string;
 
 namespace cptools::message {
 
-    string sucess();
+    string success();
     string failure();
     string warning();
 

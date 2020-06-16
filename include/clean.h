@@ -3,15 +3,17 @@
 
 #include <iostream>
 
+using std::string;
+using std::ostream;
+
 namespace cptools::clean
 {
     // Main routine
-    int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
+    int run(int argc, char * const argv[], ostream& out, ostream& err);
 
     // Auxiliary routines
-    std::string help();
-    std::string usage();
-
+    string help();
+    string usage();
 }
 
 #endif

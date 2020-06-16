@@ -16,7 +16,7 @@ namespace cptools::sh {
     int remove_dir(const string& path, string& error);
     bool compare_dirs(const string& dirA, const string& dirB, string& error);
 
-    bool is_dir(const string& path);
+    bool is_dir(const string& path, string& error);
     bool is_file(const string& path);
 
     int build(const string& output, const string& src);

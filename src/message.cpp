@@ -24,7 +24,7 @@ namespace cptools::message {
         { END, "\033[0m" },
     };
 
-    string sucess()
+    string success()
     {
         return colors[BOLD] + colors[GREEN] + "Ok!" + colors[END];
     }
