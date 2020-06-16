@@ -13,9 +13,8 @@ namespace cptools::sh {
 
     int make_dir(const string& path, string& error);
     int copy_dir(const string& dest, const string& src, string& error);
-    int remove_dir(const string& path);
-
-    bool compare_dirs(const string& dirA, const string& dirB);
+    int remove_dir(const string& path, string& error);
+    bool compare_dirs(const string& dirA, const string& dirB, string& error);
 
     bool is_dir(const string& path);
     bool is_file(const string& path);

@@ -40,7 +40,7 @@ namespace cptools::sh {
 
     int make_dir(const string& path, string& error)
     {
-        string command { "mkdir -p " + path };
+        string command { "mkdir -p " + path + " 2>&1" };
 
         auto rc = execute_command(command, error); 
 
@@ -56,6 +56,23 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_DIRECTORY;
     }
 
+    int remove_dir(const string& path, string& error)
+    {
+        string command { "rm -rf " + path + " 2>&1" };
+
+        auto rc = execute_command(command, error);
+
+        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY;
+    }
+
+    bool compare_dirs(const string& dirA, const string& dirB, string& error)
+    {
+        string command { "diff -r " + dirA + " " + dirB + " 2>&1" };
+
+        auto rc = execute_command(command, error);
+
+        return rc == 0;
+    }
     long int last_modified(const string& filepath)
     {
         struct stat sb;
@@ -83,25 +100,6 @@ namespace cptools::sh {
 
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE;
 
-    }
-
-
-    int remove_dir(const string& path)
-    {
-        string command { "rm -rf " + path };
-
-        auto rc = system(command.c_str());
-
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY;
-    }
-
-    bool compare_dirs(const string& dirA, const string& dirB)
-    {
-        string command { "diff -r " + dirA + " " + dirB };
-
-        auto rc = system(command.c_str());
-
-        return rc == 0;
     }
 
     bool is_dir(const string& path)

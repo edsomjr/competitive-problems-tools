@@ -58,7 +58,8 @@ namespace cptools::clean {
             return CP_TOOLS_OK;
         }
 
-        rc = cptools::sh::remove_dir(build_dir);
+        string error;
+        rc = cptools::sh::remove_dir(build_dir, error);
 
         if (rc != CP_TOOLS_OK)
         {
