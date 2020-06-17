@@ -14,8 +14,7 @@ namespace cptools::table {
     struct Column {
         string label;
         size_t size;
-        int pos;
-        vector<int> format;
+        long long format;
     };
 
     class Table {
@@ -25,11 +24,11 @@ namespace cptools::table {
         Table(const vector<Column>& cols) : header(cols) { };
         Table(vector<Column>&& cols) : header(cols) { };
 
-        void add_row(const vector<pair<string, int>>& row);
+        void add_row(const vector<pair<string, long long>>& row);
         
     private:
         vector<Column> header;
-        vector<vector<pair<string,int>>> rows;
+        vector<vector<pair<string,long long>>> rows;
     };
 }
 

@@ -49,7 +49,7 @@ namespace cptools::init {
 
     int copy_template_files(const string& dest, ostream& out, ostream& err)
     {
-        out << "Initializing directory '" << dest << "' ...\n";
+        out << message::info("Initializing directory '" + dest + "' ...") << "\n";
 
         // Cria o diretório, se necessário
         string error;
@@ -57,7 +57,7 @@ namespace cptools::init {
 
         if (rc != CP_TOOLS_OK)
         {
-            err << message::failure() << " Can't create directory '" << dest << "'!\n";
+            err << message::failure("Can't create directory '" + dest + "'!") << "\n";
             err << message::trace(error) << '\n';
             return rc;
         }
@@ -70,7 +70,7 @@ namespace cptools::init {
             out << message::success() << "\n";
         else
         {
-            err << message::failure() << " Directory '" << dest << "' could not be initialized!\n";
+            err << message::failure("Directory '" + dest + "' could not be initialized!") << "\n";
             err << message::trace(error) << '\n';
         }
 

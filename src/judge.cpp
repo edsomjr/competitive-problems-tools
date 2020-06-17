@@ -14,6 +14,7 @@
 #include "judge.h"
 #include "table.h"
 #include "config.h"
+#include "format.h"
 #include "message.h"
 
 using timer = std::chrono::high_resolution_clock;
@@ -32,6 +33,18 @@ Runs a solution against all test sets and gives you a veredict.
 };
 
 namespace cptools::judge {
+
+    namespace verdict {
+        int AC = 0;
+        int PE = 1;
+        int WA = 2;
+        int TLE = 3;
+        int RTE = 4;
+        int MLE = 5;
+        int UNDEF = 6;
+        int CE = 7;
+        int FAIL = 8;
+    }
 
     // Global variables
     static struct option longopts[] = {
@@ -53,21 +66,20 @@ namespace cptools::judge {
     int judge(const std::string& solution_path, std::ostream& out, std::ostream& err)
     {
         table::Table t { {
-            { "#", 4, message::align::RIGHT, { message::format::BOLD } },
-            { "Veredict", 32, message::align::LEFT, { message::format::BOLD } },
-            { "Time (ms)", 12, message::align::RIGHT, { message::format::BOLD } },
-            { "Memory (KB)", 12, message::align::RIGHT, { message::format::BOLD } },
+            { "#", 4, format::align::RIGHT | format::emph::BOLD },
+            { "Verdict", 32, format::align::LEFT | format::emph::BOLD },
+            { "Time (ms)", 12, format::align::RIGHT | format::emph::BOLD },
+            { "Memory (KB)", 12, format::align::RIGHT | format::emph::BOLD },
         } };
 
-        t.add_row({ { "1", message::preset::PS_COUNTER}, { "Accepted", message::preset::PS_AC }, 
-            { "0.344", message::preset::PS_FLOAT }, { "100", message::preset::PS_INT } });
+        t.add_row({ { "1", format::style::COUNTER }, { "Accepted", format::style::AC }, 
+            { "0.344", format::style::FLOAT }, { "100", format::style::INT } });
 
-        t.add_row({ { "2", message::preset::PS_COUNTER}, { "Wrong Answer", message::preset::PS_WA }, 
-            { "0.2", message::preset::PS_FLOAT }, { "60", message::preset::PS_INT } });
+        t.add_row({ { "2", format::style::COUNTER }, { "Wrong Answer", format::style::WA }, 
+            { "0.2", format::style::FLOAT }, { "60", format::style::INT } });
 
-        t.add_row({ { "3", message::preset::PS_COUNTER}, { "Presentation Error", 
-            message::preset::PS_PE }, 
-            { "0.5142", message::preset::PS_FLOAT }, { "2318", message::preset::PS_INT } });
+        t.add_row({ { "3", format::style::COUNTER }, { "Presentation Error", format::style::PE }, 
+            { "0.5142", format::style::FLOAT }, { "2318", format::style::INT } });
 
         out << t << '\n';
 
@@ -119,7 +131,7 @@ namespace cptools::judge {
         if (rc != CP_TOOLS_OK)
         {
             err << "[judge] Can't build solution '" << solution_path << "'\n";
-            return CE;
+            return verdict::CE;
         }
 
         out << "[judge] Judging solution '" << solution_path << "'...\n";
@@ -152,27 +164,27 @@ namespace cptools::judge {
             if (t.count() > timelimit / 1000.0)
             {
                 out << "Time Limit Exceeded\n";
-                return TLE;
+                return verdict::TLE;
             }
 
             if (rc != CP_TOOLS_OK)
             {
                 err << "[judge] Can't generate output for input '" << input << "'\n";
-                return RTE;
+                return verdict::RTE;
             }
 
             auto args { input + " " + output + " " + answer };
  
             rc = sh::exec(checker, args, "/dev/null", 3*timelimit / 1000.0);
 
-                        switch (rc) {
+            switch (rc) {
             case 6:
                 out << "Wrong Answer!\n";
-                return WA;
+                return verdict::WA;
 
             case 5:
                 out << "Presentation Error\n";
-                return PE;
+                return verdict::PE;
 
             case 4:
                 out << "Ok!\n";
@@ -180,11 +192,11 @@ namespace cptools::judge {
 
             default:
                 out << "Undefined Error!\n";
-                return UNDEF;
+                return verdict::UNDEF;
             };
         }
  
-        return AC;
+        return verdict::AC;
     }
 
     // API functions

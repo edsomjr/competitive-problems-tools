@@ -3,27 +3,32 @@
 
 #include <iostream>
 
-#define AC      0
-#define WA      1
-#define TLE     2
-#define PE      3
-#define RTE     4
-#define FL      5
-#define MLE     6
-#define CE      7
-#define UNDEF   8
+using std::string;
+using std::ostream;
 
 namespace cptools::judge
 {
+    namespace verdict {
+        extern int AC;
+        extern int WA;
+        extern int PE;
+        extern int CE;
+        extern int TLE;
+        extern int RTE;
+        extern int MLE;
+        extern int FAIL;
+        extern int UNDEF;
+    }
+
     // Main routine
-    int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
+    int run(int argc, char * const argv[], ostream& out, ostream& err);
 
     // Auxiliary routines
-    std::string help();
-    std::string usage();
+    string help();
+    string usage();
 
     // Judge solution
-    int judge(const std::string& solution_path, std::ostream& out, std::ostream& err);
+    int judge(const string& solution_path, ostream& out, ostream& err);
 }
 
 #endif

@@ -1,5 +1,5 @@
 #include "table.h"
-#include "message.h"
+#include "format.h"
 
 #include <iostream>
 
@@ -22,7 +22,8 @@ namespace cptools::table {
         {
             os << "| ";
 
-            os << message::formatted(h.label, h.size, h.pos, h.format) << " ";
+//            os << format::formatted(h.label, h.size, h.pos, h.format) << " ";
+            os << format::apply(h.label, h.format, h.size) << " ";
         }
 
         os << "|\n" << hline << '\n';
@@ -34,10 +35,11 @@ namespace cptools::table {
             for (int i = 0; i < N; ++i) 
             {
                 auto data = i < M ? row[i].first : "";
-                auto spec = i < M ? row[i].second : message::format::PLAIN;
+                auto spec = i < M ? row[i].second : 0;
 
                 os << "| ";
-                os << message::formatted(data, t.header[i].size, t.header[i].pos, { spec }) << " ";
+                //os << format::formatted(data, t.header[i].size, t.header[i].pos, { spec }) << " ";
+                os << format::apply(data, spec, t.header[i].size) << " ";
             }
 
             os << "|\n" << hline << '\n';
@@ -46,7 +48,7 @@ namespace cptools::table {
         return os;
     }
 
-    void Table::add_row(const vector<pair<string, int>>& row)
+    void Table::add_row(const vector<pair<string, long long>>& row)
     {
         rows.push_back(row);
     }
