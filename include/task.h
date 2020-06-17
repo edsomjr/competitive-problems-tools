@@ -25,6 +25,8 @@ namespace cptools::task {
         ostream& err, bool gen_output = true);    
 
     int build_tools(string& error, int tools = tools::ALL, const string& where = ".");
+    int gen_exe(string& error, const string& source, const string& dest, const string& where = ".");
+
 }
 
 #endif

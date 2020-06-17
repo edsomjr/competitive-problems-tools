@@ -220,4 +220,31 @@ namespace cptools::task {
         return CP_TOOLS_OK;
     }
 
+    int gen_exe(string& error, const string& source, const string& dest, const string& where)
+    {
+        auto dest_dir { where + "/" + CP_TOOLS_BUILD_DIR + "/" };
+
+        auto rc = sh::make_dir(dest_dir, error);
+
+        if (rc != CP_TOOLS_OK)
+            return rc;
+
+        auto program { dest_dir + dest };
+
+        rc = sh::remove_file(program, error);
+
+        if (rc != CP_TOOLS_OK)
+            return rc;
+
+        rc = sh::build(program, source);
+
+        if (rc != CP_TOOLS_OK)
+        {
+            error = "Can't build solution '" + source;
+            return rc;
+        }
+
+        return CP_TOOLS_OK;
+
+    }
 }

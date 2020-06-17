@@ -65,97 +65,70 @@ namespace cptools::judge {
 
     int judge(const std::string& solution_path, std::ostream& out, std::ostream& err)
     {
-        table::Table t { {
+        table::Table report { {
             { "#", 4, format::align::RIGHT | format::emph::BOLD },
             { "Verdict", 32, format::align::LEFT | format::emph::BOLD },
-            { "Time (ms)", 12, format::align::RIGHT | format::emph::BOLD },
+            { "Time (s)", 12, format::align::RIGHT | format::emph::BOLD },
             { "Memory (KB)", 12, format::align::RIGHT | format::emph::BOLD },
         } };
 
-        t.add_row({ { "1", format::style::COUNTER }, { "Accepted", format::style::AC }, 
-            { "0.344", format::style::FLOAT }, { "100", format::style::INT } });
+//        t.add_row({ { "1", format::style::COUNTER }, { "Accepted", format::style::AC }, 
+//            { "0.344", format::style::FLOAT }, { "100", format::style::INT } });
 
-        t.add_row({ { "2", format::style::COUNTER }, { "Wrong Answer", format::style::WA }, 
-            { "0.2", format::style::FLOAT }, { "60", format::style::INT } });
+//        t.add_row({ { "2", format::style::COUNTER }, { "Wrong Answer", format::style::WA }, 
+//            { "0.2", format::style::FLOAT }, { "60", format::style::INT } });
 
-        t.add_row({ { "3", format::style::COUNTER }, { "Presentation Error", format::style::PE }, 
-            { "0.5142", format::style::FLOAT }, { "2318", format::style::INT } });
+//        t.add_row({ { "3", format::style::COUNTER }, { "Presentation Error", format::style::PE }, 
+ //           { "0.5142", format::style::FLOAT }, { "2318", format::style::INT } });
 
-        out << t << '\n';
+//        out << t << '\n';
 
+        out << message::info("Judging solution '" + solution_path + "'...") << "\n";
+
+        // Constrói as ferramentas necessárias
         string error;
-        auto rcc = task::build_tools(error, task::tools::VALIDATOR | task::tools::CHECKER);
+        auto rc = task::build_tools(error, task::tools::VALIDATOR | task::tools::CHECKER);
 
-        out << "rc = " << rcc << '\n';
+        if (rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Can't build the required tools") << '\n';
+            err << message::trace(error);
+            return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
+        }
 
-        if (not error.empty())
-            err << error << '\n';
-        return CP_TOOLS_OK;
+        // Gera o executável da solução
+        rc = task::gen_exe(error, solution_path, "sol");
+
+        if (rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Error on solution '" + solution_path + "' compilation") << '\n';
+            err << message::trace(error) << '\n';
+            return verdict::CE;
+        }
 
         auto config = cptools::config::read("config.json");
         auto timelimit = cptools::config::get(config, "problem|timelimit", 1000);
 
-        auto validator { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
-        auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
-
-        if (source == "ERROR")
-        {
-            err << "[judge] Validator file not found!\n";
-            return CP_TOOLS_ERROR_JUDGE_MISSING_VALIDATOR;
-        }
-
-        auto rc = cptools::sh::build(validator, source);
-
-        if (rc != CP_TOOLS_OK)
-        {
-            err << "[validate_checker] Can't compile validator '" << source << "'\n";
-            return rc;
-        }
-
-        source = cptools::config::get(config, "tools|checker", std::string("ERROR"));
-
-        if (source == "ERROR")
-        {
-            err << "[judge] Checker file not found!\n";
-            return CP_TOOLS_ERROR_JUDGE_MISSING_CHECKER;
-        }
-
         auto checker { std::string(CP_TOOLS_BUILD_DIR) + "/checker" };
-
-        rc = cptools::sh::build(checker, source);
-
-        if (rc != CP_TOOLS_OK)
-        {
-            err << "[judge] Can't compile checker '" << source << "'\n";
-            return rc;
-        }
-
         auto program { std::string(CP_TOOLS_BUILD_DIR) + "/sol" };
-
-        sh::remove_file(program);
-        rc = sh::build(program, solution_path);
-
-        if (rc != CP_TOOLS_OK)
-        {
-            err << "[judge] Can't build solution '" << solution_path << "'\n";
-            return verdict::CE;
-        }
-
-        out << "[judge] Judging solution '" << solution_path << "'...\n";
+        auto validator { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
 
         auto files = task::generate_io_files("all", out, err);
 
         for (auto [input, answer] : files)
         {
+            auto number = util::split(input, '/').back();
             auto output { std::string(CP_TOOLS_BUILD_DIR) + "/out" };
 
             out << "[judge] Test '" << input << "': ";
 
+            // TODO: atualizar a função para que a saída fica na string do 3º parâmetro
             rc = sh::process(input, validator, "/dev/null");
 
             if (rc != CP_TOOLS_OK)
             {
-                err << "[judge] Input file '" << input << "' is invalid\n";
+                err << message::failure("Input file '" + input + "' is invalid") << "\n";
+                err << message::trace(error) << '\n';
                 return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
             }
 
@@ -164,6 +137,11 @@ namespace cptools::judge {
             auto end = timer::now();
 
             std::chrono::duration<double> t = end - start;
+
+            std::ostringstream oss;
+            oss << std::setprecision(5) << std::fixed << t.count();
+            auto elapsed = oss.str();
+
             out << std::setprecision(6) << std::fixed 
                 << t.count()
                 << "s, veredict: ";
@@ -171,13 +149,13 @@ namespace cptools::judge {
             if (t.count() > timelimit / 1000.0)
             {
                 out << "Time Limit Exceeded\n";
-                return verdict::TLE;
+    //            return verdict::TLE;
             }
 
             if (rc != CP_TOOLS_OK)
             {
                 err << "[judge] Can't generate output for input '" << input << "'\n";
-                return verdict::RTE;
+   //             return verdict::RTE;
             }
 
             auto args { input + " " + output + " " + answer };
@@ -187,11 +165,13 @@ namespace cptools::judge {
             switch (rc) {
             case 6:
                 out << "Wrong Answer!\n";
-                return verdict::WA;
+  //              return verdict::WA;
+                break;
 
             case 5:
                 out << "Presentation Error\n";
-                return verdict::PE;
+ //               return verdict::PE;
+                break;
 
             case 4:
                 out << "Ok!\n";
@@ -199,10 +179,17 @@ namespace cptools::judge {
 
             default:
                 out << "Undefined Error!\n";
-                return verdict::UNDEF;
+//                return verdict::UNDEF;
+                break;
             };
+
+
+        report.add_row({ { number, format::style::COUNTER }, { "Accepted", format::style::AC }, 
+            { elapsed, format::style::FLOAT }, { "100", format::style::INT } });
         }
  
+        out << report << '\n';
+
         return verdict::AC;
     }
 

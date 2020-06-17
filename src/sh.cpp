@@ -103,14 +103,13 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_FILE;
     }
 
-    int remove_file(const string& path)
+    int remove_file(const string& path, string& error)
     {
-        string command { "rm -f " + path };
+        string command { "rm -f " + path + " 2>&1" };
 
-        auto rc = system(command.c_str());
+        auto rc = execute_command(command, error); 
 
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE;
-
     }
 
     bool is_file(const string& path)

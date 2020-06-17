@@ -98,7 +98,7 @@ namespace cptools::genpdf {
         std::string texfile_path { std::string(CP_TOOLS_BUILD_DIR) + 
             (tutorial ? "/tutorial.tex" : "/problem.tex") };
 
-        sh::remove_file(texfile_path);
+        sh::remove_file(texfile_path, error);
 
         std::ofstream tex_file(texfile_path);
 

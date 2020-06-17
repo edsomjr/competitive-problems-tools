@@ -9,7 +9,7 @@ using std::string;
 namespace cptools::sh {
 
     int copy_file(const string& dest, const string& src);
-    int remove_file(const string& path);
+    int remove_file(const string& path, string& error);
 
     int make_dir(const string& path, string& error);
     int copy_dir(const string& dest, const string& src, string& error);
