@@ -6,7 +6,17 @@
 #include "error.h"
 #include "config.h"
 
+using std::to_string;
+
 namespace cptools::task {
+
+    namespace tools {
+        const int CHECKER = 1;
+        const int VALIDATOR = 2;
+        const int GENERATOR = 4;
+        const int INTERACTOR = 8;
+        const int ALL = CHECKER | VALIDATOR | GENERATOR | INTERACTOR;
+    }
 
     std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string& testset,
         std::ostream&, std::ostream& err, bool gen_output)    
@@ -149,4 +159,65 @@ namespace cptools::task {
 
         return io_files;
     }
+
+    int build_tools(string& error, int tools, const string& where)
+    {
+        auto dest_dir { where + "/" + CP_TOOLS_BUILD_DIR + "/" };
+
+        auto rc = sh::make_dir(dest_dir, error);
+
+        if (rc != CP_TOOLS_OK)
+            return rc;
+
+        auto config = cptools::config::read("config.json");
+
+        for (int mask = 1; mask <= tools; mask <<= 1)
+        {
+            int tool = tools & mask;
+            string program = "";
+
+            switch (tool) {
+            case tools::VALIDATOR:
+                program = "validator";
+                break;
+
+            case tools::CHECKER:
+                program = "checker";
+                break;
+
+            case tools::GENERATOR:
+                program = "generator";
+                break;
+
+            case tools::INTERACTOR:
+                program = "interactor";
+                break;
+
+            default:
+                error = "Invalid tool required: (" + to_string(tools) + ")";
+                return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
+            }
+
+            auto source = cptools::config::get(config, "tools|" + program, std::string(""));
+
+            if (source.empty())
+            {
+                error = "Can't find source for '" + program + "' in config file";
+                return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
+            }
+
+            auto dest = dest_dir + program;
+
+            auto rc = cptools::sh::build(dest, source);
+
+            if (rc != CP_TOOLS_OK)
+            {
+                error = "Can't compile '" + source + "'\n";
+                return rc;
+            }
+        }
+
+        return CP_TOOLS_OK;
+    }
+
 }

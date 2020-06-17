@@ -46,5 +46,7 @@
 #define CP_TOOLS_ERROR_JUDGE_MISSING_VALIDATOR          -141
 #define CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE         -142
 
+#define CP_TOOLS_ERROR_TASK_INVALID_TOOL                -150
+
 #endif
 

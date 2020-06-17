@@ -5,11 +5,26 @@
 #include <string>
 #include <vector>
 
+using std::pair;
+using std::string;
+using std::vector;
+using std::ostream;
+
 // Problem preparation related tasks
 namespace cptools::task {
 
-    std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string& testset,
-        std::ostream& out, std::ostream& err, bool gen_output = true);    
+    namespace tools {
+        extern const int ALL;
+        extern const int CHECKER;
+        extern const int VALIDATOR;
+        extern const int GENERATOR;
+        extern const int INTERACTOR;
+    }
+
+    vector<pair<string, string>> generate_io_files(const string& testset, ostream& out, 
+        ostream& err, bool gen_output = true);    
+
+    int build_tools(string& error, int tools = tools::ALL, const string& where = ".");
 }
 
 #endif

@@ -20,10 +20,7 @@ namespace cptools::table {
 
         for (auto h : t.header)
         {
-            os << "| ";
-
-//            os << format::formatted(h.label, h.size, h.pos, h.format) << " ";
-            os << format::apply(h.label, h.format, h.size) << " ";
+            os << "| " << format::apply(h.label, h.format, h.size) << " ";
         }
 
         os << "|\n" << hline << '\n';
@@ -37,9 +34,7 @@ namespace cptools::table {
                 auto data = i < M ? row[i].first : "";
                 auto spec = i < M ? row[i].second : 0;
 
-                os << "| ";
-                //os << format::formatted(data, t.header[i].size, t.header[i].pos, { spec }) << " ";
-                os << format::apply(data, spec, t.header[i].size) << " ";
+                os << "| " << format::apply(data, spec, t.header[i].size) << " ";
             }
 
             os << "|\n" << hline << '\n';

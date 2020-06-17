@@ -40,9 +40,8 @@ namespace cptools::format {
         extern long long COUNTER;
     }
 
-//    string formatted(const string& text, size_t size, long long pos, const vector<long long>& spec);
-
     string apply(const string& text, long long specs, size_t size = 0);
+
 }
 
 #endif

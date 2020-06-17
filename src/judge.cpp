@@ -83,6 +83,13 @@ namespace cptools::judge {
 
         out << t << '\n';
 
+        string error;
+        auto rcc = task::build_tools(error, task::tools::VALIDATOR | task::tools::CHECKER);
+
+        out << "rc = " << rcc << '\n';
+
+        if (not error.empty())
+            err << error << '\n';
         return CP_TOOLS_OK;
 
         auto config = cptools::config::read("config.json");
