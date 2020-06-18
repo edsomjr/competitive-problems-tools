@@ -9,15 +9,15 @@ using std::ostream;
 namespace cptools::judge
 {
     namespace verdict {
-        extern int AC;
-        extern int WA;
-        extern int PE;
-        extern int CE;
-        extern int TLE;
-        extern int RTE;
-        extern int MLE;
-        extern int FAIL;
-        extern int UNDEF;
+        extern const int AC;
+        extern const int WA;
+        extern const int PE;
+        extern const int CE;
+        extern const int TLE;
+        extern const int RTE;
+        extern const int MLE;
+        extern const int FAIL;
+        extern const int UNDEF;
     }
 
     // Main routine

@@ -13,46 +13,7 @@ using std::ostringstream;
 
 namespace cptools::format {
 
-    static long long END = 0;
-
-    namespace color {
-        long long BASE = (1 << 20);
-        long long RED = (BASE << 1);
-        long long GREEN = (BASE << 2);
-        long long YELLOW = (BASE << 3);
-        long long BLUE = (BASE << 4);
-        long long MAGENTA = (BASE << 5);
-        long long CYAN = (BASE << 6);
-        long long WHITE = (BASE << 7);
-        long long VIOLET = (BASE << 8);
-        long long GRAY = (BASE << 9);
-        long long BEIGE = (BASE << 10);
-        long long BLACK = (BASE << 11);
-    }
-
-    namespace emph {
-        long long BASE = (1 << 10);
-
-        long long BOLD = (BASE << 1);
-        long long ITALIC = (BASE << 2);
-        long long UNDERLINE = (BASE << 3);
-    }
-
-    namespace align {
-        long long BASE = 1;
-
-        long long LEFT = (BASE << 1);
-        long long RIGHT = (BASE << 2);
-    }
-
-    namespace style {
-        long long AC = emph::BOLD + align::LEFT + color::GREEN;
-        long long WA = emph::BOLD + align::LEFT + color::RED;
-        long long PE = align::LEFT + color::VIOLET;
-        long long INT = color::BLUE;
-        long long FLOAT = color::BEIGE;
-        long long COUNTER = color::CYAN;
-    }
+    static constexpr long long END = 0;
 
     static map<long long, string> codes {
         { END, "\033[0m" },

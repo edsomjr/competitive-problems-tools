@@ -10,34 +10,42 @@ using std::vector;
 namespace cptools::format {
 
     namespace color {
-        extern long long RED;
-        extern long long GREEN;
-        extern long long BLUE;
-        extern long long YELLOW;
-        extern long long VIOLET;
-        extern long long GRAY;
-        extern long long BEIGE;
-    };
+        constexpr long long BASE = (1 << 20);
+        constexpr long long RED = (BASE << 1);
+        constexpr long long GREEN = (BASE << 2);
+        constexpr long long YELLOW = (BASE << 3);
+        constexpr long long BLUE = (BASE << 4);
+        constexpr long long MAGENTA = (BASE << 5);
+        constexpr long long CYAN = (BASE << 6);
+        constexpr long long WHITE = (BASE << 7);
+        constexpr long long VIOLET = (BASE << 8);
+        constexpr long long GRAY = (BASE << 9);
+        constexpr long long BEIGE = (BASE << 10);
+        constexpr long long BLACK = (BASE << 11);
+    }
 
     namespace emph {
-        extern long long PLAIN;
-        extern long long BOLD;
-        extern long long ITALIC;
-        extern long long UNDERLINE;
+        constexpr long long BASE = (1 << 10);
+
+        constexpr long long BOLD = (BASE << 1);
+        constexpr long long ITALIC = (BASE << 2);
+        constexpr long long UNDERLINE = (BASE << 3);
     }
 
     namespace align {
-        extern long long LEFT;
-        extern long long RIGHT;
+        constexpr long long BASE = 1;
+
+        constexpr long long LEFT = (BASE << 1);
+        constexpr long long RIGHT = (BASE << 2);
     }
 
     namespace style {
-        extern long long AC;
-        extern long long WA;
-        extern long long PE;
-        extern long long INT;
-        extern long long FLOAT;
-        extern long long COUNTER;
+        constexpr long long AC = emph::BOLD + align::LEFT + color::GREEN;
+        constexpr long long WA = emph::BOLD + align::LEFT + color::RED;
+        constexpr long long PE = align::LEFT + color::VIOLET;
+        constexpr long long INT = color::BLUE;
+        constexpr long long FLOAT = color::BEIGE;
+        constexpr long long COUNTER = color::CYAN;
     }
 
     string apply(const string& text, long long specs, size_t size = 0);

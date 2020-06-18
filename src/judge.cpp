@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <map>
 
 #include <unistd.h>
 #include <getopt.h>
@@ -17,6 +18,8 @@
 #include "format.h"
 #include "message.h"
 
+using std::map;
+using std::max;
 using timer = std::chrono::high_resolution_clock;
 
 // Raw strings
@@ -34,22 +37,47 @@ Runs a solution against all test sets and gives you a veredict.
 
 namespace cptools::judge {
 
+    // Constantes
     namespace verdict {
-        int AC = 0;
-        int PE = 1;
-        int WA = 2;
-        int TLE = 3;
-        int RTE = 4;
-        int MLE = 5;
-        int UNDEF = 6;
-        int CE = 7;
-        int FAIL = 8;
+        const int AC = 0;
+        const int PE = 1;
+        const int WA = 2;
+        const int TLE = 3;
+        const int RTE = 4;
+        const int MLE = 5;
+        const int UNDEF = 6;
+        const int CE = 7;
+        const int FAIL = 8;
     }
 
     // Global variables
     static struct option longopts[] = {
        { "help", no_argument, NULL, 'h' },
        { 0, 0, 0, 0 }
+    };
+
+    map<int, std::string> ver_string {
+        { verdict::AC, "Accepted" },
+        { verdict::PE, "Presentation Error" },
+        { verdict::WA, "Wrong Answer" },
+        { verdict::CE, "Compilation Error" },
+        { verdict::TLE, "Time Limit Exceeded" },
+        { verdict::RTE, "Runtime Error" },
+        { verdict::MLE, "Memory Limit Exceeded" },
+        { verdict::FAIL, "Failure" },
+        { verdict::UNDEF, "Undefined Error" },
+    };
+    
+    const map<int, long long> ver_style {
+        { verdict::AC, format::style::AC },
+        { verdict::PE, format::style::PE },
+        { verdict::WA, format::style::WA },
+        { verdict::CE, format::style::AC },
+        { verdict::TLE, format::style::AC },
+        { verdict::RTE, format::style::AC },
+        { verdict::MLE, format::style::AC },
+        { verdict::FAIL, format::style::AC },
+        { verdict::UNDEF, format::style::AC },
     };
 
     // Auxiliary routines
@@ -114,15 +142,15 @@ namespace cptools::judge {
         auto validator { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
 
         auto files = task::generate_io_files("all", out, err);
+        int ans = verdict::AC;
 
         for (auto [input, answer] : files)
         {
             auto number = util::split(input, '/').back();
             auto output { std::string(CP_TOOLS_BUILD_DIR) + "/out" };
 
-            out << "[judge] Test '" << input << "': ";
-
             // TODO: atualizar a função para que a saída fica na string do 3º parâmetro
+            // Trocar por exec() e trocar a saída deste?
             rc = sh::process(input, validator, "/dev/null");
 
             if (rc != CP_TOOLS_OK)
@@ -142,55 +170,53 @@ namespace cptools::judge {
             oss << std::setprecision(5) << std::fixed << t.count();
             auto elapsed = oss.str();
 
-            out << std::setprecision(6) << std::fixed 
-                << t.count()
-                << "s, veredict: ";
+            int ver = verdict::AC;
 
             if (t.count() > timelimit / 1000.0)
-            {
-                out << "Time Limit Exceeded\n";
-    //            return verdict::TLE;
-            }
+                ver = verdict::TLE;
 
             if (rc != CP_TOOLS_OK)
+                ver = verdict::RTE;
+
+            if (ver == verdict::AC)
             {
-                err << "[judge] Can't generate output for input '" << input << "'\n";
-   //             return verdict::RTE;
+                auto args { input + " " + output + " " + answer };
+     
+                // Remover este '/dev/null' e colocar a saída na string de erro
+                rc = sh::exec(checker, args, "/dev/null", 2*timelimit / 1000.0);
+
+                switch (rc) {
+                case 6:
+                    ver = verdict::WA;
+                    break;
+
+                case 5:
+                    ver = verdict::PE;
+                    break;
+
+                case 4:
+                    ver = verdict::AC;
+                    break;
+
+                default:
+                    ver = verdict::UNDEF;
+                    break;
+                }; 
             }
 
-            auto args { input + " " + output + " " + answer };
- 
-            rc = sh::exec(checker, args, "/dev/null", 3*timelimit / 1000.0);
+            ans = max(ans, ver);
 
-            switch (rc) {
-            case 6:
-                out << "Wrong Answer!\n";
-  //              return verdict::WA;
-                break;
-
-            case 5:
-                out << "Presentation Error\n";
- //               return verdict::PE;
-                break;
-
-            case 4:
-                out << "Ok!\n";
-                break;
-
-            default:
-                out << "Undefined Error!\n";
-//                return verdict::UNDEF;
-                break;
-            };
-
-
-        report.add_row({ { number, format::style::COUNTER }, { "Accepted", format::style::AC }, 
-            { elapsed, format::style::FLOAT }, { "100", format::style::INT } });
+            report.add_row({ 
+                { number, format::style::COUNTER }, 
+                { ver_string[ver], ver_style.at(ver) },
+                { elapsed, format::style::FLOAT }, 
+                { "100", format::style::INT } 
+            });
         }
  
         out << report << '\n';
 
-        return verdict::AC;
+        return ans;
     }
 
     // API functions

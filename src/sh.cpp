@@ -212,8 +212,7 @@ namespace cptools::sh {
         return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PROCESS_ERROR;
     }
 
-    int exec(const string& program, const string& args, const string& output,
-        int timeout)
+    int exec(const string& program, const string& args, const string& output, int timeout)
     {
         string command;
 
