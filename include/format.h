@@ -40,9 +40,16 @@ namespace cptools::format {
     }
 
     namespace style {
-        constexpr long long AC = emph::BOLD + align::LEFT + color::GREEN;
-        constexpr long long WA = emph::BOLD + align::LEFT + color::RED;
+        constexpr long long AC = align::LEFT + color::GREEN;
+        constexpr long long WA = align::LEFT + color::RED;
         constexpr long long PE = align::LEFT + color::VIOLET;
+        constexpr long long CE = align::LEFT + color::YELLOW + emph::ITALIC;
+        constexpr long long TLE = align::LEFT + color::YELLOW;
+        constexpr long long RTE = align::LEFT + color::VIOLET;
+        constexpr long long MLE = align::LEFT + color::VIOLET;
+        constexpr long long FAIL = align::LEFT + color::MAGENTA + emph::BOLD;
+        constexpr long long UNDEF = align::LEFT + color::CYAN + emph::ITALIC;
+
         constexpr long long INT = color::BLUE;
         constexpr long long FLOAT = color::BEIGE;
         constexpr long long COUNTER = color::CYAN;

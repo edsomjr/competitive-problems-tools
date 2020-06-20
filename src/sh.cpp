@@ -1,5 +1,7 @@
 #include <map>
+#include <chrono>
 #include <vector>
+#include <fstream>
 #include <sstream>
 #include <iostream>
 
@@ -13,10 +15,36 @@
 using std::map;
 using std::vector;
 using std::ostream;
+using std::ifstream;
 using std::to_string;
 using std::ostringstream;
 
+using timer = std::chrono::high_resolution_clock;
+
 namespace cptools::sh {
+
+    static double parse_time_output(const string& out)
+    {
+        ifstream in(out);
+        string line;
+
+        while (getline(in, line), line.find("Maximum resident set size") == string::npos);
+
+        long long kbs = 0;
+
+        for (auto c : line)
+        {
+            if (isdigit(c))
+            {
+                kbs *= 10;
+                kbs += (c - '0');
+            }
+        }
+
+        double mbs = kbs / 1024.0;
+
+        return mbs; 
+    }
 
     static int execute_command(const string& command, string& out)
     {
@@ -229,4 +257,61 @@ namespace cptools::sh {
 
         return WEXITSTATUS(rc);
     }
+
+    Info profile(const string& program, const string& args, int timeout, const string& infile, 
+        const string& outfile)
+    {
+        Info info;
+
+        // Prepara o arquivo que conterá a saída do comando /usr/bin/time
+        string error;
+        auto rc = make_dir(CP_TOOLS_TEMP_DIR, error);
+    
+        if (rc != CP_TOOLS_OK)
+        {
+            info.rc = rc;
+            return info;
+        }
+
+        string out { string(CP_TOOLS_TEMP_DIR) + "/.time_output" };
+
+        // Prepara o comando para o terminal
+        string command { "/usr/bin/time -v -o " + out };
+
+        if (timeout > 0)
+            command += " timeout " + to_string(timeout) + "s ";
+
+        command += " " + program + "  " + args;
+
+        if (not infile.empty())
+            command += " < " + infile;
+
+        if (not outfile.empty())
+            command += " > " + outfile;
+
+        // Executa o comando
+        auto start = timer::now();
+
+        auto fp = popen(command.c_str(), "r");
+
+        rc = pclose(fp);
+
+        auto end = timer::now();
+
+        if (fp == NULL)
+        {
+            info.rc = CP_TOOLS_ERROR_SH_POPEN_FAILED;
+            return info;
+        }
+
+        // Prepara o retorno
+        auto t = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+
+        info.rc = rc;
+        info.elapsed = t.count();
+        info.memory = parse_time_output(out);
+
+        return info;
+    }
 }
+
