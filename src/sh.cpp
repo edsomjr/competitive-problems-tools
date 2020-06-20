@@ -276,10 +276,10 @@ namespace cptools::sh {
             command = " timeout " + to_string(timeout) + "s " + command;
 
         // Executa o comando
-        Result result;
-        result.rc = WEXITSTATUS(execute_command(command, result.output));
+        string output;
+        auto rc = execute_command(command, output);
 
-        return result;
+        return { WEXITSTATUS(rc), output };
     }
 
     Info profile(const string& program, const string& args, int timeout, const string& infile, 
