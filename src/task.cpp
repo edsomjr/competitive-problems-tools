@@ -10,14 +10,6 @@ using std::to_string;
 
 namespace cptools::task {
 
-    namespace tools {
-        const int CHECKER = 1;
-        const int VALIDATOR = 2;
-        const int GENERATOR = 4;
-        const int INTERACTOR = 8;
-        const int ALL = CHECKER | VALIDATOR | GENERATOR | INTERACTOR;
-    }
-
     std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string& testset,
         std::ostream&, std::ostream& err, bool gen_output)    
     {

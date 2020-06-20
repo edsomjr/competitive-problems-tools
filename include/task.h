@@ -14,11 +14,11 @@ using std::ostream;
 namespace cptools::task {
 
     namespace tools {
-        extern const int ALL;
-        extern const int CHECKER;
-        extern const int VALIDATOR;
-        extern const int GENERATOR;
-        extern const int INTERACTOR;
+        constexpr int CHECKER = 1;
+        constexpr int VALIDATOR = 2;
+        constexpr int GENERATOR = 4;
+        constexpr int INTERACTOR = 8;
+        constexpr int ALL = CHECKER | VALIDATOR | GENERATOR | INTERACTOR;
     }
 
     vector<pair<string, string>> generate_io_files(const string& testset, ostream& out, 
