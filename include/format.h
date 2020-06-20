@@ -45,8 +45,8 @@ namespace cptools::format {
         constexpr long long PE = align::LEFT + color::VIOLET;
         constexpr long long CE = align::LEFT + color::YELLOW + emph::ITALIC;
         constexpr long long TLE = align::LEFT + color::YELLOW;
-        constexpr long long RTE = align::LEFT + color::VIOLET;
-        constexpr long long MLE = align::LEFT + color::VIOLET;
+        constexpr long long RTE = align::LEFT + color::VIOLET + emph::ITALIC;
+        constexpr long long MLE = align::LEFT + color::BEIGE + emph::ITALIC;
         constexpr long long FAIL = align::LEFT + color::MAGENTA + emph::BOLD;
         constexpr long long UNDEF = align::LEFT + color::CYAN + emph::ITALIC;
 

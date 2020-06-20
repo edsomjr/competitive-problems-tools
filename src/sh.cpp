@@ -258,6 +258,30 @@ namespace cptools::sh {
         return WEXITSTATUS(rc);
     }
 
+    Result execute(const string& program, const string& args, const string& infile, 
+        const string& outfile, int timeout)
+    {
+        // Prepara o comando para o terminal
+        string command { program + " " + args };
+
+        if (not infile.empty())
+            command += " < " + infile;
+
+        if (not outfile.empty())
+            command += " > " + outfile;
+
+        command += " 2>&1";
+
+        if (timeout > 0)
+            command = " timeout " + to_string(timeout) + "s " + command;
+
+        // Executa o comando
+        Result result;
+        result.rc = WEXITSTATUS(execute_command(command, result.output));
+
+        return result;
+    }
+
     Info profile(const string& program, const string& args, int timeout, const string& infile, 
         const string& outfile)
     {

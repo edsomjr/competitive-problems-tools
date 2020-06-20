@@ -145,14 +145,12 @@ namespace cptools::judge {
             auto number = util::split(input, '/').back();
             auto output { std::string(CP_TOOLS_BUILD_DIR) + "/out" };
 
-            // TODO: atualizar a função para que a saída fica na string do 3º parâmetro
-            // Trocar por exec() e trocar a saída deste?
-            rc = sh::process(input, validator, "/dev/null");
+            auto res = sh::execute(validator, "", input); 
 
-            if (rc != CP_TOOLS_OK)
+            if (res.rc != CP_TOOLS_OK)
             {
                 err << message::failure("Input file '" + input + "' is invalid") << "\n";
-                err << message::trace(error) << '\n';
+                err << message::trace(res.output) << '\n';
                 return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
             }
 
@@ -175,10 +173,9 @@ namespace cptools::judge {
             {
                 auto args { input + " " + output + " " + answer };
      
-                // Remover este '/dev/null' e colocar a saída na string de erro
-                rc = sh::exec(checker, args, "/dev/null", 2*timelimit / 1000.0);
+                res = sh::execute(checker, args, "", "/dev/null", 2*timelimit / 1000.0);
 
-                switch (rc) {
+                switch (res.rc) {
                 case 6:
                     ver = verdict::WA;
                     break;
