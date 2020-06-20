@@ -2,6 +2,6 @@
 #define CP_TOOLS_DEFS_H
 
 #define NAME "cp-tools"
-#define VERSION "0.6.0-r1"
+#define VERSION "0.6.0-r3"
 
 #endif
