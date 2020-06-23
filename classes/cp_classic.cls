@@ -19,6 +19,9 @@
 \RequirePackage{xcolor,colortbl}
 \RequirePackage{xcolor}
 \RequirePackage{verbatim}
+\RequirePackage{tikz}
+
+\hyphenation{cons-tru-ção con-si-de-ra-da}
 
 \ifpdf
 \RequirePackage[pdftex]{hyperref}

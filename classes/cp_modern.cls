@@ -21,8 +21,10 @@
 \RequirePackage{verbatim}
 \RequirePackage[scaled=0.8]{helvet}
 \RequirePackage{booktabs}
+\RequirePackage{tikz}
 
 \hyphenation{cons-tru-ção con-si-de-ra-da}
+
 \ifpdf
 \RequirePackage[pdftex]{hyperref}
 \else
