@@ -44,4 +44,5 @@ int main(int argc, char* argv[])
         quitf(_fail, ":( participant has the better answer: jans = %d, pans = %d", jans, pans);
     **/
 
+    return 0;
 }
