@@ -22,6 +22,7 @@
 \RequirePackage[scaled=0.8]{helvet}
 \RequirePackage{booktabs}
 \RequirePackage{tikz}
+\RequirePackage{enumerate}
 
 \hyphenation{cons-tru-ção con-si-de-ra-da}
 

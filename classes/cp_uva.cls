@@ -23,6 +23,7 @@
 \RequirePackage{booktabs}
 \RequirePackage{lastpage}
 \RequirePackage{tikz}
+\RequirePackage{enumerate}
 
 \hyphenation{cons-tru-ção con-si-de-ra-da}
 

@@ -20,6 +20,7 @@
 \RequirePackage{xcolor}
 \RequirePackage{verbatim}
 \RequirePackage{tikz}
+\RequirePackage{enumerate}
 
 \hyphenation{cons-tru-ção con-si-de-ra-da}
 
