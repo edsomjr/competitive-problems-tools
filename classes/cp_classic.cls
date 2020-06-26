@@ -22,7 +22,7 @@
 \RequirePackage{tikz}
 \RequirePackage{enumerate}
 
-\hyphenation{cons-tru-ção con-si-de-ra-da}
+\hyphenation{cons-tru-ção con-si-de-ra-da com-ple-xi-da-de}
 
 \ifpdf
 \RequirePackage[pdftex]{hyperref}
