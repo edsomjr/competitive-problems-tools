@@ -154,7 +154,7 @@ namespace cptools::genpdf {
         bool tutorial = false;
 
         std::string document_class { "cp_modern" }, outfile { "problem.pdf" }, 
-            language { "en_US" }, label { "A" };
+            language { "pt_BR" }, label { "A" };
         int flags = gentex::Flags::INCLUDE_AUTHOR | gentex::Flags::INCLUDE_CONTEST;
 
         while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1)
