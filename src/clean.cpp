@@ -67,13 +67,12 @@ namespace cptools::clean {
         // Exclui os referidos diretórios
         for (auto dir : { build_dir, temp_dir })
         {
-            error = "";
-            auto rc = cptools::sh::remove_dir(dir, error);
+            auto res = cptools::sh::remove_dir(dir);
 
-            if (rc != CP_TOOLS_OK)
+            if (res.rc != CP_TOOLS_OK)
             {
                 err << message::failure("Error removing '" + dir + "'") << "\n";
-                err << message::trace(error) << '\n';
+                err << message::trace(res.output) << '\n';
                 return CP_TOOLS_ERROR_CLEAN_DELETE_FILES;
             }
         }

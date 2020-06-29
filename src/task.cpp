@@ -31,19 +31,17 @@ namespace cptools::task {
         auto source = "solutions/" + cptools::config::get(config, "solutions|default", 
             std::string("ERROR"));
 
-        string error;
-        auto rc = cptools::sh::make_dir(input_dir, error);
+        auto res = cptools::sh::make_dir(input_dir);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
             err << "[generate_io_files] Can't create '" << input_dir << "'\n";
             return { };
         }
 
-        error = "";
-        rc = cptools::sh::make_dir(output_dir, error);
+        res = cptools::sh::make_dir(output_dir);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
             err << "[generate_io_files] Can't create '" << output_dir << "'\n";
             return { };
@@ -55,7 +53,7 @@ namespace cptools::task {
             return { };
         }
 
-        rc = cptools::sh::build(program, source);
+        auto rc = cptools::sh::build(program, source);
 
         if (rc != CP_TOOLS_OK)
         {
@@ -156,10 +154,10 @@ namespace cptools::task {
     {
         auto dest_dir { where + "/" + CP_TOOLS_BUILD_DIR + "/" };
 
-        auto rc = sh::make_dir(dest_dir, error);
+        auto res = sh::make_dir(dest_dir);
 
-        if (rc != CP_TOOLS_OK)
-            return rc;
+        if (res.rc != CP_TOOLS_OK)
+            return res.rc;
 
         auto config = cptools::config::read("config.json");
 
@@ -216,14 +214,14 @@ namespace cptools::task {
     {
         auto dest_dir { where + "/" + CP_TOOLS_BUILD_DIR + "/" };
 
-        auto rc = sh::make_dir(dest_dir, error);
+        auto res = sh::make_dir(dest_dir);
 
-        if (rc != CP_TOOLS_OK)
-            return rc;
+        if (res.rc != CP_TOOLS_OK)
+            return res.rc;
 
         auto program { dest_dir + dest };
 
-        rc = sh::remove_file(program, error);
+        auto rc = sh::remove_file(program, error);
 
         if (rc != CP_TOOLS_OK)
             return rc;

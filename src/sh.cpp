@@ -66,40 +66,40 @@ namespace cptools::sh {
         return pclose(fp);
     }
 
-    int make_dir(const string& path, string& error)
+    Result make_dir(const string& path)
     {
-        string command { "mkdir -p " + path + " 2>&1" };
+        string command { "mkdir -p " + path + " 2>&1" }, error;
 
         auto rc = execute_command(command, error); 
 
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CREATE_DIRECTORY;
+        return { rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CREATE_DIRECTORY, error };
     }
 
-    int copy_dir(const string& dest, const string& src, string& error)
+    Result copy_dir(const string& dest, const string& src)
     {
-        string command { "cp -r -n " + src + "/* 2>&1 " + dest };
+        string command { "cp -r -n " + src + "/* 2>&1 " + dest }, error;
 
         auto rc = execute_command(command, error);
 
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_DIRECTORY;
+        return { rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_DIRECTORY, error };
     }
 
-    int remove_dir(const string& path, string& error)
+    Result remove_dir(const string& path)
     {
-        string command { "rm -rf " + path + " 2>&1" };
+        string command { "rm -rf " + path + " 2>&1" }, error;
 
         auto rc = execute_command(command, error);
 
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY;
+        return { rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY, error };
     }
 
-    bool compare_dirs(const string& dirA, const string& dirB, string& error)
+    Result same_dirs(const string& dirA, const string& dirB)
     {
-        string command { "diff -r " + dirA + " " + dirB + " 2>&1" };
+        string command { "diff -r " + dirA + " " + dirB + " 2>&1" }, error;
 
         auto rc = execute_command(command, error);
 
-        return rc == 0;
+        return { rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error };
     }
 
     bool is_dir(const string& path, string& error)
@@ -288,12 +288,11 @@ namespace cptools::sh {
         Info info;
 
         // Prepara o arquivo que conterá a saída do comando /usr/bin/time
-        string error;
-        auto rc = make_dir(CP_TOOLS_TEMP_DIR, error);
+        auto res = make_dir(CP_TOOLS_TEMP_DIR);
     
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            info.rc = rc;
+            info.rc = res.rc;
             return info;
         }
 
@@ -318,7 +317,7 @@ namespace cptools::sh {
 
         auto fp = popen(command.c_str(), "r");
 
-        rc = pclose(fp);
+        auto rc = pclose(fp);
 
         auto end = timer::now();
 

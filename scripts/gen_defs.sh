@@ -38,4 +38,8 @@ name >> include/defs.h
 version_number >> include/defs.h
 
 echo >> include/defs.h
+echo "#define CP_TOOLS_TRUE  1" >> include/defs.h
+echo "#define CP_TOOLS_FALSE 0" >> include/defs.h
+
+echo >> include/defs.h
 echo "#endif" >> include/defs.h

@@ -24,16 +24,17 @@ SCENARIO("Command init", "[init]")
 
             THEN("The output directory is initialized with the template files")
             {
-                string error;
-                REQUIRE(cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR, error) >= 0);
-                REQUIRE(error.empty());
+                auto res = cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR);
+                REQUIRE(res.rc == CP_TOOLS_OK);
+                REQUIRE(res.output.empty());
 
                 ostringstream out, err;
                 REQUIRE(cptools::init::run(argc, argv, out, err) == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
 
-                REQUIRE(cptools::sh::compare_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR, error));
-                REQUIRE(error.empty());
+                res = cptools::sh::same_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR);
+                REQUIRE(res.rc == CP_TOOLS_TRUE);
+                REQUIRE(res.output.empty());
             }
         }
 

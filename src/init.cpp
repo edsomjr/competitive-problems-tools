@@ -52,29 +52,27 @@ namespace cptools::init {
         out << message::info("Initializing directory '" + dest + "' ...") << "\n";
 
         // Cria o diretório, se necessário
-        string error;
-        auto rc = cptools::sh::make_dir(dest, error);
+        auto res = cptools::sh::make_dir(dest);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
             err << message::failure("Can't create directory '" + dest + "'!") << "\n";
-            err << message::trace(error) << '\n';
-            return rc;
+            err << message::trace(res.output) << '\n';
+            return res.rc;
         }
 
         // Copia os templates para o diretório indicado
-        error = "";
-        rc = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR, error);
+        res = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
 
-        if (rc == CP_TOOLS_OK)
+        if (res.rc == CP_TOOLS_OK)
             out << message::success() << "\n";
         else
         {
             err << message::failure("Directory '" + dest + "' could not be initialized!") << "\n";
-            err << message::trace(error) << '\n';
+            err << message::trace(res.output) << '\n';
         }
 
-        return rc;
+        return res.rc;
     }
 
     // API functions

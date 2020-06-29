@@ -22,10 +22,10 @@ namespace cptools::sh {
     int copy_file(const string& dest, const string& src);
     int remove_file(const string& path, string& error);
 
-    int make_dir(const string& path, string& error);
-    int copy_dir(const string& dest, const string& src, string& error);
-    int remove_dir(const string& path, string& error);
-    bool compare_dirs(const string& dirA, const string& dirB, string& error);
+    Result make_dir(const string& path);
+    Result copy_dir(const string& dest, const string& src);
+    Result remove_dir(const string& path);
+    Result same_dirs(const string& dirA, const string& dirB);
 
     bool is_dir(const string& path, string& error);
     bool is_file(const string& path);

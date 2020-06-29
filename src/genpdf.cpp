@@ -85,19 +85,19 @@ namespace cptools::genpdf {
         int flags, const std::string& label, const std::string& outfile, bool tutorial,
         std::ostream& out, std::ostream& err)
     {
-        std::string error;
-        auto rc = sh::make_dir(CP_TOOLS_BUILD_DIR, error);
+        auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
             err << "[genpdf] Error creating dir '" << CP_TOOLS_BUILD_DIR << "'";
-            return rc;
+            return res.rc;
         }
 
         // Generates the tex file that will be used to build the pdf file
         std::string texfile_path { std::string(CP_TOOLS_BUILD_DIR) + 
             (tutorial ? "/tutorial.tex" : "/problem.tex") };
 
+        std::string error;
         sh::remove_file(texfile_path, error);
 
         std::ofstream tex_file(texfile_path);
@@ -107,6 +107,8 @@ namespace cptools::genpdf {
             err << "[genpdf] Error opening file '" << texfile_path << "'\n";
             return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
         }
+
+        int rc;
 
         if (tutorial)
             rc = gentex::generate_tutorial_latex(doc_class, language, flags, label, tex_file, err);
