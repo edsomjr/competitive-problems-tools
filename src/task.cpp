@@ -5,6 +5,7 @@
 #include "dirs.h"
 #include "error.h"
 #include "config.h"
+#include "message.h"
 
 using std::to_string;
 
@@ -53,11 +54,12 @@ namespace cptools::task {
             return { };
         }
 
-        auto rc = cptools::sh::build(program, source);
+        res = cptools::sh::build(program, source);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[generate_io_files] Can't compile solution '" << source << "'\n";
+            err << message::failure("Can't compile solution '" + source + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
             return { };
         }
 
@@ -78,11 +80,12 @@ namespace cptools::task {
 
                 auto generator = std::string(CP_TOOLS_BUILD_DIR) + "/generator";
 
-                rc = cptools::sh::build(generator, source);
+                res = cptools::sh::build(generator, source);
 
-                if (rc != CP_TOOLS_OK)
+                if (res.rc != CP_TOOLS_OK)
                 {
-                    err << "[generate_io_files] Can't compile generator '" << source << "'\n";
+                    err << message::failure("Can't compile generator '" + source + "'!") << "\n";
+                    err << message::trace(res.output) << '\n';
                     return { };
                 }
 
@@ -93,13 +96,14 @@ namespace cptools::task {
                 {
                     std::string dest { input_dir + std::to_string(next++) };
 
-                    auto rc = sh::exec(generator, parameters, dest);
+                    auto res = sh::execute(generator, parameters, "", dest);
+//                    auto rc = sh::exec(generator, parameters, dest);
 
-                    if (rc != CP_TOOLS_OK)
+                    if (res.rc != CP_TOOLS_OK)
                     {
-                        err << "[generate_io_files] Error generating " << dest 
-                            << " with parameters '" << parameters << "'\n";
-
+                        err << message::failure("Error generating '" + dest + "' with parameters "
+                            + parameters) << "\n";
+                        err << message::trace(res.output) << '\n';
                         return { };
                     }
 
@@ -114,12 +118,14 @@ namespace cptools::task {
                 {
                     std::string dest { input_dir + std::to_string(next++) };
 
-                    rc = cptools::sh::copy_file(dest, input);
+                    auto res = cptools::sh::copy_file(dest, input);
 
-                    if (rc != CP_TOOLS_OK)
+                    if (res.rc != CP_TOOLS_OK)
                     {
-                        err << "[generate_io_files] Can't copy input '" << input << " on '"
-                            << dest << "'\n";
+                        err << message::failure("Can't copy input '" + input + "' on " 
+                            + dest + "!") << "\n";
+                        err << message::trace(res.output) << '\n';
+
                         return { };
                     }
 
@@ -135,11 +141,14 @@ namespace cptools::task {
                 std::string input { io_files[i - 1].first };
                 std::string output { output_dir + std::to_string(i) };
 
-                rc = cptools::sh::process(input, program, output);
+//                rc = cptools::sh::process(input, program, output);
+                auto res = cptools::sh::execute(program, "", input, output);
 
-                if (rc != CP_TOOLS_OK)
+                if (res.rc != CP_TOOLS_OK)
                 {
-                    err << "[generate_io_files] Can't generate output for input '" << input << "'\n";
+                    err << message::failure("Can't generate output for input '" + input 
+                        + "'!") << "\n";
+                    err << message::trace(res.output) << '\n';
                     return { };
                 }
 
@@ -198,12 +207,13 @@ namespace cptools::task {
 
             auto dest = dest_dir + program;
 
-            auto rc = cptools::sh::build(dest, source);
+            auto res = cptools::sh::build(dest, source);
 
-            if (rc != CP_TOOLS_OK)
+            if (res.rc != CP_TOOLS_OK)
             {
-                error = "Can't compile '" + source + "'\n";
-                return rc;
+                error + message::failure("Can't compile '" + source + "'!") + "\n";
+                error + message::trace(res.output) + '\n';
+                return res.rc;
             }
         }
 
@@ -221,17 +231,22 @@ namespace cptools::task {
 
         auto program { dest_dir + dest };
 
-        auto rc = sh::remove_file(program, error);
+        res = sh::remove_file(program);
 
-        if (rc != CP_TOOLS_OK)
-            return rc;
-
-        rc = sh::build(program, source);
-
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            error = "Can't build solution '" + source;
-            return rc;
+            error += message::failure("Can't remove file '" + program + "'!") + "\n";
+            error += message::trace(res.output) + '\n';
+            return res.rc;
+        }
+
+        res = sh::build(program, source);
+
+        if (res.rc != CP_TOOLS_OK)
+        {
+            error += message::failure("Can't build solution '" + source + "'!") + "\n";
+            error += message::trace(res.output) + '\n';
+            return res.rc;
         }
 
         return CP_TOOLS_OK;

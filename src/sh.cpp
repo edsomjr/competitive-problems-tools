@@ -102,13 +102,13 @@ namespace cptools::sh {
         return { rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error };
     }
 
-    bool is_dir(const string& path, string& error)
+    Result is_dir(const string& path)
     {
-        string command { "test -d " + path };
+        string command { "test -d " + path + " 2>&1" }, error;
     
         auto rc = execute_command(command, error);
 
-        return rc == 0;
+        return { rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error };
     }
 
 
@@ -122,44 +122,44 @@ namespace cptools::sh {
         return sb.st_atime;
     }
 
-    int copy_file(const string& dest, const string& src)
+    Result copy_file(const string& dest, const string& src)
     {
-        string command { "cp " + src + " " + dest };
-
-        auto rc = system(command.c_str());
-
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_FILE;
-    }
-
-    int remove_file(const string& path, string& error)
-    {
-        string command { "rm -f " + path + " 2>&1" };
+        string command { "cp " + src + " " + dest  + " 2>&1" }, error;
 
         auto rc = execute_command(command, error); 
 
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE;
+        return { rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_FILE, error };
     }
 
-    bool is_file(const string& path)
+    Result remove_file(const string& path)
     {
-        string command { "test -f " + path };
+        string command { "rm -f " + path + " 2>&1" }, error;
 
-        auto rc = system(command.c_str());
+        auto rc = execute_command(command, error); 
 
-        return rc == 0;
+        return { rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE, error };
     }
 
-
-    int compile_cpp(const string& output, const string& src)
+    Result is_file(const string& path)
     {
-        string command { "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src };
+        string command { "test -f " + path }, error;
 
-        auto rc = system(command.c_str());
+        auto rc = execute_command(command, error); 
 
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR;
+        return { rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error };
     }
 
-    int build_py(const string& output, const string& src)
+
+    Result compile_cpp(const string& output, const string& src)
+    {
+        string command { "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src + " 2>&1" }, error;
+
+        auto rc = execute_command(command, error); 
+
+        return { rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR, error };
+    }
+
+    Result build_py(const string& output, const string& src)
     {
         vector<string> commands {
             "echo '#!/usr/bin/python' > " + output,
@@ -169,17 +169,18 @@ namespace cptools::sh {
 
         for (auto command : commands)
         {
-            auto rc = system(command.c_str());
+            string error;
+            auto rc = execute_command(command, error);
 
             if (rc != CP_TOOLS_OK)
-                return CP_TOOLS_ERROR_SH_PY_BUILD_ERROR;
+                return { CP_TOOLS_ERROR_SH_PY_BUILD_ERROR, error };
         }
 
-        return CP_TOOLS_OK;
+        return { CP_TOOLS_OK, "" };
     }
 
 
-    int build_tex(const string& output, const string& src)
+    Result build_tex(const string& output, const string& src)
     {
         string outdir { "." };
 
@@ -192,24 +193,25 @@ namespace cptools::sh {
         string command { string("export TEXINPUTS=\".:") + CP_TOOLS_CLASSES_DIR 
             + ":\" && pdflatex -output-directory=" + outdir + " " + src };
 
-        auto rc = system(command.c_str());
+        string error;
+        auto rc = execute_command(command, error);
 
         // Roda duas vezes para garantir que estilos que tenham referências sejam
         // renderizados corretamente
-        if (rc == 0)
-            rc = system(command.c_str());
+        if (rc == CP_TOOLS_OK)
+            rc = execute_command(command, error);
 
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PDFLATEX_ERROR;
+        return { rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PDFLATEX_ERROR, error };
  
     }
 
-    map<string, int (*)(const string&, const string&)> fs {
+    map<string, Result (*)(const string&, const string&)> fs {
         { "cpp", compile_cpp },
         { "tex", build_tex },
         { "py", build_py },
     };
 
-    int build(const string& output, const string& src)
+    Result build(const string& output, const string& src)
     {
         auto tokens = util::split(src, '.');
         auto ext = tokens.back();
@@ -220,16 +222,16 @@ namespace cptools::sh {
     
         if (x <= y)
         {
-            return CP_TOOLS_OK;
+            return { CP_TOOLS_OK, "" };
         }
 
         if (it == fs.end())
-            return CP_TOOLS_ERROR_SH_BUILD_EXT_NOT_FOUND;
+            return { CP_TOOLS_ERROR_SH_BUILD_EXT_NOT_FOUND, "Extension not found!" };
 
         return it->second(output, src); 
     }
 
-    int process(const string& input, const string& program, const string& output,
+/*    int process(const string& input, const string& program, const string& output,
         int timeout)
     {
         string command { "timeout " + to_string(timeout) + "s " + program + " < " 
@@ -257,7 +259,7 @@ namespace cptools::sh {
 
         return WEXITSTATUS(rc);
     }
-
+*/
     Result execute(const string& program, const string& args, const string& infile, 
         const string& outfile, int timeout)
     {

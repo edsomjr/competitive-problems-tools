@@ -16,6 +16,7 @@
 #include "error.h"
 #include "config.h"
 #include "gentex.h"
+#include "message.h"
 
 
 // Raw strings
@@ -97,8 +98,14 @@ namespace cptools::genpdf {
         std::string texfile_path { std::string(CP_TOOLS_BUILD_DIR) + 
             (tutorial ? "/tutorial.tex" : "/problem.tex") };
 
-        std::string error;
-        sh::remove_file(texfile_path, error);
+        res = sh::remove_file(texfile_path);
+
+        if (res.rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Can't remove file '" + texfile_path + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return res.rc;
+        }
 
         std::ofstream tex_file(texfile_path);
 
@@ -127,20 +134,23 @@ namespace cptools::genpdf {
         std::string pdf_file { std::string(CP_TOOLS_BUILD_DIR) + 
             (tutorial ? "/tutorial.pdf" : "/problem.pdf") };
 
-        rc = sh::build(pdf_file, texfile_path);
+        res = sh::build(pdf_file, texfile_path);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[genpdf] Error generating the PDF file '" << pdf_file << "'\n";
-            return rc;
+            err << message::failure("Error generating the PDF file '" + pdf_file + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return res.rc;
         }
 
         // Copy the generated PDF to the output file
-        rc = sh::copy_file(outfile, pdf_file);
+        res = sh::copy_file(outfile, pdf_file);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[genpdf] Error copying PDF file '" << pdf_file << "' to '" << outfile << "'\n";
+            err << message::failure("Error copying PDF file '" + pdf_file + "' to '" +
+                outfile + "!") << "\n";
+            err << message::trace(res.output) << '\n';
             return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
         }
 

@@ -10,6 +10,7 @@
 #include "check.h"
 #include "error.h"
 #include "config.h"
+#include "message.h"
 
 
 // Raw strings
@@ -82,12 +83,13 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
         }
 
-        auto rc = cptools::sh::build(validator, source);
+        auto res = cptools::sh::build(validator, source);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[judge] Can't compile validator '" << source << "'\n";
-            return rc;
+            err << message::failure("Can't compile validator '" + source + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return res.rc;
         }
 
         source = cptools::config::get(config, "tools|checker", std::string("ERROR"));
@@ -100,12 +102,13 @@ namespace cptools::check {
 
         auto checker { std::string(CP_TOOLS_BUILD_DIR) + "/checker" };
 
-        rc = cptools::sh::build(checker, source);
+        res = cptools::sh::build(checker, source);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[validate_checker] Can't compile checker '" << source << "'\n";
-            return rc;
+            err << message::failure("Can't compile checker '" + source + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return res.rc;
         }
 
         source = "solutions/" + 
@@ -119,12 +122,13 @@ namespace cptools::check {
 
         auto solution { std::string(CP_TOOLS_BUILD_DIR) + "/solution" };
 
-        rc = cptools::sh::build(solution, source);
+        res = cptools::sh::build(solution, source);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[validate_checker] Can't compile solution '" << source << "'\n";
-            return rc;
+            err << message::failure("Can't compile solution '" + source + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return res.rc;
         }
 
         auto tests = cptools::config::get(config, "tests|checker", 
@@ -148,31 +152,40 @@ namespace cptools::check {
                 return CP_TOOLS_ERROR_CHECK_INVALID_VEREDICT;
             }
 
-            auto rc = sh::process(input, validator, "/dev/null");
+//            auto rc = sh::process(input, validator, "/dev/null");
+            auto result = sh::execute(validator, "", input);
 
-            if (rc != CP_TOOLS_OK)
+            if (result.rc != CP_TOOLS_OK)
             {
-                err << "[validate_checker] Input file '" << input << "' is invalid\n";
+                err << message::failure("Input file '" + input + "' is invalid!") << "\n";
+                err << message::trace(result.output) << '\n';
                 return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
             }
 
             auto res { std::string(CP_TOOLS_BUILD_DIR) + "/.res" };
 
-            rc = sh::process(input, solution, res);
+//            rc = sh::process(input, solution, res);
+            result = sh::execute(solution, "", input, res);
 
-            if (rc != CP_TOOLS_OK)
+            if (result.rc != CP_TOOLS_OK)
             {
-                err << "[validate_checker] Can't generate output for input '" << input << "'\n";
-                return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
+                err << message::failure("Can't generatate output for input '" + input 
+                    + "'!") << "\n";
+                err << message::trace(result.output) << '\n';
+                return result.rc;
             }
 
             auto args { input + " " + output + " " + res };
             auto expected = rcodes[veredict];
-            auto got = sh::exec(checker, args, "/dev/null");
 
-            if (got != expected)
+            auto got = sh::execute(checker, args);
+//            auto got = sh::exec(checker, args, "/dev/null");
+
+            if (got.rc != expected)
             {
-                err << "[validate_checker] Test '" << input << "' failed!\n";
+
+                err << message::failure("Test '" + input + "' failed!") << "\n";
+                err << message::trace(got.output) << '\n';
                 return CP_TOOLS_ERROR_CHECK_TEST_FAILED;
             }
         }
@@ -196,12 +209,13 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
         }
 
-        auto rc = cptools::sh::build(program, source);
+        auto res = cptools::sh::build(program, source);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[validate_validator] Can't compile validator '" << source << "'\n";
-            return rc;
+            err << message::failure("Can't compile validator '" + source + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return res.rc;
         }
 
         auto tests = cptools::config::get(config, "tests|validator", 
@@ -215,16 +229,18 @@ namespace cptools::check {
 
         out << "Testing the validator (" << tests.size() << " tests) ...\n";
 
-        for (auto [input, veredict] : tests)
+        for (auto [input, verdict] : tests)
         {
-            auto rc = sh::process(input, program, "/dev/null");
+            //auto rc = sh::process(input, program, "/dev/null");
+            auto result = sh::execute(program, "", input);
 
-            if ((veredict == "VALID" and rc != CP_TOOLS_OK) or
-                (veredict == "INVALID" and rc == CP_TOOLS_OK))
+            if ((verdict == "VALID" and result.rc != CP_TOOLS_OK) or
+                (verdict == "INVALID" and result.rc == CP_TOOLS_OK))
             {
-                err << "[validate_validator] input = '" << input << "' is invalid: expected = '" 
-                    << veredict << "'\n";
-                return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
+                err << message::failure("Input '" + input + " is invalid: expected = '" +
+                    verdict) << "\n";
+                err << message::trace(result.output) << '\n';
+                return result.rc;
             }
         }
 
@@ -248,12 +264,13 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
         }
 
-        auto rc = cptools::sh::build(program, source);
+        auto res = cptools::sh::build(program, source);
 
-        if (rc != CP_TOOLS_OK)
+        if (res.rc != CP_TOOLS_OK)
         {
-            err << "[validate_tests] Can't compile validator '" << source << "'\n";
-            return rc;
+            err << message::failure("Can't compile validator '" + source + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return res.rc;
         }
 
 
@@ -271,9 +288,10 @@ namespace cptools::check {
         {
             err << "[check tests] Validating " << input << "...\n";
 
-            auto rc = cptools::sh::process(input, program, "/dev/null");
+//            auto rc = cptools::sh::process(input, program, "/dev/null");
+            auto result = sh::execute(program, "", input);
 
-            if (rc != CP_TOOLS_OK)
+            if (result.rc != CP_TOOLS_OK)
             {
                 out << "Input file '" << input << "' is invalid!\n";
                 return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
