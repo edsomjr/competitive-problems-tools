@@ -39,9 +39,12 @@ Generate a LaTeX file from the problem description. The options are:
     -l              Lists all available document classes.
     --list
 
+    -t              Generates LaTeX file for problem's tutorial.
+    --tutorial
+
     --no_author     Omits problem's author.
 
-    --no_contest    problem's contest.
+    --no_contest    Omits problem's contest.
 
 )message" };
 
@@ -59,6 +62,7 @@ namespace cptools::gentex {
         { "list", no_argument, NULL, 'l' },
         { "class", required_argument, NULL, 'c' },
         { "output", required_argument, NULL, 'o' },
+        { "tutorial", no_argument, NULL, 't' },
         { "no_author", no_argument, NULL, NO_AUTHOR },
         { "no_contest", no_argument, NULL, NO_CONTEST },
         { 0, 0, 0, 0 }
@@ -265,7 +269,9 @@ namespace cptools::gentex {
         string document_class { "cp_modern" }, outfile, language { "pt_BR" }, label { "A" };
         int flags = flag::INCLUDE_AUTHOR | flag::INCLUDE_CONTEST;
 
-        while ((option = getopt_long(argc, argv, "ho:c:lg:b:", longopts, NULL)) != -1)
+        auto f = generate_latex;
+
+        while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1)
         {
             switch (option) {
             case 'h':
@@ -293,12 +299,16 @@ namespace cptools::gentex {
 
                 if (not validate_language(language))
                 {
-                    err << "Language " << language << " not find or supported\n";
+                    err << message::failure("Language " + language + " not find or supported\n");
                     return -1;
                 }
         
                 break;
             }
+
+            case 't':
+                f = generate_tutorial_latex;
+                break;
 
             case NO_AUTHOR:
                 flags &= (~flag::INCLUDE_AUTHOR);
@@ -321,10 +331,10 @@ namespace cptools::gentex {
             if (!of)
                 return CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE;
 
-            return generate_latex(document_class, language, flags, label, of, err);
+            return f(document_class, language, flags, label, of, err);
         }
 
-        return generate_latex(document_class, language, flags, label, out, err);
+        return f(document_class, language, flags, label, out, err);
     }
 
 }
