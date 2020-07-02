@@ -4,23 +4,28 @@
 #include <iostream>
 #include <map>
 
-namespace cptools::gentex {
+using namespace std;
 
+namespace cptools::gentex
+{
     // Auxiliary routines and definitions
-    typedef enum { INCLUDE_AUTHOR = 1, INCLUDE_CONTEST = 2 } Flags;
+    namespace flag {
+        constexpr int INCLUDE_AUTHOR  = 1;
+        constexpr int INCLUDE_CONTEST = 2;
+    }
 
-    bool validate_language(const std::string& lang);
+    bool validate_language(const string& lang);
 
-    int list_document_classes(std::ostream& out, std::ostream& err);
+    int list_document_classes(ostream& out, ostream& err);
 
-    int generate_latex(const std::string& doc_class, const std::string& language, 
-        int flags, const std::string& label, std::ostream& out, std::ostream& err);
+    int generate_latex(const string& doc_class, const string& language, 
+        int flags, const string& label, ostream& out, ostream& err);
 
-    int generate_tutorial_latex(const std::string& doc_class, const std::string& language, 
-        int flags, const std::string& label, std::ostream& out, std::ostream& err);
+    int generate_tutorial_latex(const string& doc_class, const string& language, 
+        int flags, const string& label, ostream& out, ostream& err);
+
     // Main routine
-    int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);
-
+    int run(int argc, char * const argv[], ostream& out, ostream& err);
 }
 
 #endif

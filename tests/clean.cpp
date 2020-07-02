@@ -36,9 +36,9 @@ SCENARIO("Command clean", "[clean]")
             char * const argv[] { (char *) "cp-tools", (char *) "clean", (char *) "-w", 
                 (char *) CP_TOOLS_TEMP_DIR };
 
-            string error;
-            REQUIRE(cptools::sh::make_dir(CP_TOOLS_TEMP_DIR, error) == CP_TOOLS_OK);
-            REQUIRE(error.empty());
+            auto res = cptools::sh::make_dir(CP_TOOLS_TEMP_DIR);
+            REQUIRE(res.rc == CP_TOOLS_OK);
+            REQUIRE(res.output.empty());
 
             // getopt library must be reseted between tests
             optind = 1;

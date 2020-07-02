@@ -1,4 +1,4 @@
-% Classic format of competitive problems.
+% Modern format for competitive problems.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{cp_modern}
 \LoadClass[12pt]{article}
@@ -21,6 +21,10 @@
 \RequirePackage{verbatim}
 \RequirePackage[scaled=0.8]{helvet}
 \RequirePackage{booktabs}
+\RequirePackage{tikz}
+\RequirePackage{enumerate}
+
+\hyphenation{cons-tru-ção con-si-de-ra-da com-ple-xi-da-de}
 
 \ifpdf
 \RequirePackage[pdftex]{hyperref}

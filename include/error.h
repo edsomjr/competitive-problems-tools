@@ -1,6 +1,9 @@
 #ifndef CP_TOOLS_ERROR_H 
 #define CP_TOOLS_ERROR_H 
 
+#define CP_TOOLS_TRUE   1
+#define CP_TOOLS_FALSE  0
+
 #define CP_TOOLS_OK                                     0
 #define CP_TOOLS_ERROR_MISSING_ARGUMENT                 -1
 #define CP_TOOLS_ERROR_INVALID_OPTION                   -2
@@ -44,7 +47,10 @@
 
 #define CP_TOOLS_ERROR_JUDGE_MISSING_CHECKER            -140
 #define CP_TOOLS_ERROR_JUDGE_MISSING_VALIDATOR          -141
-#define CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE         -142
+#define CP_TOOLS_ERROR_JUDGE_MISSING_TOOL               -142
+#define CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE         -143
+
+#define CP_TOOLS_ERROR_TASK_INVALID_TOOL                -150
 
 #endif
 

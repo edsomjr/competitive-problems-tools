@@ -8,10 +8,10 @@ int main(int argc, char* argv[])
 {
     registerValidation(argc, argv);
 
-    auto x = inf.readInt(0, 100, "x");
+    inf.readInt(0, 1000, "x");
     inf.readSpace();
 
-    auto y = inf.readInt(0, 100, "y");
+    inf.readInt(0, 1000, "y");
     inf.readEoln();
 
     inf.readEof();

@@ -1,42 +1,55 @@
 #include "message.h"
+#include "format.h"
 
 #include <map>
 #include <sstream>
+#include <iomanip>
 
 using std::map;
+using std::setw;
+using std::left;
 using std::istringstream;
 using std::ostringstream;
 
 namespace cptools::message {
 
-    enum Color { RED, GREEN, BLUE, GRAY, YELLOW, VIOLET, BOLD, ITALIC, UNDERLINE, END };
-
-    static map<Color, string> colors {
-        { RED, "\033[91m" },
-        { GREEN, "\033[92m" },
-        { BLUE, "\033[94m" },
-        { GRAY, "\033[90m" },
-        { YELLOW, "\033[93m" },
-        { VIOLET, "\033[35m" },
-        { BOLD, "\033[1m" },
-        { ITALIC, "\033[3m" },
-        { UNDERLINE, "\033[4m" },
-        { END, "\033[0m" },
-    };
-
-    string success()
+    string info(const string& text)
     {
-        return colors[BOLD] + colors[GREEN] + "Ok!" + colors[END];
+        auto msg = format::apply(text, format::color::GRAY);
+        
+        return msg;
     }
 
-    string failure()
+    string header(const string& text)
     {
-        return colors[BOLD] + colors[RED] + "Fail!" + colors[END];
+        auto msg = format::apply(text, format::emph::BOLD);
+        
+        return msg;
     }
 
-    string warning()
+
+    string success(const string& text)
     {
-        return colors[BOLD] + colors[YELLOW] + "Warning!" + colors[END];
+        auto ok = format::apply("Ok!", format::emph::BOLD + format::color::GREEN);
+        auto msg = format::apply(text, format::color::GRAY);
+        
+        return ok + ' ' + msg;
+    }
+
+    string failure(const string& text)
+    {
+        auto fail = format::apply("Fail!", format::emph::BOLD + format::color::RED);
+        auto msg = format::apply(text, format::emph::ITALIC + format::color::RED);
+        
+        return fail + ' ' + msg;
+    }
+
+    string warning(const string& text)
+    {
+        auto warning = format::apply("Warning!", format::emph::BOLD + format::color::YELLOW);
+        auto msg = format::apply(text, format::emph::ITALIC + format::color::YELLOW);
+        
+        return warning + ' ' + msg;
     }
 
     string trace(const string& errors)
@@ -45,14 +58,14 @@ namespace cptools::message {
         ostringstream oss;
 
         oss << '\n';
-        oss << colors[BOLD] << colors[VIOLET] << "Errors:\n" << colors[END];
+        oss << format::apply("Errors:", format::emph::BOLD + format::color::VIOLET) << '\n';
+
         string line;
 
         while (getline(iss, line))
-            oss << colors[ITALIC] << colors[VIOLET] + '\t' + line + '\n';
-
-        oss << colors[END];
+            oss << format::apply("\t" + line, format::emph::ITALIC + format::color::VIOLET) << '\n';
 
         return oss.str();
     }
+
 }

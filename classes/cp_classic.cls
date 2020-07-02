@@ -1,4 +1,4 @@
-% Classic format of competitive problems.
+% Classic format for competitive problems.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{cp_classic}
 \LoadClass[12pt]{article}
@@ -19,6 +19,10 @@
 \RequirePackage{xcolor,colortbl}
 \RequirePackage{xcolor}
 \RequirePackage{verbatim}
+\RequirePackage{tikz}
+\RequirePackage{enumerate}
+
+\hyphenation{cons-tru-ção con-si-de-ra-da com-ple-xi-da-de}
 
 \ifpdf
 \RequirePackage[pdftex]{hyperref}
