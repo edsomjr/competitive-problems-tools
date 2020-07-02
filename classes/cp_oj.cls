@@ -1,6 +1,6 @@
-% Classic format of competitive problems.
+% Format used in OJ (onlinejudge.org) PDFs.
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{cp_uva}
+\ProvidesClass{cp_oj}
 \LoadClass[12pt]{article}
  
 \DeclareOption{portuguese}{\def\portuguese{yes}}

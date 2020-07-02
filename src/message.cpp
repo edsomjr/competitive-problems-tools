@@ -20,6 +20,14 @@ namespace cptools::message {
         return msg;
     }
 
+    string header(const string& text)
+    {
+        auto msg = format::apply(text, format::emph::BOLD);
+        
+        return msg;
+    }
+
+
     string success(const string& text)
     {
         auto ok = format::apply("Ok!", format::emph::BOLD + format::color::GREEN);

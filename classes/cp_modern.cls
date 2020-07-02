@@ -1,4 +1,4 @@
-% Classic format of competitive problems.
+% Modern format for competitive problems.
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{cp_modern}
 \LoadClass[12pt]{article}
