@@ -238,7 +238,7 @@ namespace cptools::gentex {
 
         out << "\\begin{samples}{" << c1_size << "}{" << c2_size << "}\n";
 
-        auto io_files = cptools::task::generate_io_files("samples", out, err);
+        auto io_files = task::generate_io_files("samples", out, err);
 
         for (auto [infile, outfile] : io_files)
             out << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" 
@@ -262,7 +262,7 @@ namespace cptools::gentex {
     {
         int option = -1;
 
-        string document_class { "cp_modern" }, outfile, language { "en_US" }, label { "A" };
+        string document_class { "cp_modern" }, outfile, language { "pt_BR" }, label { "A" };
         int flags = flag::INCLUDE_AUTHOR | flag::INCLUDE_CONTEST;
 
         while ((option = getopt_long(argc, argv, "ho:c:lg:b:", longopts, NULL)) != -1)
