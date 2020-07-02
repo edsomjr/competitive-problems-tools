@@ -167,7 +167,7 @@ namespace cptools::genpdf {
 
         std::string document_class { "cp_modern" }, outfile { "problem.pdf" }, 
             language { "pt_BR" }, label { "A" };
-        int flags = gentex::Flags::INCLUDE_AUTHOR | gentex::Flags::INCLUDE_CONTEST;
+        int flags = gentex::flag::INCLUDE_AUTHOR | gentex::flag::INCLUDE_CONTEST;
 
         while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1)
         {
@@ -210,11 +210,11 @@ namespace cptools::genpdf {
                 break;
 
             case NO_AUTHOR:
-                flags &= (~gentex::Flags::INCLUDE_AUTHOR);
+                flags &= (~gentex::flag::INCLUDE_AUTHOR);
                 break;
 
             case NO_CONTEST:
-                flags &= (~gentex::Flags::INCLUDE_CONTEST);
+                flags &= (~gentex::flag::INCLUDE_CONTEST);
                 break;
 
             default:
