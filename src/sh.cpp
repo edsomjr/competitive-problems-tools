@@ -54,9 +54,9 @@ namespace cptools::sh {
             return CP_TOOLS_ERROR_SH_POPEN_FAILED;
 
         ostringstream oss;
-        char buffer[65536];
+        char buffer[1024*1024];
 
-        while (fread(buffer, sizeof(char), 65536, fp) > 0)
+        while (fread(buffer, sizeof(char), 1024*1024, fp) > 0)
         {
             oss << buffer;
         }
