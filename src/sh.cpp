@@ -54,9 +54,9 @@ namespace cptools::sh {
             return CP_TOOLS_ERROR_SH_POPEN_FAILED;
 
         ostringstream oss;
-        char buffer[4096];
+        char buffer[1024*1024];
 
-        while (fread(buffer, sizeof(char), 4096, fp) > 0)
+        while (fread(buffer, sizeof(char), 1024*1024, fp) > 0)
         {
             oss << buffer;
         }
@@ -191,7 +191,7 @@ namespace cptools::sh {
         }
 
         string command { string("export TEXINPUTS=\".:") + CP_TOOLS_CLASSES_DIR 
-            + ":\" && pdflatex -output-directory=" + outdir + " " + src };
+            + ":\" && pdflatex -halt-on-error -output-directory=" + outdir + " " + src };
 
         string error;
         auto rc = execute_command(command, error);

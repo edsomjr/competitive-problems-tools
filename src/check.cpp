@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include <unistd.h>
 #include <getopt.h>
@@ -12,6 +13,7 @@
 #include "config.h"
 #include "message.h"
 
+using namespace std;
 
 // Raw strings
 static const std::string help_message {
@@ -57,6 +59,12 @@ namespace cptools::check {
         { "AC", 4 },
         { "PE", 5 },
         { "WA", 6 },
+    };
+
+    static std::map<int, std::string> mcodes {
+        { 4, "AC" },
+        { 5, "PE" },
+        { 6, "WA" },
     };
 
     // Auxiliary routines
@@ -178,14 +186,19 @@ namespace cptools::check {
             auto args { input + " " + output + " " + res };
             auto expected = rcodes[veredict];
 
-            auto got = sh::execute(checker, args);
+            auto got = sh::execute(checker, args, "", "");
 //            auto got = sh::exec(checker, args, "/dev/null");
 
             if (got.rc != expected)
             {
+                ostringstream oss;
+
+                oss << got.output;
+                oss << "Got: " << mcodes[got.rc] << ", expected: " << mcodes[expected] << '\n';
 
                 err << message::failure("Test '" + input + "' failed!") << "\n";
-                err << message::trace(got.output) << '\n';
+                err << message::trace(oss.str());
+
                 return CP_TOOLS_ERROR_CHECK_TEST_FAILED;
             }
         }
