@@ -18,9 +18,10 @@
 #include "gentex.h"
 #include "message.h"
 
+using namespace std;
 
 // Raw strings
-static const std::string help_message {
+static const string help_message {
 R"message(
 Generate a PDF file from the problem description. The options are:
 
@@ -71,31 +72,30 @@ namespace cptools::genpdf {
     };
 
     // Auxiliary routines
-    std::string usage()
+    string usage()
     {
         return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] [-g lang] [-l] [-t] [--no-author] [--no-contest]";
     }
 
-    std::string help()
+    string help()
     {
         return usage() + help_message;
     }
 
-
-    int generate_pdf(const std::string& doc_class, const std::string& language, 
-        int flags, const std::string& label, const std::string& outfile, bool tutorial,
-        std::ostream& out, std::ostream& err)
+    int generate_pdf(const string& doc_class, const string& language, int flags, 
+        const string& label, const string& outfile, bool tutorial, ostream& out, ostream& err)
     {
         auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
 
         if (res.rc != CP_TOOLS_OK)
         {
-            err << "[genpdf] Error creating dir '" << CP_TOOLS_BUILD_DIR << "'";
+            err << message::failure("Error creating dir '" + string(CP_TOOLS_BUILD_DIR) + "'\n");
+            err << message::trace(res.output) << '\n';
             return res.rc;
         }
 
         // Generates the tex file that will be used to build the pdf file
-        std::string texfile_path { std::string(CP_TOOLS_BUILD_DIR) + 
+        string texfile_path { string(CP_TOOLS_BUILD_DIR) + 
             (tutorial ? "/tutorial.tex" : "/problem.tex") };
 
         res = sh::remove_file(texfile_path);
@@ -107,31 +107,28 @@ namespace cptools::genpdf {
             return res.rc;
         }
 
-        std::ofstream tex_file(texfile_path);
+        ofstream tex_file(texfile_path);
 
         if (not tex_file)
         {
-            err << "[genpdf] Error opening file '" << texfile_path << "'\n";
+            err << message::failure("Error opening file '" + texfile_path) << "'\n";
+            err << message::trace(res.output) << '\n';
             return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
         }
 
-        int rc;
-
-        if (tutorial)
-            rc = gentex::generate_tutorial_latex(doc_class, language, flags, label, tex_file, err);
-        else
-            rc = gentex::generate_latex(doc_class, language, flags, label, tex_file, err);
+        auto task = tutorial ? gentex::generate_tutorial_latex : gentex::generate_latex;
+        auto rc = task(doc_class, language, flags, label, tex_file, err);
 
         if (rc != CP_TOOLS_OK)
         {
-            err << "[genpdf] Error generating the LaTeX file '" << texfile_path << "'\n";
+            err << message::failure("Error generating the LaTeX file '" + texfile_path) << "'\n";
             return rc;
         }
 
         tex_file.close();
 
         // Generates the PDF file 'problem.pdf' on CP_TOOLS_BUILD_DIR
-        std::string pdf_file { std::string(CP_TOOLS_BUILD_DIR) + 
+        string pdf_file { string(CP_TOOLS_BUILD_DIR) + 
             (tutorial ? "/tutorial.pdf" : "/problem.pdf") };
 
         res = sh::build(pdf_file, texfile_path);
@@ -154,20 +151,21 @@ namespace cptools::genpdf {
             return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
         }
 
-        out << "[genpdf] File '" << outfile << "' generated.\n";
+        out << message::success("File '" + outfile + "' generated.\n");
 
         return CP_TOOLS_OK;
     }
 
     // API functions
-    int run(int argc, char * const argv[], std::ostream& out, std::ostream& err)
+    int run(int argc, char * const argv[], ostream& out, ostream& err)
     {
         int option = -1;
         bool tutorial = false;
 
-        std::string document_class { "cp_modern" }, outfile { "problem.pdf" }, 
-            language { "pt_BR" }, label { "A" };
         int flags = gentex::flag::INCLUDE_AUTHOR | gentex::flag::INCLUDE_CONTEST;
+
+        string document_class { "cp_modern" }, outfile { "problem.pdf" }, language { "pt_BR" }, 
+                                label { "A" };
 
         while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1)
         {
@@ -177,15 +175,15 @@ namespace cptools::genpdf {
                 return 0;
 
             case 'b':
-                label = std::string(optarg);
+                label = string(optarg);
                 break;
 
             case 'o':
-                outfile = std::string(optarg);
+                outfile = string(optarg);
                 break;
 
             case 'c':
-                document_class = std::string(optarg);
+                document_class = string(optarg);
                 break;
 
             case 'l':
@@ -193,12 +191,12 @@ namespace cptools::genpdf {
 
             case 'g':
             {
-                language = std::string(optarg);
+                language = string(optarg);
 
                 if (not gentex::validate_language(language))
                 {
-                    err << "Language " << language << " not find or supported\n";
-                    return -1;
+                    err << message::failure("Language '" + language + "' not find or supported\n");
+                    return CP_TOOLS_ERROR_GENPDF_INVALID_LANGUAGE;
                 }
         
                 break;
