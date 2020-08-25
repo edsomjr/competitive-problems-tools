@@ -118,7 +118,7 @@ namespace cptools::check {
             err << message::trace(res.output) << '\n';
             return res.rc;
         }
-
+ 
         source = "solutions/" + 
             cptools::config::get(config, "solutions|default", std::string("ERROR"));
 
@@ -148,7 +148,7 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
         }
 
-        out << "Testing the checker (" << tests.size() << " tests) ...\n";
+        out << message::info("Testing the checker (" + to_string(tests.size()) + " tests) ...\n");
 
         for (auto [input, data] : tests)
         {
@@ -199,7 +199,7 @@ namespace cptools::check {
             }
         }
 
-        out << "Ok!\n";
+        out << message::success() << "\n";
 
         return CP_TOOLS_OK;
     }
