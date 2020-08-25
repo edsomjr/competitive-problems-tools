@@ -160,7 +160,7 @@ namespace cptools::check {
                 return CP_TOOLS_ERROR_CHECK_INVALID_VEREDICT;
             }
 
-            auto result = sh::execute(validator, "", input);
+            auto result = sh::execute(validator, "", input, "");
 
             if (result.rc != CP_TOOLS_OK)
             {
