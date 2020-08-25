@@ -152,15 +152,14 @@ namespace cptools::check {
 
         for (auto [input, data] : tests)
         {
-            auto [output, veredict] = data;
+            auto [output, verdict] = data;
 
-            if (rcodes.find(veredict) == rcodes.end())
+            if (rcodes.find(verdict) == rcodes.end())
             {
-                err << "[validate_checker] Invalid veredict: '" << veredict << "'\n";
+                err << "[validate_checker] Invalid verdict: '" << verdict << "'\n";
                 return CP_TOOLS_ERROR_CHECK_INVALID_VEREDICT;
             }
 
-//            auto rc = sh::process(input, validator, "/dev/null");
             auto result = sh::execute(validator, "", input);
 
             if (result.rc != CP_TOOLS_OK)
@@ -172,7 +171,6 @@ namespace cptools::check {
 
             auto res { std::string(CP_TOOLS_BUILD_DIR) + "/.res" };
 
-//            rc = sh::process(input, solution, res);
             result = sh::execute(solution, "", input, res);
 
             if (result.rc != CP_TOOLS_OK)
@@ -184,10 +182,8 @@ namespace cptools::check {
             }
 
             auto args { input + " " + output + " " + res };
-            auto expected = rcodes[veredict];
-
+            auto expected = rcodes[verdict];
             auto got = sh::execute(checker, args, "", "");
-//            auto got = sh::exec(checker, args, "/dev/null");
 
             if (got.rc != expected)
             {
@@ -240,24 +236,24 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
         }
 
-        out << "Testing the validator (" << tests.size() << " tests) ...\n";
+        out << message::info("Testing the validator (" + to_string(tests.size()) + " tests) ...\n");
 
         for (auto [input, verdict] : tests)
         {
-            //auto rc = sh::process(input, program, "/dev/null");
-            auto result = sh::execute(program, "", input);
+            auto result = sh::execute(program, "", input, "");
 
-            if ((verdict == "VALID" and result.rc != CP_TOOLS_OK) or
-                (verdict == "INVALID" and result.rc == CP_TOOLS_OK))
+            string res = (result.output.find("FAIL") == string::npos ? "VALID" : "INVALID");
+
+            if (verdict != res)
             {
                 err << message::failure("Input '" + input + " is invalid: expected = '" +
-                    verdict) << "\n";
+                    verdict + "', got = '" + res + "'\n");
                 err << message::trace(result.output) << '\n';
                 return result.rc;
             }
         }
 
-        out << "Ok!\n";
+        out << message::success() << '\n';
 
         return CP_TOOLS_OK;
     }
