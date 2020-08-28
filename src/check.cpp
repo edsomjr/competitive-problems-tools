@@ -80,8 +80,16 @@ namespace cptools::check {
 
     int validate_checker(std::ostream& out, std::ostream& err)
     {
-        auto validator { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
+        auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
 
+        if (res.rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Error creating dir '" + string(CP_TOOLS_BUILD_DIR) + "'\n");
+            err << message::trace(res.output) << '\n';
+            return res.rc;
+        }
+
+        auto validator { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
         auto config = cptools::config::read("config.json");
         auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
 
@@ -91,7 +99,7 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
         }
 
-        auto res = cptools::sh::build(validator, source);
+        res = cptools::sh::build(validator, source);
 
         if (res.rc != CP_TOOLS_OK)
         {
@@ -207,8 +215,16 @@ namespace cptools::check {
 
     int validate_validator(std::ostream& out, std::ostream& err)
     {
-        auto program { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
+        auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
 
+        if (res.rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Error creating dir '" + string(CP_TOOLS_BUILD_DIR) + "'\n");
+            err << message::trace(res.output) << '\n';
+            return res.rc;
+        }
+
+        auto program { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
         auto config = cptools::config::read("config.json");
         auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
 
@@ -218,7 +234,7 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
         }
 
-        auto res = cptools::sh::build(program, source);
+        res = cptools::sh::build(program, source);
 
         if (res.rc != CP_TOOLS_OK)
         {
@@ -260,8 +276,16 @@ namespace cptools::check {
 
     int validate_tests(std::ostream& out, std::ostream& err)
     {
-        auto program { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
+        auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
 
+        if (res.rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Error creating dir '" + string(CP_TOOLS_BUILD_DIR) + "'\n");
+            err << message::trace(res.output) << '\n';
+            return res.rc;
+        }
+
+        auto program { std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
         auto config = cptools::config::read("config.json");
         auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
 
@@ -273,7 +297,7 @@ namespace cptools::check {
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
         }
 
-        auto res = cptools::sh::build(program, source);
+        res = cptools::sh::build(program, source);
 
         if (res.rc != CP_TOOLS_OK)
         {
