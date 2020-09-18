@@ -36,7 +36,7 @@ namespace cptools::task {
 
         if (res.rc != CP_TOOLS_OK)
         {
-            err << "[generate_io_files] Can't create '" << input_dir << "'\n";
+            err << message::failure("Can't create '" + input_dir + "'\n");
             return { };
         }
 
@@ -44,13 +44,13 @@ namespace cptools::task {
 
         if (res.rc != CP_TOOLS_OK)
         {
-            err << "[generate_io_files] Can't create '" << output_dir << "'\n";
+            err << message::failure("Can't create '" + output_dir + "'\n");
             return { };
         }
 
         if (source == "solutions/ERROR")
         {
-            err << "[generate_io_files] Default solution file not found!\n";
+            err << message::failure("Default solution file not found!\n");
             return { };
         }
 
@@ -74,7 +74,7 @@ namespace cptools::task {
 
                 if (source == "tools/ERROR")
                 {
-                    err << "[generate_io_files] Generator file not found!\n";
+                    err << message::failure("Generator file not found!\n");
                     return { };
                 }
 
@@ -97,7 +97,6 @@ namespace cptools::task {
                     std::string dest { input_dir + std::to_string(next++) };
 
                     auto res = sh::execute(generator, parameters, "", dest);
-//                    auto rc = sh::exec(generator, parameters, dest);
 
                     if (res.rc != CP_TOOLS_OK)
                     {
@@ -141,7 +140,6 @@ namespace cptools::task {
                 std::string input { io_files[i - 1].first };
                 std::string output { output_dir + std::to_string(i) };
 
-//                rc = cptools::sh::process(input, program, output);
                 auto res = cptools::sh::execute(program, "", input, output);
 
                 if (res.rc != CP_TOOLS_OK)
