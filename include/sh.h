@@ -31,8 +31,6 @@ namespace cptools::sh {
     Result is_file(const string& path);
 
     Result build(const string& output, const string& src);
- //   int process(const string& input, const string& program, const string& output, int timeout = 3);
-//    int exec(const string& program, const string& args, const string& output, int timeout = 3);
 
     Result execute(const string& program, const string& args, const string& infile = "", 
         const string& outfile = "/dev/null", int timeout = 3);

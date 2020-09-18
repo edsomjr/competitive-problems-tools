@@ -258,13 +258,13 @@ namespace cptools::check {
         {
             auto result = sh::execute(program, "", input, "");
 
-            string res = (result.output.find("FAIL") == string::npos ? "VALID" : "INVALID");
+            string res = (result.output.find("FAIL") == string::npos ? "OK" : "INVALID");
 
             if (verdict != res)
             {
                 err << message::failure("Input '" + input + " is invalid: expected = '" +
                     verdict + "', got = '" + res + "'\n");
-                err << message::trace(result.output) << '\n';
+                err << message::trace(result.output.empty() ? "Test valid!" : result.output) << '\n';
                 return result.rc;
             }
         }
@@ -289,11 +289,9 @@ namespace cptools::check {
         auto config = cptools::config::read("config.json");
         auto source = cptools::config::get(config, "tools|validator", std::string("ERROR"));
 
-        out << "[validate_tests] source = '" << source << "'\n";
-
         if (source == "ERROR")
         {
-            err << "[validate_tests] Default solution file not found!\n";
+            err << message::failure("Default solution file not found!\n");
             return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
         }
 
@@ -306,32 +304,30 @@ namespace cptools::check {
             return res.rc;
         }
 
-
         auto io_files = task::generate_io_files("all", out, err, false);
 
         if (io_files.empty())
         {
-            err << "[validate_tests] There are no io files to validate!\n";
+            err << message::failure("There are no io files to validate!\n");
             return CP_TOOLS_ERROR_CHECK_MISSING_IO_FILES;
         }
 
-        out << "Checking " << io_files.size() << " input files...\n";
+        out << message::info("Validating the input files (" + to_string(io_files.size()) +
+            " tests) ...\n");
 
         for (auto [input, _] : io_files)
         {
-            err << "[check tests] Validating " << input << "...\n";
-
-//            auto rc = cptools::sh::process(input, program, "/dev/null");
-            auto result = sh::execute(program, "", input);
+            auto result = sh::execute(program, "", input, "");
 
             if (result.rc != CP_TOOLS_OK)
             {
-                out << "Input file '" << input << "' is invalid!\n";
+                err << message::failure("Input file '" + input + "' is invalid!\n");
+                err << message::trace(result.output) << '\n';
                 return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
             }
         }
 
-        out << "Ok!\n";
+        out << message::success() << "\n";
 
         return CP_TOOLS_OK;
     }

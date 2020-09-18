@@ -56,9 +56,11 @@ namespace cptools::sh {
         ostringstream oss;
         char buffer[1024*1024];
 
-        while (fread(buffer, sizeof(char), 1024*1024, fp) > 0)
+        int amount;
+
+        while ((amount = fread(buffer, sizeof(char), 1024*1024, fp)) > 0)
         {
-            oss << buffer;
+            oss << string(buffer, amount);
         }
 
         out = oss.str();
