@@ -6,8 +6,8 @@
   commits if your PR already received reviews or comments.
   
   Before submitting a Pull Request, please ensure you've done the following:
-  - Read the Open Sauced Contributing Guide: https://github.com/edsomjr/competitive-problems-tools/blob/HEAD/CONTRIBUTING.md#create-a-pull-request.
-  - Read the Open Sauced Code of Conduct: https://github.com/edsomjr/competitive-problems-tools/blob/HEAD/CODE_OF_CONDUCT.md.
+  - Read the Open Sauced Contributing Guide: https://github.com/edsomjr/competitive-problems-tools/blob/HEAD/CONTRIBUTING.md#pull-requests.
+  - Read the Open Sauced Code of Conduct: https://github.com/edsomjr/competitive-problems-tools/blob/preparing-for-hacktoberfest/CODE_OF_CONDUCT.md.
   - Create small PRs. In most cases, this will be possible.
   - Provide tests for your changes.
   - Use descriptive commit messages.

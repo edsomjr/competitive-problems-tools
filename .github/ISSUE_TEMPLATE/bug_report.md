@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve Open Sauced
+about: Create a report to help us improve cp-tools
 title: "Bug: "
 labels: needs triage, bug
 ---
