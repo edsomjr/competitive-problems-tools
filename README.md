@@ -24,7 +24,6 @@
 
 ## About
 Format, test and pack competitive programming problems.
-<!-- MORE INFORMATION HERE? -->
 
 ## Installation
 
@@ -58,10 +57,9 @@ To uninstall run
 ## Features
 
 <!-- FEATURES THAT ARE ALREADY PRESENT -->
-- [x] Integration with Polygon
-- [x] Integration with MOJ
-- [x] Support Markdown and LaTex
-<!-- FUTURE FEATURES -->
+- [x] Generates the problem PDF and checks the solutions
+- [ ] Integration with Polygon
+- [ ] Integration with MOJ
 - [ ] Support for interactive questions
 
 ## Basic usage
@@ -104,10 +102,15 @@ $ cp-tools -h
 ```
 ## Tests
 
-<!-- HOW TO RUN THE TESTS? -->
+To run the unit test use the commands
+
+```
+$ make
+$ ./cp-run_tests
+```
 
 ## Technologies
 
-* C++ 17
+* C++17
 * GCC v.10.2.0
-<!-- THERE ARE MORE Technologies? -->
+* LaTeX
