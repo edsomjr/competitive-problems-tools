@@ -1,7 +1,28 @@
 # cp-tools
 
-![Travis](https://travis-ci.org/edsomjr/competitive-problems-tools.svg?branch=master)
+<!-- FUTURE cp-tools LOGO -->
+<h1 align="center">
+    <img src=".github/static/cpp-logo.png" alt="Competitive programming Tools Logo" width="200">
+</h1>
 
+<p align='center'>
+    <img src='https://travis-ci.org/edsomjr/competitive-problems-tools.svg?branch=master'>
+    <img src='https://img.shields.io/badge/License-GPLv3-blue.svg'>
+    <img src='https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square'>
+</p>
+
+<p align="center">
+  <a href="#about">About the project</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#features">Features</a> •
+  <a href="#basic-usage">Basic usage</a> •
+  <a href="#tests">Tests</a> •
+  <a href="#technologies">Technologies</a> •
+</p>
+
+<br>
+
+## About
 Format, test and pack competitive programming problems.
 
 ## Installation
@@ -32,6 +53,14 @@ To uninstall run
 - pdflatex
 - GCC 8
 - Python 3
+
+## Features
+
+<!-- FEATURES THAT ARE ALREADY PRESENT -->
+- [x] Generates the problem PDF and checks the solutions
+- [ ] Integration with Polygon
+- [ ] Integration with MOJ
+- [ ] Support for interactive questions
 
 ## Basic usage
 
@@ -71,3 +100,17 @@ For more information, use the option `-h` (or `--help`), as shown below:
 ```
 $ cp-tools -h
 ```
+## Tests
+
+To run the unit test use the commands
+
+```
+$ make
+$ ./cp-run_tests
+```
+
+## Technologies
+
+* C++17
+* GCC v.10.2.0
+* LaTeX
