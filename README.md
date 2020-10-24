@@ -36,7 +36,7 @@ $ make
 To install `cp-tools`, use the command below as a super user:
 
 ```
-# make install
+$ make install
 ```
 
 The binary will be copied in `/usr/local/bin`. The support files will be copied in `/usr/local/lib/cp-tools` directory.
@@ -44,7 +44,7 @@ The binary will be copied in `/usr/local/bin`. The support files will be copied 
 To uninstall run
 
 ```
-# make uninstall
+$ make uninstall
 ```
 
 ## Dependencies
