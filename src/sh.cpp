@@ -181,6 +181,30 @@ namespace cptools::sh {
         return { CP_TOOLS_OK, "" };
     }
 
+    Result compile_java(const string& output, const string& src)
+    {
+        auto dir = util::split(src, '/').front();
+        auto filename = util::split(src, '.').front();
+        auto name = util::split(filename, '/').back();
+
+        vector<string> commands {
+            "javac " + src,
+            "echo '#!/bin/bash' > " + output,
+            "echo 'java -cp " + dir + "/ " + name + "' > " + output,
+            "chmod 755 " + output,
+         };
+
+        for (auto command : commands)
+        {
+            string error;
+            auto rc = execute_command(command, error);
+
+            if (rc != CP_TOOLS_OK)
+                return { CP_TOOLS_ERROR_SH_PY_BUILD_ERROR, error };
+        }
+
+        return { CP_TOOLS_OK, "" };
+    }
 
     Result build_tex(const string& output, const string& src)
     {
@@ -209,6 +233,7 @@ namespace cptools::sh {
 
     map<string, Result (*)(const string&, const string&)> fs {
         { "cpp", compile_cpp },
+        { "java", compile_java },
         { "tex", build_tex },
         { "py", build_py },
     };
@@ -233,35 +258,6 @@ namespace cptools::sh {
         return it->second(output, src); 
     }
 
-/*    int process(const string& input, const string& program, const string& output,
-        int timeout)
-    {
-        string command { "timeout " + to_string(timeout) + "s " + program + " < " 
-            + input + " > " + output };
-
-        auto rc = system(command.c_str());
-
-        return rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PROCESS_ERROR;
-    }
-
-    int exec(const string& program, const string& args, const string& output, int timeout)
-    {
-        string command;
-
-        if (timeout > 0)
-        {
-            command = "timeout " + to_string(timeout) + "s " + program + "  " 
-                + args + " > " + output;
-        } else
-        {
-            command = program + "  " + args + " > " + output;;
-        }
-
-        int rc = system(command.c_str());
-
-        return WEXITSTATUS(rc);
-    }
-*/
     Result execute(const string& program, const string& args, const string& infile, 
         const string& outfile, int timeout)
     {
