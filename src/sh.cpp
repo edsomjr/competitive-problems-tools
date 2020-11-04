@@ -164,7 +164,7 @@ namespace cptools::sh {
     Result build_py(const string& output, const string& src)
     {
         vector<string> commands {
-            "echo '#!/usr/bin/python' > " + output,
+            "echo '#!/usr/bin/python3' > " + output,
             "cat " + src + " >> " + output,
             "chmod 755 " + output,
          };
