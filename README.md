@@ -53,6 +53,7 @@ $ make uninstall
 - pdflatex
 - GCC 8
 - Python 3
+- openJDK 13
 
 ## Features
 
