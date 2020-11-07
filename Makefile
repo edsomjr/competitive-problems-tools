@@ -44,6 +44,7 @@ SCRIPTS_DIR=scripts
 TEMPLATE_DIR=templates
 
 INSTALL_BIN_DIR=/usr/local/bin
+INSTALL_MAN_DIR=/usr/share/man/man1
 INSTALL_CLASSES_DIR=/usr/local/lib
 INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
@@ -66,6 +67,7 @@ SOURCES:=${filter-out $(SRC_DIR)/main.cpp, $(SOURCES)}
 
 OBJECTS=$(SOURCES:.cpp=$(OBJ_EXTENSION))
 COMPLETION_SCRIPT=$(PROJECT)-completion.sh
+MAN_FILE=cp-tools.1
 
 PROJECT_MAIN=$(SRC_DIR)/main.cpp
 PROJECT_OBJECT=$(PROJECT_MAIN:.cpp=$(OBJ_EXTENSION))
@@ -110,12 +112,14 @@ install: $(PROJECT)
 	@mkdir -p $(INSTALL_CLASSES_DIR)/$(PROJECT)
 	@cp -r $(CLASSES_DIR) $(INSTALL_CLASSES_DIR)/$(PROJECT)/
 	@cp $(SCRIPTS_DIR)/$(COMPLETION_SCRIPT) $(INSTALL_COMPLETION_DIR)
+	@cp $(MAN_FILE) $(INSTALL_MAN_DIR)
 
 
 uninstall:
 	@rm -f $(INSTALL_COMPLETION_DIR)/$(COMPLETION_SCRIPT)
 	@rm -rf $(INSTALL_TEMPLATE_DIR)/$(PROJECT)
 	@rm -f $(INSTALL_BIN_DIR)/$(PROJECT)
+	@rm -f $(INSTALL_MAN_DIR)/$(MAN_FILE)
 
 
 clean:
