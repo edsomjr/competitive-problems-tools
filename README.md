@@ -100,6 +100,13 @@ For more information, use the option `-h` (or `--help`), as shown below:
 ```
 $ cp-tools -h
 ```
+
+Or read cp-tools man page using
+
+```
+$ man cp-tools
+```
+
 ## Tests
 
 To run the unit test use the commands
