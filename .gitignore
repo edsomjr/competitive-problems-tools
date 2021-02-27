@@ -41,3 +41,6 @@ build
 # Python
 __py-cache__
 *.pyc
+
+# Visual Code configurations
+.vscode

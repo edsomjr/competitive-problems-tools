@@ -13,6 +13,7 @@
 #include "gentex.h"
 #include "genpdf.h"
 #include "cptools.h"
+#include "polygon.h"
 
 using std::map;
 
@@ -29,6 +30,7 @@ Format, test and pack competitive programming problems.
     genpdf              Generates a PDF file from the problem description. 
     gentex              Generates a LaTeX file from the problem description. 
     judge               Runs a solution against all tests sets.
+    polygon             Connects and synchronize with a Polygon account.
 )message"
 };
 
@@ -53,6 +55,7 @@ namespace cptools {
         { "gentex", gentex::run },
         { "genpdf", genpdf::run },
         { "judge", judge::run },
+        { "polygon", polygon::run },
     };
 
     static struct option longopts[] = {
