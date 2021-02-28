@@ -8,4 +8,6 @@
 #define CP_TOOLS_BUILD_DIR      ".cp-build"
 #define CP_TOOLS_TEMP_DIR       ".cp-tmp"
 
+#define CP_TOOLS_CONFIG_FILE    "." NAME "-config.json"
+
 #endif
