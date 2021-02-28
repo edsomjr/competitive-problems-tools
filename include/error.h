@@ -53,5 +53,8 @@
 
 #define CP_TOOLS_ERROR_TASK_INVALID_TOOL                -150
 
+#define CP_TOOLS_ERROR_POLYGON_INVALID_OPTION           -160
+#define CP_TOOLS_ERROR_POLYGON_MUTUAL_CHOICE_ERROR      -161
+
 #endif
 
