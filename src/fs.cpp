@@ -1,9 +1,11 @@
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <pwd.h>
 
 #include "fs.h"
 #include "dirs.h"
+#include "message.h"
 
 namespace cptools::fs {
     string get_home_dir() {
@@ -15,8 +17,16 @@ namespace cptools::fs {
         return string(homedir);
     }
 
-    string get_default_config() {
+    string get_default_config_path() {
         auto homedir = get_home_dir();
-        return homedir + "/" + CP_TOOLS_CONFIG_FILE;
+        auto config_path = homedir + "/" + CP_TOOLS_CONFIG_FILE;
+        return config_path;
+    }
+
+    bool file_exists(const string &path) {
+        struct stat buffer;
+        auto success = stat(path.c_str(), &buffer);
+        if(success == 0) return true;
+        return false;
     }
 }

@@ -63,7 +63,7 @@ namespace cptools::polygon {
     {
         int option = -1;
         Credentials creds;
-        string creds_file = fs::get_default_config();
+        string creds_file = fs::get_default_config_path();
         bool creds_from_cmd = false;
         bool creds_from_file = false;
         bool creds_set_from_file = false;
