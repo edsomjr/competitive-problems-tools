@@ -6,6 +6,8 @@
 #include "error.h"
 #include "message.h"
 #include "fs.h"
+#include "config.h"
+#include "exceptions.h"
 
 
 // Raw strings
@@ -109,6 +111,16 @@ namespace cptools::polygon {
         if (not creds_from_cmd) {
             // try to get from the file
             // set creds_set_from_file
+            try
+            {
+                auto json = config::read(creds_file);
+            }
+            catch(const exceptions::inexistent_file& e)
+            {
+                err << message::failure(string(e.what()));
+                return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
+            }
+            
         }
 
         if (not no_stdin and not creds_set_from_file) {
