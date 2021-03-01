@@ -109,18 +109,21 @@ namespace cptools::polygon {
         }
 
         if (not creds_from_cmd) {
-            // try to get from the file
-            // set creds_set_from_file
+            nlohmann::json loaded_json;
             try
             {
-                auto json = config::read(creds_file);
+                loaded_json = config::read(creds_file);
             }
             catch(const exceptions::inexistent_file& e)
             {
                 err << message::failure(string(e.what()));
                 return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
             }
-            
+
+            creds.key = config::get(loaded_json, "polygon|key", creds.key);
+            creds.secret = config::get(loaded_json, "polygon|secret", creds.secret);
+
+            creds_set_from_file = true;
         }
 
         if (not no_stdin and not creds_set_from_file) {
