@@ -113,6 +113,7 @@ namespace cptools::commands::polygon {
             nlohmann::json loaded_json;
             try
             {
+                out << message::info("Getting credentials from " + creds_file + "\n");
                 loaded_json = config::read(creds_file);
             }
             catch(const exceptions::inexistent_file& e)
@@ -135,10 +136,15 @@ namespace cptools::commands::polygon {
         creds.key = util::strip(creds.key);
         creds.secret = util::strip(creds.secret);
 
-        // TODO: API call to test if the credentials work (Polygon API module + HTTPS module)
+        auto connected = api::polygon::test_connection(creds);
 
-        err << message::failure("This method is not yet implemented.\n");
+        if(not connected) {
+            err << message::failure("Could not connect with the given credentials.");
+            return CP_TOOLS_ERROR_POLYGON_CANT_CONNECT;
+        }
 
-        return CP_TOOLS_ERROR_INVALID_COMMAND;
+        out << message::success("The given credentials are valid.");
+
+        return CP_TOOLS_OK;
     }
 }

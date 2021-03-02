@@ -18,7 +18,7 @@ namespace cptools::config {
             return config;
         }
 
-        throw(exceptions::inexistent_file(config_file_path));
+        throw(exceptions::inexistent_file());
     }
 
 }

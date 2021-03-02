@@ -3,6 +3,10 @@
 
 #include <string>
 
+#include "httplib.h"
+
+using std::string;
+
 namespace cptools::api::polygon {
 
     struct Credentials {
@@ -11,6 +15,10 @@ namespace cptools::api::polygon {
     };
 
     bool test_connection(const Credentials& creds);
+
+    string sha_512(const string& s);
+
+    string generate_api_sig(const string& method_name, const httplib::Params& params, const Credentials& creds);
 
 }
 
