@@ -9,11 +9,11 @@
 #include "task.h"
 #include "defs.h"
 #include "dirs.h"
-#include "init.h"
+#include "commands/init.h"
 #include "util.h"
 #include "error.h"
 #include "config.h"
-#include "gentex.h"
+#include "commands/gentex.h"
 #include "message.h"
 
 // Raw strings
@@ -49,7 +49,7 @@ Generate a LaTeX file from the problem description. The options are:
 )message" };
 
 
-namespace cptools::gentex {
+namespace cptools::commands::gentex {
 
     constexpr int NO_AUTHOR  = 1000;
     constexpr int NO_CONTEST = 2000;

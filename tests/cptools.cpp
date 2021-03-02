@@ -3,7 +3,7 @@
 
 #include "catch.hpp"
 
-#include "cptools.h"
+#include "commands/cptools.h"
 #include "error.h"
 
 using std::ostringstream;
@@ -22,10 +22,10 @@ SCENARIO("Command line options", "[cptools]")
             {
                 ostringstream out, err;
 
-                auto rc = cptools::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_OK);
-                REQUIRE(out.str() == (cptools::usage() + '\n'));
+                REQUIRE(out.str() == (cptools::commands::usage() + '\n'));
                 REQUIRE(err.str().empty());
             }
         }
@@ -40,11 +40,11 @@ SCENARIO("Command line options", "[cptools]")
             {
                 ostringstream out, err;
 
-                auto rc = cptools::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
-                REQUIRE(out.str() == (cptools::help() + '\n'));
+                REQUIRE(out.str() == (cptools::commands::help() + '\n'));
             }
         }
 
@@ -58,11 +58,11 @@ SCENARIO("Command line options", "[cptools]")
             {
                 ostringstream out, err;
 
-                auto rc = cptools::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
-                REQUIRE(out.str() == (cptools::version() + '\n'));
+                REQUIRE(out.str() == (cptools::commands::version() + '\n'));
             }
         }
 
@@ -77,11 +77,11 @@ SCENARIO("Command line options", "[cptools]")
             {
                 ostringstream out, err;
 
-                auto rc = cptools::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_ERROR_INVALID_OPTION);
                 REQUIRE(out.str().empty());
-                REQUIRE(err.str() == (cptools::help() + '\n'));
+                REQUIRE(err.str() == (cptools::commands::help() + '\n'));
             }
         }
 
@@ -96,11 +96,11 @@ SCENARIO("Command line options", "[cptools]")
 
                     ostringstream out, err;
 
-                    auto rc = cptools::run(argc, argv, out, err);
+                    auto rc = cptools::commands::run(argc, argv, out, err);
 
                     REQUIRE(rc == CP_TOOLS_OK);
                     REQUIRE(err.str().empty());
-                    REQUIRE(out.str() == (cptools::help() + '\n'));
+                    REQUIRE(out.str() == (cptools::commands::help() + '\n'));
                 }
 
                 {
@@ -110,11 +110,11 @@ SCENARIO("Command line options", "[cptools]")
 
                     ostringstream out, err;
 
-                    auto rc = cptools::run(argc, argv, out, err);
+                    auto rc = cptools::commands::run(argc, argv, out, err);
 
                     REQUIRE(rc == CP_TOOLS_OK);
                     REQUIRE(err.str().empty());
-                    REQUIRE(out.str() == (cptools::version() + '\n'));
+                    REQUIRE(out.str() == (cptools::commands::version() + '\n'));
                 }
             }
         }

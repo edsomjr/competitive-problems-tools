@@ -6,7 +6,7 @@
 using std::string;
 using std::ostream;
 
-namespace cptools::judge
+namespace cptools::commands::judge
 {
     namespace verdict {
         extern const int AC;

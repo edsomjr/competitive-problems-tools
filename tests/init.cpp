@@ -7,7 +7,7 @@
 
 #include "sh.h"
 #include "dirs.h"
-#include "init.h"
+#include "commands/init.h"
 #include "error.h"
 
 using namespace std;
@@ -29,7 +29,7 @@ SCENARIO("Command init", "[init]")
                 REQUIRE(res.output.empty());
 
                 ostringstream out, err;
-                REQUIRE(cptools::init::run(argc, argv, out, err) == CP_TOOLS_OK);
+                REQUIRE(cptools::commands::init::run(argc, argv, out, err) == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
 
                 res = cptools::sh::same_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR);
@@ -50,11 +50,11 @@ SCENARIO("Command init", "[init]")
             {
                 ostringstream out, err;
 
-                auto rc = cptools::init::run(argc, argv, out, err);
+                auto rc = cptools::commands::init::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
-                REQUIRE(out.str() == (cptools::init::help() + '\n'));
+                REQUIRE(out.str() == (cptools::commands::init::help() + '\n'));
             }
         }
 
@@ -71,11 +71,11 @@ SCENARIO("Command init", "[init]")
             {
                 ostringstream out, err;
 
-                auto rc = cptools::init::run(argc, argv, out, err);
+                auto rc = cptools::commands::init::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_ERROR_INIT_INVALID_OPTION);
                 REQUIRE(out.str().empty());
-                REQUIRE(err.str() == (cptools::init::help() + '\n'));
+                REQUIRE(err.str() == (cptools::commands::init::help() + '\n'));
             }
         }
     }

@@ -8,9 +8,9 @@
 #include "defs.h"
 #include "dirs.h"
 #include "task.h"
-#include "clean.h"
+#include "commands/clean.h"
 #include "error.h"
-#include "judge.h"
+#include "commands/judge.h"
 #include "table.h"
 #include "config.h"
 #include "format.h"
@@ -33,7 +33,7 @@ Runs a solution against all test sets and gives you a veredict.
 )message"
 };
 
-namespace cptools::judge {
+namespace cptools::commands::judge {
 
     // Constantes
     namespace verdict {

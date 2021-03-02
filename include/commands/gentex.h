@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace cptools::gentex
+namespace cptools::commands::gentex
 {
     // Auxiliary routines and definitions
     namespace flag {

@@ -6,7 +6,7 @@
 #include "sh.h"
 #include "dirs.h"
 #include "defs.h"
-#include "init.h"
+#include "commands/init.h"
 #include "error.h"
 #include "message.h"
 
@@ -27,7 +27,7 @@ Initialize an empty directory with template files. If a file already exists, it 
 )message"
 };
 
-namespace cptools::init {
+namespace cptools::commands::init {
 
     // Global variables
     static struct option longopts[] = {

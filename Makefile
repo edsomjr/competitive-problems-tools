@@ -13,9 +13,6 @@ else
     CFLAGS+=$(DEBUG_CFLAGS)
 endif
 
-LDFLAGS=
-INCLUDES=-Iinclude -Ilibs
-
 # Tools
 AR=ar
 AR_FLAGS=rcs
@@ -59,18 +56,25 @@ TEST_SUIT=cp-run_tests
 # External libraries
 LIBS=
 
+# Internal libraries
+INCLUDES_FILES=include
+INCLUDES_LIBS=${shell find libs -type d}
+
+LDFLAGS=
+INCLUDES=${addprefix $(INCLUDES_FLAG), $(INCLUDES_FILES)} ${addprefix $(INCLUDES_FLAG), $(INCLUDES_LIBS)}
+
 .PHONY: all clean
 
 # Project source files
-SOURCES=${wildcard $(SRC_DIR)/*.cpp}
-SOURCES:=${filter-out $(SRC_DIR)/main.cpp, $(SOURCES)}
+PROJECT_MAIN=$(SRC_DIR)/main.cpp
+PROJECT_OBJECT=$(PROJECT_MAIN:.cpp=$(OBJ_EXTENSION))
+
+SOURCES=${shell find $(SRC_DIR) -type f -name *.cpp}
+SOURCES:=${filter-out $(PROJECT_MAIN), $(SOURCES)}
 
 OBJECTS=$(SOURCES:.cpp=$(OBJ_EXTENSION))
 COMPLETION_SCRIPT=$(PROJECT)-completion.sh
 MAN_FILE=cp-tools.1
-
-PROJECT_MAIN=$(SRC_DIR)/main.cpp
-PROJECT_OBJECT=$(PROJECT_MAIN:.cpp=$(OBJ_EXTENSION))
 
 TEST_SOURCES=${wildcard $(TESTS_DIR)/*.cpp}
 TEST_OBJECTS=$(TEST_SOURCES:.cpp=$(OBJ_EXTENSION))

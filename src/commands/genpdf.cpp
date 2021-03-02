@@ -11,11 +11,11 @@
 #include "task.h"
 #include "defs.h"
 #include "dirs.h"
-#include "init.h"
+#include "commands/init.h"
 #include "util.h"
 #include "error.h"
 #include "config.h"
-#include "gentex.h"
+#include "commands/gentex.h"
 #include "message.h"
 
 using namespace std;
@@ -53,7 +53,7 @@ Generate a PDF file from the problem description. The options are:
 )message" };
 
 
-namespace cptools::genpdf {
+namespace cptools::commands::genpdf {
 
     typedef enum { NO_AUTHOR = 1000, NO_CONTEST } Value;
 

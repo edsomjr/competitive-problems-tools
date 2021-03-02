@@ -6,14 +6,14 @@
 #include "defs.h"
 #include "error.h"
 
-#include "init.h"
-#include "check.h"
-#include "clean.h"
-#include "judge.h"
-#include "gentex.h"
-#include "genpdf.h"
-#include "cptools.h"
-#include "polygon.h"
+#include "commands/init.h"
+#include "commands/check.h"
+#include "commands/clean.h"
+#include "commands/judge.h"
+#include "commands/gentex.h"
+#include "commands/genpdf.h"
+#include "commands/cptools.h"
+#include "commands/polygon.h"
 
 using std::map;
 
@@ -45,7 +45,7 @@ Written by Edson Alves.)body"
 };
 
 
-namespace cptools {
+namespace cptools::commands {
 
     // Global variables
     map<string, int (*)(int, char *const [], ostream&, ostream&)> commands {

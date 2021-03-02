@@ -1,7 +1,7 @@
 #include <iostream>
 #include <getopt.h>
 
-#include "polygon.h"
+#include "commands/polygon.h"
 #include "defs.h"
 #include "error.h"
 #include "message.h"
@@ -37,7 +37,7 @@ The options are:
 )message"
 };
 
-namespace cptools::polygon {
+namespace cptools::commands::polygon {
 
     // Global variables
     static struct option longopts[] = {

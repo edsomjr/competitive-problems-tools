@@ -1,22 +1,18 @@
-#ifndef CP_TOOLS_POLYGON_H
-#define CP_TOOLS_POLYGON_H
+#ifndef CP_TOOLS_H
+#define CP_TOOLS_H
 
 #include <iostream>
 
 using std::ostream;
 using std::string;
 
-namespace cptools::polygon {
-
-    struct Credentials {
-        string key;
-        string secret;
-    };
+namespace cptools::commands {
 
     int run(int argc, char * const argv[], ostream& out, ostream& err);
 
     string help();
     string usage();
+    string version();
 
 }
 

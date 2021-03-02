@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace cptools::check
+namespace cptools::commands::check
 {
     // Main routine
     int run(int argc, char * const argv[], std::ostream& out, std::ostream& err);

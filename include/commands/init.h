@@ -1,19 +1,18 @@
-#ifndef CP_TOOLS_CLEAN_H
-#define CP_TOOLS_CLEAN_H
+#ifndef CP_TOOLS_INIT_H
+#define CP_TOOLS_INIT_H
 
 #include <iostream>
 
-using std::string;
 using std::ostream;
+using std::string;
 
-namespace cptools::clean
-{
-    // Main routine
+namespace cptools::commands::init {
+
     int run(int argc, char * const argv[], ostream& out, ostream& err);
 
-    // Auxiliary routines
     string help();
     string usage();
+
 }
 
 #endif

@@ -8,7 +8,7 @@
 #include "task.h"
 #include "defs.h"
 #include "dirs.h"
-#include "check.h"
+#include "commands/check.h"
 #include "error.h"
 #include "config.h"
 #include "message.h"
@@ -42,7 +42,7 @@ Verify problem files and tools.
 )message"
 };
 
-namespace cptools::check {
+namespace cptools::commands::check {
 
     // Global variables
     static struct option longopts[] = {

@@ -4,7 +4,7 @@
 #include "sh.h"
 #include "defs.h"
 #include "dirs.h"
-#include "clean.h"
+#include "commands/clean.h"
 #include "error.h"
 #include "message.h"
 
@@ -26,7 +26,7 @@ of the working folder.
 )message"
 };
 
-namespace cptools::clean {
+namespace cptools::commands::clean {
 
     // Global variables
     static struct option longopts[] = {
