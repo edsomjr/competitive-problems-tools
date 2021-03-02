@@ -2,6 +2,7 @@
 #include <getopt.h>
 
 #include "commands/polygon.h"
+#include "api/polygon.h"
 #include "defs.h"
 #include "error.h"
 #include "message.h"
@@ -64,7 +65,7 @@ namespace cptools::commands::polygon {
     int run(int argc, char* const argv[], ostream& out, ostream& err)
     {
         int option = -1;
-        Credentials creds;
+        api::polygon::Credentials creds;
         string creds_file { fs::get_default_config_path() };
         bool creds_from_cmd = false;
         bool creds_from_file = false;
@@ -130,6 +131,9 @@ namespace cptools::commands::polygon {
             // get from stdin
             // if dont get from here, throw error
         }
+
+        creds.key = util::strip(creds.key);
+        creds.secret = util::strip(creds.secret);
 
         // TODO: API call to test if the credentials work (Polygon API module + HTTPS module)
 
