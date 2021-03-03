@@ -1,6 +1,8 @@
 #include <chrono>
 #include <vector>
 #include <string>
+#include <cstdlib>
+#include <algorithm>
 
 #include "api/polygon.h"
 #include "httplib.h"
@@ -37,18 +39,21 @@ namespace cptools::api::polygon {
     }
 
     string generate_api_sig(const string& method_name, const httplib::Params& params, const Credentials& creds) {
-        string rand { "123456"}; // TODO: hardcoded rand, not recommended in the documentation
         string params_str;
         string delimiters { "?&" };
+
+        auto rand_int = rand() % 1000000 + 100000;
+        rand_int = std::max(rand_int, 999999);
+        string rand_str { std::to_string(rand_int) };
 
         for(const auto& [key, val] : params) {
             auto delimiter = delimiters[params_str.size() > 0];
             params_str += delimiter + key + "=" + val;
         }
 
-        string hashed = sha_512(rand + "/" + method_name + params_str + "#" + creds.secret);
+        string hashed = sha_512(rand_str + "/" + method_name + params_str + "#" + creds.secret);
 
-        return rand + hashed;
+        return rand_str + hashed;
     }
 
 }
