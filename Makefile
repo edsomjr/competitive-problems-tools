@@ -85,7 +85,7 @@ LINKER=$(CXX)
 .PHONY: all clean build tests format
 
 
-all: $(LIBRARY) $(PROJECT) $(TEST_SUIT)
+all: format build tests
 
 
 format:
