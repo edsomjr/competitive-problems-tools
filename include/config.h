@@ -10,34 +10,31 @@ using nlohmann::json;
 
 namespace cptools::config {
 
-    json read(const std::string& config_file_path);
+json read(const std::string &config_file_path);
 
-    template<typename T>
-    T get(const json& config, const std::string& fields, T default_value)
-    {
-        auto fs = util::split(fields, '|');
-        auto js = config;
+template <typename T>
+T get(const json &config, const std::string &fields, T default_value) {
+  auto fs = util::split(fields, '|');
+  auto js = config;
 
-        for (const auto& f : fs)
-        {
-            auto it = js.find(f);
+  for (const auto &f : fs) {
+    auto it = js.find(f);
 
-            if (it == js.end())
-                return default_value;
-            else
-                js = *it;
-        }
+    if (it == js.end())
+      return default_value;
+    else
+      js = *it;
+  }
 
-        try {
-            auto value = js.get<T>();
-            return value;
-        } catch (std::exception& e)
-        {
-        }
+  try {
+    auto value = js.get<T>();
+    return value;
+  } catch (std::exception &e) {
+  }
 
-        return default_value;
-    }
-    
+  return default_value;
 }
+
+} // namespace cptools::config
 
 #endif

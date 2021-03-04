@@ -5,10 +5,14 @@ env: CXX=g++-8
 
 addons:
     apt:
+        update: true
         sources:
             - ubuntu-toolchain-r-test
         packages:
             - g++-8
+
+before_install:
+    - sudo apt-get -y install libssl-dev
 
 script:
     - make

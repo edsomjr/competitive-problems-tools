@@ -7,12 +7,11 @@
 using std::string;
 using std::vector;
 
-namespace cptools::util 
-{
-    vector<string> split(const string& s, char delim = ' ');
+namespace cptools::util {
+vector<string> split(const string &s, char delim = ' ');
 
-    string strip(const string& s);
-    string strip(const string& s, char c);
-}
+string strip(const string &s);
+string strip(const string &s, char c);
+} // namespace cptools::util
 
 #endif

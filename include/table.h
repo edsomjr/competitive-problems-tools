@@ -4,32 +4,32 @@
 #include <iostream>
 #include <vector>
 
-using std::pair;
 using std::ostream;
+using std::pair;
 using std::string;
 using std::vector;
 
 namespace cptools::table {
 
-    struct Column {
-        string label;
-        size_t size;
-        long long format;
-    };
+struct Column {
+  string label;
+  size_t size;
+  long long format;
+};
 
-    class Table {
-        friend ostream& operator<<(ostream& os, const Table& table);
+class Table {
+  friend ostream &operator<<(ostream &os, const Table &table);
 
-    public:
-        Table(const vector<Column>& cols) : header(cols) { };
-        Table(vector<Column>&& cols) : header(cols) { };
+public:
+  Table(const vector<Column> &cols) : header(cols){};
+  Table(vector<Column> &&cols) : header(cols){};
 
-        void add_row(const vector<pair<string, long long>>& row);
-        
-    private:
-        vector<Column> header;
-        vector<vector<pair<string,long long>>> rows;
-    };
-}
+  void add_row(const vector<pair<string, long long>> &row);
+
+private:
+  vector<Column> header;
+  vector<vector<pair<string, long long>>> rows;
+};
+} // namespace cptools::table
 
 #endif
