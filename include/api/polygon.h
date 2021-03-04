@@ -9,17 +9,19 @@ using std::string;
 
 namespace cptools::api::polygon {
 
-    struct Credentials {
-        std::string key;
-        std::string secret;
-    };
+struct Credentials {
+  std::string key;
+  std::string secret;
+};
 
-    bool test_connection(const Credentials& creds);
+bool test_connection(const Credentials &creds);
 
-    string sha_512(const string& s);
+string sha_512(const string &s);
 
-    string generate_api_sig(const string& method_name, const httplib::Params& params, const Credentials& creds);
+string generate_api_sig(const string &method_name,
+                        const httplib::Params &params,
+                        const Credentials &creds);
 
-}
+} // namespace cptools::api::polygon
 
 #endif

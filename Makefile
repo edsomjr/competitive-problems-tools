@@ -82,10 +82,14 @@ LINKER=$(CXX)
 
 # Rules
 .SUFFIXES: .cpp .$(OBJ_EXTENSION)
-.PHONY: all clean build tests
+.PHONY: all clean build tests format
 
 
 all: $(LIBRARY) $(PROJECT) $(TEST_SUIT)
+
+
+format:
+	@-find $(INC_DIR) $(TESTS_DIR) $(SRC_DIR) -type f -name "*.cpp" -or -name "*.h" | xargs clang-format -i
 
 
 build: $(PROJECT)

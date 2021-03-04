@@ -3,13 +3,13 @@
 
 #include <string>
 
-using std::string;
 using std::ostream;
+using std::string;
 
 namespace cptools::fs {
-    string get_home_dir();
-    string get_default_config_path();
-    bool file_exists(const string &path);
-}
+string get_home_dir();
+string get_default_config_path();
+bool file_exists(const string &path);
+} // namespace cptools::fs
 
 #endif

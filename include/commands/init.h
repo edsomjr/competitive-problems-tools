@@ -8,11 +8,11 @@ using std::string;
 
 namespace cptools::commands::init {
 
-    int run(int argc, char * const argv[], ostream& out, ostream& err);
+int run(int argc, char *const argv[], ostream &out, ostream &err);
 
-    string help();
-    string usage();
+string help();
+string usage();
 
-}
+} // namespace cptools::commands::init
 
 #endif

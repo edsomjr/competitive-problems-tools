@@ -1,25 +1,25 @@
 #include <map>
 
-#include <unistd.h>
 #include <getopt.h>
+#include <unistd.h>
 
 #include "defs.h"
 #include "error.h"
 
-#include "commands/init.h"
 #include "commands/check.h"
 #include "commands/clean.h"
-#include "commands/judge.h"
-#include "commands/gentex.h"
-#include "commands/genpdf.h"
 #include "commands/cptools.h"
+#include "commands/genpdf.h"
+#include "commands/gentex.h"
+#include "commands/init.h"
+#include "commands/judge.h"
 #include "commands/polygon.h"
 
 using std::map;
 
 // Raw strings
-static const string help_message {
-R"message(
+static const string help_message{
+    R"message(
 Format, test and pack competitive programming problems.
 
     Action              Description
@@ -31,93 +31,71 @@ Format, test and pack competitive programming problems.
     gentex              Generates a LaTeX file from the problem description. 
     judge               Runs a solution against all tests sets.
     polygon             Connects and synchronize with a Polygon account.
-)message"
-};
+)message"};
 
-static const string version_header { NAME " " VERSION "\n" };
+static const string version_header{NAME " " VERSION "\n"};
 
-static const string version_body { 
-R"body(License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+static const string version_body{
+    R"body(License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 
-Written by Edson Alves.)body"
-};
-
+Written by Edson Alves.)body"};
 
 namespace cptools::commands {
 
-    // Global variables
-    map<string, int (*)(int, char *const [], ostream&, ostream&)> commands {
-        { "init", init::run },
-        { "check", check::run },
-        { "clean", clean::run },
-        { "gentex", gentex::run },
-        { "genpdf", genpdf::run },
-        { "judge", judge::run },
-        { "polygon", polygon::run },
-    };
+// Global variables
+map<string, int (*)(int, char *const[], ostream &, ostream &)> commands{
+    {"init", init::run},       {"check", check::run},   {"clean", clean::run},
+    {"gentex", gentex::run},   {"genpdf", genpdf::run}, {"judge", judge::run},
+    {"polygon", polygon::run},
+};
 
-    static struct option longopts[] = {
-       { "help", no_argument, NULL, 'h' },
-       { "version", no_argument, NULL, 'v' },
-       { 0, 0, 0, 0 }
-    };
+static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
+                                   {"version", no_argument, NULL, 'v'},
+                                   {0, 0, 0, 0}};
 
-    // Auxiliary routines
-    string usage()
-    {
-        return "Usage: " NAME " [-h] [-v] action";
+// Auxiliary routines
+string usage() { return "Usage: " NAME " [-h] [-v] action"; }
+
+string help() { return usage() + help_message; }
+
+string version() { return version_header + version_body; }
+
+// API functions
+int run(int argc, char *const argv[], ostream &out, ostream &err) {
+  if (argc >= 2) {
+    string command{argv[1]};
+
+    for (const auto &[cmd, exec] : commands)
+      if (cmd == command)
+        return exec(argc, argv, out, err);
+
+    if (command.front() != '-') {
+      err << NAME << ": invalid action '" << command << "'\n";
+      return CP_TOOLS_ERROR_INVALID_COMMAND;
     }
+  }
 
-    string help()
-    {
-        return usage() + help_message;
+  int option = -1;
+
+  while ((option = getopt_long(argc, argv, "hv", longopts, NULL)) != -1) {
+    switch (option) {
+    case 'h':
+      out << help() << '\n';
+      return CP_TOOLS_OK;
+
+    case 'v':
+      out << version() << '\n';
+      return CP_TOOLS_OK;
+
+    default:
+      err << help() << '\n';
+      return CP_TOOLS_ERROR_INVALID_OPTION;
     }
+  }
 
-    string version()
-    {
-        return version_header + version_body;
-    }
-
-    // API functions
-    int run(int argc, char* const argv[], ostream& out, ostream& err)
-    {
-        if (argc >= 2)
-        {
-            string command { argv[1] };
-
-            for (const auto& [cmd, exec] : commands)
-                if (cmd == command)
-                    return exec(argc, argv, out, err);
-
-            if (command.front() != '-')
-            {
-                err << NAME << ": invalid action '" << command << "'\n";
-                return CP_TOOLS_ERROR_INVALID_COMMAND;
-            }
-        }
-
-        int option = -1;
-
-        while ((option = getopt_long(argc, argv, "hv", longopts, NULL)) != -1)
-        {
-            switch (option) {
-            case 'h':
-                out << help() << '\n';
-                return CP_TOOLS_OK;
-
-            case 'v':
-                out << version() << '\n';
-                return CP_TOOLS_OK;
-
-            default:
-                err << help() << '\n';
-                return CP_TOOLS_ERROR_INVALID_OPTION;
-            }
-        }
-
-        out << usage() << '\n';
-        return CP_TOOLS_OK;
-    }
+  out << usage() << '\n';
+  return CP_TOOLS_OK;
 }
+} // namespace cptools::commands
