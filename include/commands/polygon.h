@@ -3,16 +3,21 @@
 
 #include <iostream>
 
+#include "api/polygon.h"
+
 using std::ostream;
 using std::string;
 
 namespace cptools::commands::polygon {
 
-    int run(int argc, char * const argv[], ostream& out, ostream& err);
+int run(int argc, char *const argv[], ostream &out, ostream &err);
 
-    string help();
-    string usage();
+void get_credentials_from_file(const api::polygon::Credentials &creds,
+                               const string &filepath, ostream &out);
 
-}
+string help();
+string usage();
+
+} // namespace cptools::commands::polygon
 
 #endif
