@@ -19,10 +19,8 @@ struct Info {
   double memory;
 };
 
-Result copy_file(const string &dest, const string &src);
 Result remove_file(const string &path);
 
-Result make_dir(const string &path);
 Result copy_dir(const string &dest, const string &src);
 Result remove_dir(const string &path);
 Result same_dirs(const string &dirA, const string &dirB);

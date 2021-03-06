@@ -1,7 +1,7 @@
+#include <filesystem>
+#include <getopt.h>
 #include <iostream>
 #include <sstream>
-
-#include <getopt.h>
 #include <unistd.h>
 
 #include "commands/check.h"
@@ -9,11 +9,15 @@
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "message.h"
 #include "sh.h"
 #include "task.h"
 
 using namespace std;
+
+using filesystem::create_directory;
+using filesystem::filesystem_error;
 
 // Raw strings
 static const std::string help_message{
@@ -72,13 +76,16 @@ std::string usage() {
 std::string help() { return usage() + help_message; }
 
 int validate_checker(std::ostream &out, std::ostream &err) {
-  auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
+  bool fsres = false;
+  try {
+    fsres = create_directory(CP_TOOLS_BUILD_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Error creating dir '" +
                             string(CP_TOOLS_BUILD_DIR) + "'\n");
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
   }
 
   auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
@@ -91,7 +98,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
   }
 
-  res = cptools::sh::build(validator, source);
+  auto res = cptools::sh::build(validator, source);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't compile validator '" + source + "'!")
@@ -199,13 +206,16 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 }
 
 int validate_validator(std::ostream &out, std::ostream &err) {
-  auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
+  bool fsres = false;
+  try {
+    fsres = create_directory(CP_TOOLS_BUILD_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Error creating dir '" +
                             string(CP_TOOLS_BUILD_DIR) + "'\n");
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
@@ -218,7 +228,7 @@ int validate_validator(std::ostream &out, std::ostream &err) {
     return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
   }
 
-  res = cptools::sh::build(program, source);
+  auto res = cptools::sh::build(program, source);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't compile validator '" + source + "'!")
@@ -260,13 +270,16 @@ int validate_validator(std::ostream &out, std::ostream &err) {
 }
 
 int validate_tests(std::ostream &out, std::ostream &err) {
-  auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
+  bool fsres = false;
+  try {
+    fsres = create_directory(CP_TOOLS_BUILD_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Error creating dir '" +
                             string(CP_TOOLS_BUILD_DIR) + "'\n");
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
@@ -279,7 +292,7 @@ int validate_tests(std::ostream &out, std::ostream &err) {
     return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
   }
 
-  res = cptools::sh::build(program, source);
+  auto res = cptools::sh::build(program, source);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't compile validator '" + source + "'!")

@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <pwd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -23,11 +24,4 @@ string get_default_config_path() {
   return config_path;
 }
 
-bool file_exists(const string &path) {
-  struct stat buffer;
-  auto success = stat(path.c_str(), &buffer);
-  if (success == 0)
-    return true;
-  return false;
-}
 } // namespace cptools::fs

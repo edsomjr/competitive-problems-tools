@@ -1,10 +1,9 @@
 #include <cmath>
+#include <dirent.h>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
-
-#include <dirent.h>
 #include <getopt.h>
+#include <iostream>
 #include <unistd.h>
 
 #include "commands/gentex.h"
@@ -13,12 +12,17 @@
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "message.h"
 #include "sh.h"
 #include "task.h"
 #include "util.h"
 
 using namespace std;
+
+using filesystem::copy_file;
+using filesystem::create_directory;
+using filesystem::filesystem_error;
 
 // Raw strings
 static const string help_message{
@@ -80,20 +84,23 @@ string help() { return usage() + help_message; }
 int generate_pdf(const string &doc_class, const string &language, int flags,
                  const string &label, const string &outfile, bool tutorial,
                  ostream &out, ostream &err) {
-  auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
+  bool fsres = false;
+  try {
+    fsres = create_directory(CP_TOOLS_BUILD_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Error creating dir '" +
                             string(CP_TOOLS_BUILD_DIR) + "'\n");
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
   }
 
   // Generates the tex file that will be used to build the pdf file
   string texfile_path{string(CP_TOOLS_BUILD_DIR) +
                       (tutorial ? "/tutorial.tex" : "/problem.tex")};
 
-  res = sh::remove_file(texfile_path);
+  auto res = sh::remove_file(texfile_path);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't remove file '" + texfile_path + "'!")
@@ -136,13 +143,18 @@ int generate_pdf(const string &doc_class, const string &language, int flags,
   }
 
   // Copy the generated PDF to the output file
-  res = sh::copy_file(outfile, pdf_file);
+  fsres = copy_file(pdf_file, outfile);
 
-  if (res.rc != CP_TOOLS_OK) {
+  fsres = false;
+  try {
+    fsres = copy_file(pdf_file, outfile);
+  } catch (const filesystem_error &error) {
+  }
+
+  if (not fsres) {
     err << message::failure("Error copying PDF file '" + pdf_file + "' to '" +
-                            outfile + "!")
-        << "\n";
-    err << message::trace(res.output) << '\n';
+                            outfile + "!");
+
     return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
   }
 

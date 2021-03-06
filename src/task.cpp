@@ -1,13 +1,19 @@
 #include <algorithm>
+#include <filesystem>
 
 #include "config.h"
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "message.h"
 #include "sh.h"
 #include "task.h"
 
 using std::to_string;
+
+using std::filesystem::copy_file;
+using std::filesystem::create_directory;
+using std::filesystem::filesystem_error;
 
 namespace cptools::task {
 
@@ -31,16 +37,23 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
   auto source = "solutions/" + cptools::config::get(config, "solutions|default",
                                                     std::string("ERROR"));
 
-  auto res = cptools::sh::make_dir(input_dir);
+  bool fsres = false;
+  try {
+    fsres = create_directory(input_dir);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Can't create '" + input_dir + "'\n");
     return {};
   }
 
-  res = cptools::sh::make_dir(output_dir);
+  try {
+    fsres = create_directory(output_dir);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Can't create '" + output_dir + "'\n");
     return {};
   }
@@ -50,7 +63,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
     return {};
   }
 
-  res = cptools::sh::build(program, source);
+  auto res = cptools::sh::build(program, source);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't compile solution '" + source + "'!") << "\n";
@@ -107,14 +120,15 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
       for (auto [input, comment] : inputs) {
         std::string dest{input_dir + std::to_string(next++)};
 
-        auto res = cptools::sh::copy_file(dest, input);
+        bool res = false;
+        try {
+          res = copy_file(input, dest);
+        } catch (const filesystem_error &error) {
+        }
 
-        if (res.rc != CP_TOOLS_OK) {
+        if (not res) {
           err << message::failure("Can't copy input '" + input + "' on " +
-                                  dest + "!")
-              << "\n";
-          err << message::trace(res.output) << '\n';
-
+                                  dest + "!");
           return {};
         }
 
@@ -148,10 +162,14 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
 int build_tools(string &error, int tools, const string &where) {
   auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
-  auto res = sh::make_dir(dest_dir);
+  bool fsres = false;
+  try {
+    fsres = create_directory(dest_dir);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK)
-    return res.rc;
+  if (not fsres)
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
 
   auto config = cptools::config::read("config.json");
 
@@ -207,14 +225,18 @@ int gen_exe(string &error, const string &source, const string &dest,
             const string &where) {
   auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
-  auto res = sh::make_dir(dest_dir);
+  bool fsres = false;
+  try {
+    fsres = create_directory(dest_dir);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK)
-    return res.rc;
+  if (not fsres)
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
 
   auto program{dest_dir + dest};
 
-  res = sh::remove_file(program);
+  auto res = sh::remove_file(program);
 
   if (res.rc != CP_TOOLS_OK) {
     error += message::failure("Can't remove file '" + program + "'!") + "\n";

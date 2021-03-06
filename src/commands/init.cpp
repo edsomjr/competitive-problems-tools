@@ -1,6 +1,6 @@
-#include <iostream>
-
+#include <filesystem>
 #include <getopt.h>
+#include <iostream>
 #include <unistd.h>
 
 #include "commands/init.h"
@@ -9,6 +9,9 @@
 #include "error.h"
 #include "message.h"
 #include "sh.h"
+
+using std::filesystem::create_directory;
+using std::filesystem::filesystem_error;
 
 // Raw strings
 static const string help_message{
@@ -40,17 +43,20 @@ string help() { return usage() + help_message; }
 int copy_template_files(const string &dest, ostream &out, ostream &err) {
   out << message::info("Initializing directory '" + dest + "' ...") << "\n";
 
-  // Cria o diretório, se necessário
-  auto res = cptools::sh::make_dir(dest);
-
-  if (res.rc != CP_TOOLS_OK) {
-    err << message::failure("Can't create directory '" + dest + "'!") << "\n";
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+  // Creates the directory if necessary
+  bool fsres = false;
+  try {
+    fsres = create_directory(dest);
+  } catch (const filesystem_error &error) {
   }
 
-  // Copia os templates para o diretório indicado
-  res = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
+  if (not fsres) {
+    err << message::failure("Can't create directory '" + dest + "'!") << "\n";
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  }
+
+  // Copy templates to the directory
+  auto res = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
 
   if (res.rc == CP_TOOLS_OK)
     out << message::success() << "\n";
