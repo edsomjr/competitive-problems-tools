@@ -1,7 +1,8 @@
 language: cpp
-compiler: g++-8
+compiler: g++-9
 os: linux
-env: CXX=g++-8
+dist: focal
+env: CXX=g++-9
 
 addons:
     apt:
@@ -9,10 +10,8 @@ addons:
         sources:
             - ubuntu-toolchain-r-test
         packages:
-            - g++-8
-
-before_install:
-    - sudo apt-get -y install libssl-dev
+            - g++-9
+            - libssl-dev
 
 script:
     - make
@@ -20,7 +19,7 @@ script:
     - ./cp-tools -v
     - ./cp-run_tests
 
-after_sucess:
+after_success:
     - echo "Success"
 
 after_failure:
