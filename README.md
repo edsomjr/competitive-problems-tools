@@ -49,10 +49,10 @@ $ make uninstall
 
 ## Dependencies
 
-- Command line tools: `diff`, `mkdir`, `test`, `cp`, `rm`
 - pdflatex
-- GCC 8
+- GCC 9
 - Python 3
+- libssl-dev
 
 ## Features
 
@@ -93,6 +93,12 @@ To judge a solution, use the command
 
 ```
 $ cp-tools judge solution[.c|.cpp|.java|.py]
+```
+
+To connect to Polygon API use the command
+
+```
+$ cp-tools polygon
 ```
 
 For more information, use the option `-h` (or `--help`), as shown below:
