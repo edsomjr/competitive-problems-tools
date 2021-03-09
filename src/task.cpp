@@ -229,7 +229,7 @@ int gen_exe(string &error, const string &source, const string &dest,
   bool fsres = false;
   try {
     fsres = create_directory(dest_dir);
-  } catch (const filesystem_error &error) {
+  } catch (const filesystem_error &err) {
   }
 
   if (not fsres)
@@ -237,15 +237,18 @@ int gen_exe(string &error, const string &source, const string &dest,
 
   auto program{dest_dir + dest};
 
-  auto res = sh::remove_file(program);
-
-  if (res.rc != CP_TOOLS_OK) {
-    error += message::failure("Can't remove file '" + program + "'!") + "\n";
-    error += message::trace(res.output) + '\n';
-    return res.rc;
+  bool removed = false;
+  try {
+    removed = std::filesystem::remove(program);
+  } catch (const std::filesystem::filesystem_error &err) {
   }
 
-  res = sh::build(program, source);
+  if (not removed) {
+    error += message::failure("Can't remove file '" + program + "'!") + "\n";
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_FILE;
+  }
+
+  auto res = sh::build(program, source);
 
   if (res.rc != CP_TOOLS_OK) {
     error += message::failure("Can't build solution '" + source + "'!") + "\n";

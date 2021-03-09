@@ -98,21 +98,21 @@ int generate_pdf(const string &doc_class, const string &language, int flags,
   // Generates the tex file that will be used to build the pdf file
   string texfile_path{string(CP_TOOLS_BUILD_DIR) +
                       (tutorial ? "/tutorial.tex" : "/problem.tex")};
+  bool removed = false;
+  try {
+    removed = std::filesystem::remove(texfile_path);
+  } catch (const std::filesystem::filesystem_error &error) {
+  }
 
-  auto res = sh::remove_file(texfile_path);
-
-  if (res.rc != CP_TOOLS_OK) {
-    err << message::failure("Can't remove file '" + texfile_path + "'!")
-        << "\n";
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+  if (not removed) {
+    err << message::failure("Can't remove file '" + texfile_path + "'!") + "\n";
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_FILE;
   }
 
   ofstream tex_file(texfile_path);
 
   if (not tex_file) {
     err << message::failure("Error opening file '" + texfile_path) << "'\n";
-    err << message::trace(res.output) << '\n';
     return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
   }
 
@@ -132,7 +132,7 @@ int generate_pdf(const string &doc_class, const string &language, int flags,
   string pdf_file{string(CP_TOOLS_BUILD_DIR) +
                   (tutorial ? "/tutorial.pdf" : "/problem.pdf")};
 
-  res = sh::build(pdf_file, texfile_path);
+  auto res = sh::build(pdf_file, texfile_path);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Error generating the PDF file '" + pdf_file + "'!")

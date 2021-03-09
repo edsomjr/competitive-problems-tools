@@ -113,15 +113,6 @@ long int last_modified(const string &filepath) {
   return sb.st_atime;
 }
 
-Result remove_file(const string &path) {
-  string command{"rm -f " + path + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_FILE,
-          error};
-}
-
 Result is_file(const string &path) {
   string command{"test -f " + path}, error;
 
