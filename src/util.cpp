@@ -1,3 +1,8 @@
+#include <filesystem>
+#include <fstream>
+
+#include "exceptions.h"
+#include "json.hpp"
 #include "util.h"
 
 namespace cptools::util {
@@ -66,4 +71,24 @@ std::string strip(const std::string &s) { return strip(s, " \t\n\r\b"); }
 std::string strip(const std::string &s, char c) {
   return strip(s, string(1, c));
 }
+
+nlohmann::json read_json_file(const std::string &config_file_path) {
+  bool res = false;
+  try {
+    res = std::filesystem::exists(config_file_path);
+  } catch (const std::filesystem::filesystem_error &err) {
+  }
+
+  if (res) {
+    std::ifstream config_file(config_file_path);
+    nlohmann::json config;
+
+    config_file >> config;
+
+    return config;
+  }
+
+  throw(exceptions::inexistent_file());
+}
+
 } // namespace cptools::util

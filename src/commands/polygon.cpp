@@ -3,12 +3,12 @@
 
 #include "api/polygon.h"
 #include "commands/polygon.h"
-#include "config.h"
 #include "defs.h"
 #include "error.h"
 #include "exceptions.h"
 #include "fs.h"
 #include "message.h"
+#include "util.h"
 
 // Raw strings
 static const string help_message{
@@ -51,10 +51,11 @@ void get_credentials_from_file(api::polygon::Credentials &creds,
                                const string &filepath, ostream &out) {
   nlohmann::json loaded_json;
   out << message::info("Getting credentials from " + filepath + "\n");
-  loaded_json = config::read(filepath);
+  loaded_json = util::read_json_file(filepath);
 
-  creds.key = config::get(loaded_json, "polygon|key", creds.key);
-  creds.secret = config::get(loaded_json, "polygon|secret", creds.secret);
+  creds.key = util::get_json_value(loaded_json, "polygon|key", creds.key);
+  creds.secret =
+      util::get_json_value(loaded_json, "polygon|secret", creds.secret);
 }
 
 // API functions

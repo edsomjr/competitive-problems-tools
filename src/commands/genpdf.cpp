@@ -8,7 +8,6 @@
 
 #include "commands/gentex.h"
 #include "commands/init.h"
-#include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"

@@ -6,7 +6,6 @@
 
 #include "commands/clean.h"
 #include "commands/judge.h"
-#include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
@@ -15,6 +14,7 @@
 #include "sh.h"
 #include "table.h"
 #include "task.h"
+#include "util.h"
 
 using std::map;
 using std::max;
@@ -115,10 +115,11 @@ int judge(const std::string &solution_path, std::ostream &out,
     return verdict::CE;
   }
 
-  auto config = cptools::config::read("config.json");
-  auto timelimit = cptools::config::get(config, "problem|timelimit", 1000);
+  auto config = cptools::util::read_json_file("config.json");
+  auto timelimit =
+      cptools::util::get_json_value(config, "problem|timelimit", 1000);
   auto memory_limit =
-      cptools::config::get(config, "problem|memory_limit", 1000);
+      cptools::util::get_json_value(config, "problem|memory_limit", 1000);
 
   auto checker{std::string(CP_TOOLS_BUILD_DIR) + "/checker"};
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/sol"};

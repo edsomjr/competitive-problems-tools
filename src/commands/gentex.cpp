@@ -8,7 +8,6 @@
 
 #include "commands/gentex.h"
 #include "commands/init.h"
-#include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
@@ -153,20 +152,20 @@ int list_document_classes(ostream &out, ostream &err) {
 int generate_tutorial_latex(const string &doc_class, const string &language,
                             int flags, const string &label, ostream &out,
                             ostream &) {
-  auto config = config::read("config.json");
+  auto config = util::read_json_file("config.json");
 
   auto lang{languages.at(language)};
-  auto event{config::get(config, "problem|contest", string())};
-  auto author{config::get(config, "problem|author", string())};
-  auto title{
-      config::get(config, "problem|title|" + language, string("Título"))};
+  auto event{util::get_json_value(config, "problem|contest", string())};
+  auto author{util::get_json_value(config, "problem|author", string())};
+  auto title{util::get_json_value(config, "problem|title|" + language,
+                                  string("Título"))};
 
   if ((not(flags & flag::INCLUDE_CONTEST)) or
-      (not config::get(config, "PDF|include_contest", false)))
+      (not util::get_json_value(config, "PDF|include_contest", false)))
     event = "";
 
   if ((not(flags & flag::INCLUDE_AUTHOR)) or
-      (not config::get(config, "PDF|include_author", false)))
+      (not util::get_json_value(config, "PDF|include_author", false)))
     author = "";
 
   out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
@@ -196,25 +195,28 @@ int generate_tutorial_latex(const string &doc_class, const string &language,
 
 int generate_latex(const string &doc_class, const string &language, int flags,
                    const string &label, ostream &out, ostream &err) {
-  auto config = config::read("config.json");
+  auto config = util::read_json_file("config.json");
 
   auto lang{languages.at(language)};
-  auto event{config::get(config, "problem|contest", string())};
-  auto author{config::get(config, "problem|author", string())};
-  auto title{
-      config::get(config, "problem|title|" + language, string("Título"))};
-  auto timelimit{config::get(config, "problem|timelimit", 1.0)};
-  int memorylimit = round(config::get(config, "problem|memory_limit", 256.0));
+  auto event{util::get_json_value(config, "problem|contest", string())};
+  auto author{util::get_json_value(config, "problem|author", string())};
+  auto title{util::get_json_value(config, "problem|title|" + language,
+                                  string("Título"))};
+  auto timelimit{util::get_json_value(config, "problem|timelimit", 1.0)};
+  int memorylimit =
+      round(util::get_json_value(config, "problem|memory_limit", 256.0));
 
-  auto c1_size = config::get(config, "PDF|first_column_size", string("6cm"));
-  auto c2_size = config::get(config, "PDF|second_column_size", string("8cm"));
+  auto c1_size =
+      util::get_json_value(config, "PDF|first_column_size", string("6cm"));
+  auto c2_size =
+      util::get_json_value(config, "PDF|second_column_size", string("8cm"));
 
   if ((not(flags & flag::INCLUDE_CONTEST)) or
-      (not config::get(config, "PDF|include_contest", false)))
+      (not util::get_json_value(config, "PDF|include_contest", false)))
     event = "";
 
   if ((not(flags & flag::INCLUDE_AUTHOR)) or
-      (not config::get(config, "PDF|include_author", false)))
+      (not util::get_json_value(config, "PDF|include_author", false)))
     author = "";
 
   out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";

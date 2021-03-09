@@ -5,7 +5,6 @@
 #include <unistd.h>
 
 #include "commands/check.h"
-#include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
@@ -13,6 +12,7 @@
 #include "message.h"
 #include "sh.h"
 #include "task.h"
+#include "util.h"
 
 using namespace std;
 
@@ -89,9 +89,9 @@ int validate_checker(std::ostream &out, std::ostream &err) {
   }
 
   auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::config::read("config.json");
-  auto source =
-      cptools::config::get(config, "tools|validator", std::string("ERROR"));
+  auto config = cptools::util::read_json_file("config.json");
+  auto source = cptools::util::get_json_value(config, "tools|validator",
+                                              std::string("ERROR"));
 
   if (source == "ERROR") {
     err << "[validate_validator] Validator file not found!\n";
@@ -107,7 +107,8 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  source = cptools::config::get(config, "tools|checker", std::string("ERROR"));
+  source = cptools::util::get_json_value(config, "tools|checker",
+                                         std::string("ERROR"));
 
   if (source == "ERROR") {
     err << "[validate_checker] Checker file not found!\n";
@@ -124,8 +125,9 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  source = "solutions/" + cptools::config::get(config, "solutions|default",
-                                               std::string("ERROR"));
+  source =
+      "solutions/" + cptools::util::get_json_value(config, "solutions|default",
+                                                   std::string("ERROR"));
 
   if (source == "solutions/ERROR") {
     err << "[validate_checker] Default solution file not found!\n";
@@ -142,7 +144,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  auto tests = cptools::config::get(
+  auto tests = cptools::util::get_json_value(
       config, "tests|checker",
       std::map<std::string, std::pair<std::string, std::string>>{});
 
@@ -219,9 +221,9 @@ int validate_validator(std::ostream &out, std::ostream &err) {
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::config::read("config.json");
-  auto source =
-      cptools::config::get(config, "tools|validator", std::string("ERROR"));
+  auto config = cptools::util::read_json_file("config.json");
+  auto source = cptools::util::get_json_value(config, "tools|validator",
+                                              std::string("ERROR"));
 
   if (source == "ERROR") {
     err << "[validate_validator] Default solution file not found!\n";
@@ -237,8 +239,8 @@ int validate_validator(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  auto tests = cptools::config::get(config, "tests|validator",
-                                    std::map<std::string, std::string>{});
+  auto tests = cptools::util::get_json_value(
+      config, "tests|validator", std::map<std::string, std::string>{});
 
   if (tests.empty()) {
     err << "[validate_validator] There are no tests for the validator\n";
@@ -283,9 +285,9 @@ int validate_tests(std::ostream &out, std::ostream &err) {
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::config::read("config.json");
-  auto source =
-      cptools::config::get(config, "tools|validator", std::string("ERROR"));
+  auto config = cptools::util::read_json_file("config.json");
+  auto source = cptools::util::get_json_value(config, "tools|validator",
+                                              std::string("ERROR"));
 
   if (source == "ERROR") {
     err << message::failure("Default solution file not found!\n");

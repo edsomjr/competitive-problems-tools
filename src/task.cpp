@@ -1,13 +1,13 @@
 #include <algorithm>
 #include <filesystem>
 
-#include "config.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
 #include "message.h"
 #include "sh.h"
 #include "task.h"
+#include "util.h"
 
 using std::to_string;
 
@@ -33,9 +33,10 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
   auto output_dir{std::string(CP_TOOLS_BUILD_DIR) + "/output/"};
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/solution"};
 
-  auto config = cptools::config::read("config.json");
-  auto source = "solutions/" + cptools::config::get(config, "solutions|default",
-                                                    std::string("ERROR"));
+  auto config = cptools::util::read_json_file("config.json");
+  auto source =
+      "solutions/" + cptools::util::get_json_value(config, "solutions|default",
+                                                   std::string("ERROR"));
 
   bool fsres = false;
   try {
@@ -76,8 +77,8 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
 
   for (auto s : sets) {
     if (s == "random") {
-      source =
-          cptools::config::get(config, "tools|generator", std::string("ERROR"));
+      source = cptools::util::get_json_value(config, "tools|generator",
+                                             std::string("ERROR"));
 
       if (source == "tools/ERROR") {
         err << message::failure("Generator file not found!\n");
@@ -95,8 +96,8 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
         return {};
       }
 
-      auto inputs = cptools::config::get(config, "tests|random",
-                                         std::vector<std::string>{});
+      auto inputs = cptools::util::get_json_value(config, "tests|random",
+                                                  std::vector<std::string>{});
 
       for (auto parameters : inputs) {
         std::string dest{input_dir + std::to_string(next++)};
@@ -114,8 +115,8 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
         io_files.emplace_back(std::make_pair(dest, ""));
       }
     } else {
-      auto inputs = cptools::config::get(config, "tests|" + s,
-                                         std::map<std::string, std::string>{});
+      auto inputs = cptools::util::get_json_value(
+          config, "tests|" + s, std::map<std::string, std::string>{});
 
       for (auto [input, comment] : inputs) {
         std::string dest{input_dir + std::to_string(next++)};
@@ -171,7 +172,7 @@ int build_tools(string &error, int tools, const string &where) {
   if (not fsres)
     return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
 
-  auto config = cptools::config::read("config.json");
+  auto config = cptools::util::read_json_file("config.json");
 
   for (int mask = 1; mask <= tools; mask <<= 1) {
     int tool = tools & mask;
@@ -199,8 +200,8 @@ int build_tools(string &error, int tools, const string &where) {
       return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
     }
 
-    auto source =
-        cptools::config::get(config, "tools|" + program, std::string(""));
+    auto source = cptools::util::get_json_value(config, "tools|" + program,
+                                                std::string(""));
 
     if (source.empty()) {
       error = "Can't find source for '" + program + "' in config file";
