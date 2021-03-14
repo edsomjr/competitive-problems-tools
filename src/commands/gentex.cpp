@@ -87,8 +87,7 @@ int list_document_classes(ostream &out, ostream &err) {
   DIR *d = opendir(classes_dir.c_str());
 
   if (d == nullptr) {
-    err << message::failure("Directory '" + classes_dir +
-                            "' does not exists\n");
+    err << message::failure("Directory '" + classes_dir + "' does not exist\n");
     return CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES;
   }
 

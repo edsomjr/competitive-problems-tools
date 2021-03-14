@@ -1,5 +1,4 @@
 #include <chrono>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -10,6 +9,7 @@
 
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "sh.h"
 #include "util.h"
 
@@ -19,9 +19,6 @@ using std::ostream;
 using std::ostringstream;
 using std::to_string;
 using std::vector;
-
-using std::filesystem::create_directory;
-using std::filesystem::filesystem_error;
 
 using timer = std::chrono::high_resolution_clock;
 
@@ -249,14 +246,9 @@ Info profile(const string &program, const string &args, int timeout,
   Info info;
 
   // Prepares the file which will have the output of the command /usr/bin/time
-  bool res = false;
-  try {
-    res = create_directory(CP_TOOLS_TEMP_DIR);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not res) {
-    info.rc = CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  auto res = fs::create_directory(CP_TOOLS_TEMP_DIR);
+  if (not res.ok) {
+    info.rc = res.rc;
     return info;
   }
 

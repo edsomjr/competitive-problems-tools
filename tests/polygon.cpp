@@ -9,22 +9,24 @@
 #include "fs.h"
 #include "util.h"
 
-using namespace std::filesystem;
 using cptools::commands::polygon::run;
 
-const path config_path = cptools::fs::get_default_config_path();
-const path config_bkp = config_path.generic_string() + ".bkp";
+const std::filesystem::path config_path =
+    cptools::fs::get_default_config_path();
+const std::filesystem::path config_bkp = config_path.generic_string() + ".bkp";
 const std::string default_json_invalid{
     "{\"polygon\":{\"key\": \"\", \"secret\": \"\"}}"};
 
 SCENARIO("Command polygon", "[polygon]") {
-  if (not exists(config_bkp) and exists(config_path))
+  auto config_path_exists = cptools::fs::exists(config_path).ok;
+  auto config_bkp_exists = cptools::fs::exists(config_bkp).ok;
+  if (not config_bkp_exists and config_path_exists)
     copy_file(config_path, config_bkp);
 
   GIVEN("An execution of the command") {
     WHEN("There is no options") {
       AND_WHEN("There's no credentials file in user's home") {
-        remove(config_path);
+        std::filesystem::remove(config_path);
         int argc = 2;
         char *const argv[]{(char *)"cp-tools", (char *)"polygon"};
         optind = 1;
@@ -37,7 +39,7 @@ SCENARIO("Command polygon", "[polygon]") {
       }
 
       AND_WHEN("There's an invalid credentials file in user's home") {
-        remove(config_path);
+        std::filesystem::remove(config_path);
         std::ofstream config_stream{config_path};
         config_stream << default_json_invalid;
         config_stream.close();
@@ -106,8 +108,8 @@ SCENARIO("Command polygon", "[polygon]") {
         auto valid_json = "{\"polygon\":{\"key\":\"" + polygon_key +
                           "\",\"secret\":\"" + polygon_secret + "\"}}";
 
-        if (exists(config_path))
-          remove(config_path);
+        if (cptools::fs::exists(config_path).ok)
+          std::filesystem::remove(config_path);
         std::ofstream valid_config(config_path);
         valid_config << valid_json;
         valid_config.close();
@@ -141,9 +143,9 @@ SCENARIO("Command polygon", "[polygon]") {
     }
   }
 
-  if (exists(config_bkp)) {
-    remove(config_path);
-    copy_file(config_bkp, config_path);
-    remove(config_bkp);
+  if (cptools::fs::exists(config_bkp).ok) {
+    std::filesystem::remove(config_path);
+    std::filesystem::copy_file(config_bkp, config_path);
+    std::filesystem::remove(config_bkp);
   }
 }

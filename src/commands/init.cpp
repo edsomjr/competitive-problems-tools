@@ -7,11 +7,9 @@
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "message.h"
 #include "sh.h"
-
-using std::filesystem::create_directory;
-using std::filesystem::filesystem_error;
 
 // Raw strings
 static const string help_message{
@@ -43,16 +41,11 @@ string help() { return usage() + help_message; }
 int copy_template_files(const string &dest, ostream &out, ostream &err) {
   out << message::info("Initializing directory '" + dest + "' ...") << "\n";
 
-  // Creates the directory if necessary
-  bool fsres = false;
-  try {
-    fsres = create_directory(dest);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not fsres) {
-    err << message::failure("Can't create directory '" + dest + "'!") << "\n";
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  // Creates the directory
+  auto fs_res = fs::create_directory(dest);
+  if (not fs_res.ok) {
+    err << message::failure(fs_res.error_message);
+    return fs_res.rc;
   }
 
   // Copy templates to the directory

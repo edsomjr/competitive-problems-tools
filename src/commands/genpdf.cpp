@@ -20,7 +20,6 @@
 using namespace std;
 
 using filesystem::copy_file;
-using filesystem::create_directory;
 using filesystem::filesystem_error;
 
 // Raw strings
@@ -83,16 +82,10 @@ string help() { return usage() + help_message; }
 int generate_pdf(const string &doc_class, const string &language, int flags,
                  const string &label, const string &outfile, bool tutorial,
                  ostream &out, ostream &err) {
-  bool fsres = false;
-  try {
-    fsres = create_directory(CP_TOOLS_BUILD_DIR);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not fsres) {
-    err << message::failure("Error creating dir '" +
-                            string(CP_TOOLS_BUILD_DIR) + "'\n");
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
+  if (not fs_res.ok) {
+    err << message::failure(fs_res.error_message);
+    return fs_res.rc;
   }
 
   // Generates the tex file that will be used to build the pdf file
@@ -142,15 +135,15 @@ int generate_pdf(const string &doc_class, const string &language, int flags,
   }
 
   // Copy the generated PDF to the output file
-  fsres = copy_file(pdf_file, outfile);
+  auto ok = copy_file(pdf_file, outfile);
 
-  fsres = false;
+  ok = false;
   try {
-    fsres = copy_file(pdf_file, outfile);
+    ok = copy_file(pdf_file, outfile);
   } catch (const filesystem_error &error) {
   }
 
-  if (not fsres) {
+  if (not ok) {
     err << message::failure("Error copying PDF file '" + pdf_file + "' to '" +
                             outfile + "!");
 

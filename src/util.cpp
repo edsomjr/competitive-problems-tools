@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include "exceptions.h"
+#include "fs.h"
 #include "json.hpp"
 #include "util.h"
 
@@ -73,22 +74,16 @@ std::string strip(const std::string &s, char c) {
 }
 
 nlohmann::json read_json_file(const std::string &config_file_path) {
-  bool res = false;
-  try {
-    res = std::filesystem::exists(config_file_path);
-  } catch (const std::filesystem::filesystem_error &err) {
-  }
+  auto result = fs::exists(config_file_path);
+  if (not result.ok)
+    throw(exceptions::inexistent_file_error(config_file_path));
 
-  if (res) {
-    std::ifstream config_file(config_file_path);
-    nlohmann::json config;
+  std::ifstream config_file(config_file_path);
+  nlohmann::json config;
 
-    config_file >> config;
+  config_file >> config;
 
-    return config;
-  }
-
-  throw(exceptions::inexistent_file());
+  return config;
 }
 
 } // namespace cptools::util
