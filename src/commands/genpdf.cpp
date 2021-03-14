@@ -126,7 +126,7 @@ int generate_pdf(const string &doc_class, const string &language, int flags,
   }
 
   // Copy the generated PDF to the output file
-  auto copy_res = fs::copy_file(pdf_file, outfile);
+  auto copy_res = fs::copy(pdf_file, outfile);
   if (not copy_res.ok) {
     err << message::failure(copy_res.error_message);
     return copy_res.rc;

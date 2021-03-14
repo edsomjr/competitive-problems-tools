@@ -4,10 +4,10 @@
 #include <sstream>
 
 #include "catch.hpp"
-
 #include "commands/init.h"
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "sh.h"
 
 using namespace std;
@@ -20,18 +20,18 @@ SCENARIO("Command init", "[init]") {
                          (char *)CP_TOOLS_TEMP_DIR};
 
       THEN("The output directory is initialized with the template files") {
-        auto res = cptools::sh::remove_dir(CP_TOOLS_TEMP_DIR);
+        auto res = cptools::fs::remove(CP_TOOLS_TEMP_DIR);
         REQUIRE(res.rc == CP_TOOLS_OK);
-        REQUIRE(res.output.empty());
 
         ostringstream out, err;
         REQUIRE(cptools::commands::init::run(argc, argv, out, err) ==
                 CP_TOOLS_OK);
         REQUIRE(err.str().empty());
 
-        res = cptools::sh::same_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR);
-        REQUIRE(res.rc == CP_TOOLS_TRUE);
-        REQUIRE(res.output.empty());
+        auto res_same =
+            cptools::sh::same_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR);
+        REQUIRE(res_same.rc == CP_TOOLS_TRUE);
+        REQUIRE(res_same.output.empty());
       }
     }
 

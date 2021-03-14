@@ -44,39 +44,43 @@ const Result create_directory(const std::string &path) {
 }
 
 const Result exists(const std::string &path) {
-  bool exists = false;
+  bool ok = false;
   try {
-    exists = std::filesystem::exists(path);
+    ok = std::filesystem::exists(path);
   } catch (const std::filesystem::filesystem_error &err) {
     return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_EXISTS, err);
   }
 
-  if (exists)
-    return make_result(exists);
-  else
-    return make_result(exists, CP_TOOLS_ERROR_CPP_FILESYSTEM_EXISTS,
-                       "Impossible to check if" + path + "exists");
+  return make_result(ok);
 }
 
-const Result copy_file(const std::string &src, const std::string &dst) {
-  bool copied = false;
-  try {
-    copied = std::filesystem::copy_file(src, dst);
-  } catch (const std::filesystem::filesystem_error &err) {
-    return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY_FILE, err);
+const Result copy(const std::string &src, const std::string &dst,
+                  bool overwrite) {
+  if (overwrite and fs::exists(dst).ok) {
+    fs::remove(dst);
   }
 
-  if (copied)
-    return make_result(copied);
-  else
-    return make_result(copied, CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY_FILE,
-                       "Impossible to copy " + src + " to " + dst);
+  using std::filesystem::copy_options;
+  copy_options options = copy_options::recursive;
+  if (overwrite)
+    options |= copy_options::overwrite_existing;
+
+  try {
+    std::filesystem::copy(src, dst, options);
+  } catch (const std::filesystem::filesystem_error &err) {
+    return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY, err);
+  }
+
+  return make_result(true);
 }
 
 const Result remove(const std::string &path) {
+  if (not fs::exists(path).ok)
+    return make_result(true);
+
   bool removed = false;
   try {
-    removed = std::filesystem::remove(path);
+    removed = std::filesystem::remove_all(path);
   } catch (const std::filesystem::filesystem_error &err) {
     return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE, err);
   }
@@ -86,6 +90,21 @@ const Result remove(const std::string &path) {
   else
     return make_result(removed, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE,
                        "Impossible to remove " + path);
+}
+
+const Result equivalent(const std::string &p1, const std::string &p2) {
+  bool same = false;
+  try {
+    same = std::filesystem::equivalent(p1, p2);
+  } catch (const std::filesystem::filesystem_error &err) {
+    return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_EQUIVALENT, err);
+  }
+
+  if (same)
+    return make_result(same);
+  else
+    return make_result(same, CP_TOOLS_ERROR_CPP_FILESYSTEM_EQUIVALENT,
+                       "Impossible to compare " + p1 + " and " + p2);
 }
 
 std::string get_home_dir() {

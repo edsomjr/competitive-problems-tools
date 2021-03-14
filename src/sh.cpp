@@ -66,31 +66,6 @@ static int execute_command(const string &command, string &out) {
   return pclose(fp);
 }
 
-Result copy_dir(const string &dest, const string &src) {
-  string command{"cp -r -n " + src + "/* 2>&1 " + dest}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY_DIRECTORY,
-          error};
-}
-
-Result remove_dir(const string &path) {
-  string command{"rm -rf " + path + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE, error};
-}
-
-Result same_dirs(const string &dirA, const string &dirB) {
-  string command{"diff -r " + dirA + " " + dirB + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error};
-}
-
 Result is_dir(const string &path) {
   string command{"test -d " + path + " 2>&1"}, error;
 
@@ -106,6 +81,14 @@ long int last_modified(const string &filepath) {
     return 0;
 
   return sb.st_atime;
+}
+
+Result same_dirs(const string &dirA, const string &dirB) {
+  string command{"diff -r " + dirA + " " + dirB + " 2>&1"}, error;
+
+  auto rc = execute_command(command, error);
+
+  return {rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error};
 }
 
 Result is_file(const string &path) {

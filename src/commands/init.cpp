@@ -41,24 +41,12 @@ string help() { return usage() + help_message; }
 int copy_template_files(const string &dest, ostream &out, ostream &err) {
   out << message::info("Initializing directory '" + dest + "' ...") << "\n";
 
-  // Creates the directory
-  auto fs_res = fs::create_directory(dest);
-  if (not fs_res.ok) {
-    err << message::failure(fs_res.error_message);
-    return fs_res.rc;
-  }
-
   // Copy templates to the directory
-  auto res = cptools::sh::copy_dir(dest, CP_TOOLS_TEMPLATES_DIR);
-
-  if (res.rc == CP_TOOLS_OK)
-    out << message::success() << "\n";
-  else {
-    err << message::failure("Directory '" + dest +
-                            "' could not be initialized!")
-        << "\n";
-    err << message::trace(res.output) << '\n';
-  }
+  auto res = cptools::fs::copy(CP_TOOLS_TEMPLATES_DIR, dest, true);
+  if (not res.ok)
+    err << message::failure(res.error_message);
+  else
+    out << message::success();
 
   return res.rc;
 }
