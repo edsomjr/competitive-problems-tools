@@ -207,15 +207,10 @@ int gen_exe(string &error, const string &source, const string &dest,
 
   auto program{dest_dir + dest};
 
-  bool removed = false;
-  try {
-    removed = std::filesystem::remove(program);
-  } catch (const std::filesystem::filesystem_error &err) {
-  }
-
-  if (not removed) {
-    error += message::failure("Can't remove file '" + program + "'!") + "\n";
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_FILE;
+  auto removed_result = fs::remove(program);
+  if (not removed_result.ok) {
+    error += message::failure(removed_result.error_message);
+    return removed_result.rc;
   }
 
   auto res = sh::build(program, source);

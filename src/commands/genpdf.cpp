@@ -87,15 +87,10 @@ int generate_pdf(const string &doc_class, const string &language, int flags,
   // Generates the tex file that will be used to build the pdf file
   string texfile_path{string(CP_TOOLS_BUILD_DIR) +
                       (tutorial ? "/tutorial.tex" : "/problem.tex")};
-  bool removed = false;
-  try {
-    removed = std::filesystem::remove(texfile_path);
-  } catch (const std::filesystem::filesystem_error &error) {
-  }
-
-  if (not removed) {
-    err << message::failure("Can't remove file '" + texfile_path + "'!") + "\n";
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_FILE;
+  auto removed_result = fs::remove(texfile_path);
+  if (not removed_result.ok) {
+    err << message::failure(removed_result.error_message);
+    return removed_result.rc;
   }
 
   ofstream tex_file(texfile_path);

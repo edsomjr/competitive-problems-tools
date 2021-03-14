@@ -20,6 +20,7 @@ const Result make_result(bool res, int rc, const std::string err_msg);
 const Result create_directory(const std::string &path);
 const Result exists(const std::string &path);
 const Result copy_file(const std::string &src, const std::string &dst);
+const Result remove(const std::string &path);
 
 std::string get_home_dir();
 std::string get_default_config_path();

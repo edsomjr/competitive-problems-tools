@@ -73,6 +73,21 @@ const Result copy_file(const std::string &src, const std::string &dst) {
                        "Impossible to copy " + src + " to " + dst);
 }
 
+const Result remove(const std::string &path) {
+  bool removed = false;
+  try {
+    removed = std::filesystem::remove(path);
+  } catch (const std::filesystem::filesystem_error &err) {
+    return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE, err);
+  }
+
+  if (removed)
+    return make_result(removed);
+  else
+    return make_result(removed, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE,
+                       "Impossible to remove " + path);
+}
+
 std::string get_home_dir() {
   char *homedir = getenv("HOME");
   if (homedir == NULL) {

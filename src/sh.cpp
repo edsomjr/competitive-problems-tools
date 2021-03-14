@@ -80,9 +80,7 @@ Result remove_dir(const string &path) {
 
   auto rc = execute_command(command, error);
 
-  return {rc == 0 ? CP_TOOLS_OK
-                  : CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_DIRECTORY,
-          error};
+  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE, error};
 }
 
 Result same_dirs(const string &dirA, const string &dirB) {
