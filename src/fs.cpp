@@ -13,14 +13,15 @@ namespace cptools::fs {
 
 const Result make_result(bool res) { return Result{res, CP_TOOLS_OK, ""}; }
 
-const Result make_result(bool res, const std::filesystem::filesystem_error &e) {
-  Result result{res, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY, ""};
+const Result make_result(bool res, int rc,
+                         const std::filesystem::filesystem_error &e) {
+  Result result{res, rc, ""};
   result.error_message = e.what();
   return result;
 }
 
-const Result make_result(bool res, const std::string err_msg) {
-  return Result{res, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY, err_msg};
+const Result make_result(bool res, int rc, const std::string err_msg) {
+  return Result{res, rc, err_msg};
 }
 
 const Result create_directory(const std::string &path) {
@@ -31,13 +32,15 @@ const Result create_directory(const std::string &path) {
   try {
     created = std::filesystem::create_directory(path);
   } catch (const std::filesystem::filesystem_error &err) {
-    return make_result(false, err);
+    return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY,
+                       err);
   }
 
   if (created)
     return make_result(created);
   else
-    return make_result(created, "Failed to create directory " + path);
+    return make_result(created, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY,
+                       "Failed to create directory " + path);
 }
 
 const Result exists(const std::string &path) {
@@ -45,13 +48,29 @@ const Result exists(const std::string &path) {
   try {
     exists = std::filesystem::exists(path);
   } catch (const std::filesystem::filesystem_error &err) {
-    return make_result(false, err);
+    return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_EXISTS, err);
   }
 
   if (exists)
     return make_result(exists);
   else
-    return make_result(exists, "Impossible to check if" + path + "exists");
+    return make_result(exists, CP_TOOLS_ERROR_CPP_FILESYSTEM_EXISTS,
+                       "Impossible to check if" + path + "exists");
+}
+
+const Result copy_file(const std::string &src, const std::string &dst) {
+  bool copied = false;
+  try {
+    copied = std::filesystem::copy_file(src, dst);
+  } catch (const std::filesystem::filesystem_error &err) {
+    return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY_FILE, err);
+  }
+
+  if (copied)
+    return make_result(copied);
+  else
+    return make_result(copied, CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY_FILE,
+                       "Impossible to copy " + src + " to " + dst);
 }
 
 std::string get_home_dir() {

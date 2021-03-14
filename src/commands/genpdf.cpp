@@ -1,6 +1,5 @@
 #include <cmath>
 #include <dirent.h>
-#include <filesystem>
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
@@ -18,9 +17,6 @@
 #include "util.h"
 
 using namespace std;
-
-using filesystem::copy_file;
-using filesystem::filesystem_error;
 
 // Raw strings
 static const string help_message{
@@ -135,19 +131,10 @@ int generate_pdf(const string &doc_class, const string &language, int flags,
   }
 
   // Copy the generated PDF to the output file
-  auto ok = copy_file(pdf_file, outfile);
-
-  ok = false;
-  try {
-    ok = copy_file(pdf_file, outfile);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not ok) {
-    err << message::failure("Error copying PDF file '" + pdf_file + "' to '" +
-                            outfile + "!");
-
-    return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
+  auto copy_res = fs::copy_file(pdf_file, outfile);
+  if (not copy_res.ok) {
+    err << message::failure(copy_res.error_message);
+    return copy_res.rc;
   }
 
   out << message::success("File '" + outfile + "' generated.\n");

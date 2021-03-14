@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <filesystem>
 
 #include "dirs.h"
 #include "error.h"
@@ -10,9 +9,6 @@
 #include "util.h"
 
 using std::to_string;
-
-using std::filesystem::copy_file;
-using std::filesystem::filesystem_error;
 
 namespace cptools::task {
 
@@ -109,15 +105,9 @@ generate_io_files(const std::string &testset, std::ostream &out,
       for (auto [input, comment] : inputs) {
         std::string dest{input_dir + std::to_string(next++)};
 
-        bool res = false;
-        try {
-          res = copy_file(input, dest);
-        } catch (const filesystem_error &error) {
-        }
-
-        if (not res) {
-          err << message::failure("Can't copy input '" + input + "' on " +
-                                  dest + "!");
+        auto res = fs::copy_file(input, dest);
+        if (not res.ok) {
+          err << message::failure(res.error_message);
           return {};
         }
 
