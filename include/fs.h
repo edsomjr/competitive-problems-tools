@@ -23,6 +23,8 @@ const Result copy(const std::string &src, const std::string &dst,
                   bool overwrite = false);
 const Result remove(const std::string &path);
 const Result equivalent(const std::string &p1, const std::string &p2);
+const Result is_directory(const std::string &path);
+const Result is_file(const std::string &path);
 
 std::string get_home_dir();
 std::string get_default_config_path();

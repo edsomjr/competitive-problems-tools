@@ -37,6 +37,7 @@ cp-run_tests
 *.swp
 *.deb
 build
+.cp-tmp
 
 # Python
 __py-cache__

@@ -107,6 +107,28 @@ const Result equivalent(const std::string &p1, const std::string &p2) {
                        "Impossible to compare " + p1 + " and " + p2);
 }
 
+const Result is_directory(const std::string &path) {
+  bool is_dir = false;
+  try {
+    is_dir = std::filesystem::is_directory(path);
+  } catch (const std::filesystem::filesystem_error &err) {
+    make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_IS_DIRECTORY, err);
+  }
+
+  return make_result(is_dir);
+}
+
+const Result is_file(const std::string &path) {
+  bool is_file = false;
+  try {
+    is_file = std::filesystem::is_regular_file(path);
+  } catch (const std::filesystem::filesystem_error &err) {
+    make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_IS_FILE, err);
+  }
+
+  return make_result(is_file);
+}
+
 std::string get_home_dir() {
   char *homedir = getenv("HOME");
   if (homedir == NULL) {

@@ -66,14 +66,6 @@ static int execute_command(const string &command, string &out) {
   return pclose(fp);
 }
 
-Result is_dir(const string &path) {
-  string command{"test -d " + path + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error};
-}
-
 long int last_modified(const string &filepath) {
   struct stat sb;
 
@@ -85,14 +77,6 @@ long int last_modified(const string &filepath) {
 
 Result diff_dirs(const string &dirA, const string &dirB) {
   string command{"diff -r " + dirA + " " + dirB + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error};
-}
-
-Result is_file(const string &path) {
-  string command{"test -f " + path}, error;
 
   auto rc = execute_command(command, error);
 
