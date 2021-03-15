@@ -29,7 +29,7 @@ SCENARIO("Command init", "[init]") {
         REQUIRE(err.str().empty());
 
         auto res_same =
-            cptools::sh::same_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR);
+            cptools::sh::diff_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR);
         REQUIRE(res_same.rc == CP_TOOLS_TRUE);
         REQUIRE(res_same.output.empty());
       }

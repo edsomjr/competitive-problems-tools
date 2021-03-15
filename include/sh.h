@@ -21,7 +21,7 @@ struct Info {
 
 Result is_dir(const string &path);
 Result is_file(const string &path);
-Result same_dirs(const string &dirA, const string &dirB);
+Result diff_dirs(const string &dirA, const string &dirB);
 
 Result build(const string &output, const string &src);
 

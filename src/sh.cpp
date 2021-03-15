@@ -83,7 +83,7 @@ long int last_modified(const string &filepath) {
   return sb.st_atime;
 }
 
-Result same_dirs(const string &dirA, const string &dirB) {
+Result diff_dirs(const string &dirA, const string &dirB) {
   string command{"diff -r " + dirA + " " + dirB + " 2>&1"}, error;
 
   auto rc = execute_command(command, error);
