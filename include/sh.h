@@ -19,12 +19,7 @@ struct Info {
   double memory;
 };
 
-Result copy_dir(const string &dest, const string &src);
-Result remove_dir(const string &path);
-Result same_dirs(const string &dirA, const string &dirB);
-
-Result is_dir(const string &path);
-Result is_file(const string &path);
+Result diff_dirs(const string &dirA, const string &dirB);
 
 Result build(const string &output, const string &src);
 

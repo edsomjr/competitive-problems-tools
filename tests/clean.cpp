@@ -1,5 +1,4 @@
 #include <cstdlib>
-#include <filesystem>
 #include <getopt.h>
 #include <iostream>
 #include <sstream>
@@ -8,12 +7,11 @@
 #include "commands/clean.h"
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "sh.h"
 
 using std::ostringstream;
 using std::string;
-using std::filesystem::create_directory;
-using std::filesystem::filesystem_error;
 
 SCENARIO("Command clean", "[clean]") {
   GIVEN("An execution of the command clean with options") {
@@ -33,13 +31,9 @@ SCENARIO("Command clean", "[clean]") {
       char *const argv[]{(char *)"cp-tools", (char *)"clean", (char *)"-w",
                          (char *)CP_TOOLS_TEMP_DIR};
 
-      bool fsres = false;
-      try {
-        fsres = create_directory(CP_TOOLS_TEMP_DIR);
-      } catch (const filesystem_error &error) {
-      }
+      auto fs_res = cptools::fs::create_directory(CP_TOOLS_TEMP_DIR);
 
-      REQUIRE(fsres);
+      REQUIRE(fs_res.ok);
 
       // getopt library must be reseted between tests
       optind = 1;

@@ -103,7 +103,7 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
   if (not creds_from_cmd) {
     try {
       get_credentials_from_file(creds, creds_file, out);
-    } catch (exceptions::inexistent_file &e) {
+    } catch (const exceptions::inexistent_file_error &e) {
       err << message::failure(string(e.what()));
       return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
     }

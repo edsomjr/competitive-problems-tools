@@ -1,5 +1,4 @@
 #include <chrono>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -10,6 +9,7 @@
 
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "sh.h"
 #include "util.h"
 
@@ -19,9 +19,6 @@ using std::ostream;
 using std::ostringstream;
 using std::to_string;
 using std::vector;
-
-using std::filesystem::create_directory;
-using std::filesystem::filesystem_error;
 
 using timer = std::chrono::high_resolution_clock;
 
@@ -69,41 +66,6 @@ static int execute_command(const string &command, string &out) {
   return pclose(fp);
 }
 
-Result copy_dir(const string &dest, const string &src) {
-  string command{"cp -r -n " + src + "/* 2>&1 " + dest}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY_DIRECTORY,
-          error};
-}
-
-Result remove_dir(const string &path) {
-  string command{"rm -rf " + path + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK
-                  : CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_DIRECTORY,
-          error};
-}
-
-Result same_dirs(const string &dirA, const string &dirB) {
-  string command{"diff -r " + dirA + " " + dirB + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error};
-}
-
-Result is_dir(const string &path) {
-  string command{"test -d " + path + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error};
-}
-
 long int last_modified(const string &filepath) {
   struct stat sb;
 
@@ -113,8 +75,8 @@ long int last_modified(const string &filepath) {
   return sb.st_atime;
 }
 
-Result is_file(const string &path) {
-  string command{"test -f " + path}, error;
+Result diff_dirs(const string &dirA, const string &dirB) {
+  string command{"diff -r " + dirA + " " + dirB + " 2>&1"}, error;
 
   auto rc = execute_command(command, error);
 
@@ -249,14 +211,9 @@ Info profile(const string &program, const string &args, int timeout,
   Info info;
 
   // Prepares the file which will have the output of the command /usr/bin/time
-  bool res = false;
-  try {
-    res = create_directory(CP_TOOLS_TEMP_DIR);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not res) {
-    info.rc = CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  auto res = fs::create_directory(CP_TOOLS_TEMP_DIR);
+  if (not res.ok) {
+    info.rc = res.rc;
     return info;
   }
 

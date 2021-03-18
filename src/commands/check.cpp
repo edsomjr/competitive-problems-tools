@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <getopt.h>
 #include <iostream>
 #include <sstream>
@@ -15,9 +14,6 @@
 #include "util.h"
 
 using namespace std;
-
-using filesystem::create_directory;
-using filesystem::filesystem_error;
 
 // Raw strings
 static const std::string help_message{
@@ -76,16 +72,11 @@ std::string usage() {
 std::string help() { return usage() + help_message; }
 
 int validate_checker(std::ostream &out, std::ostream &err) {
-  bool fsres = false;
-  try {
-    fsres = create_directory(CP_TOOLS_BUILD_DIR);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not fsres) {
-    err << message::failure("Error creating dir '" +
-                            string(CP_TOOLS_BUILD_DIR) + "'\n");
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  out << message::info("Creating directory " CP_TOOLS_BUILD_DIR);
+  auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
+  if (not fs_res.ok) {
+    err << message::failure(fs_res.error_message);
+    return fs_res.rc;
   }
 
   auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
@@ -208,16 +199,11 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 }
 
 int validate_validator(std::ostream &out, std::ostream &err) {
-  bool fsres = false;
-  try {
-    fsres = create_directory(CP_TOOLS_BUILD_DIR);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not fsres) {
-    err << message::failure("Error creating dir '" +
-                            string(CP_TOOLS_BUILD_DIR) + "'\n");
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  out << message::info("Creating directory " CP_TOOLS_BUILD_DIR);
+  auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
+  if (not fs_res.ok) {
+    err << message::failure(fs_res.error_message);
+    return fs_res.rc;
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
@@ -272,16 +258,11 @@ int validate_validator(std::ostream &out, std::ostream &err) {
 }
 
 int validate_tests(std::ostream &out, std::ostream &err) {
-  bool fsres = false;
-  try {
-    fsres = create_directory(CP_TOOLS_BUILD_DIR);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not fsres) {
-    err << message::failure("Error creating dir '" +
-                            string(CP_TOOLS_BUILD_DIR) + "'\n");
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
+  out << message::info("Creating directory " CP_TOOLS_BUILD_DIR);
+  auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
+  if (not fs_res.ok) {
+    err << message::failure(fs_res.error_message);
+    return fs_res.rc;
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};

@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <filesystem>
 
 #include "dirs.h"
 #include "error.h"
@@ -11,15 +10,11 @@
 
 using std::to_string;
 
-using std::filesystem::copy_file;
-using std::filesystem::create_directory;
-using std::filesystem::filesystem_error;
-
 namespace cptools::task {
 
 std::vector<std::pair<std::string, std::string>>
-generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
-                  bool gen_output) {
+generate_io_files(const std::string &testset, std::ostream &out,
+                  std::ostream &err, bool gen_output) {
   std::vector<std::string> sets{"samples", "manual", "random"};
 
   auto it = std::find(sets.begin(), sets.end(), testset);
@@ -38,25 +33,14 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
       "solutions/" + cptools::util::get_json_value(config, "solutions|default",
                                                    std::string("ERROR"));
 
-  bool fsres = false;
-  try {
-    fsres = create_directory(input_dir);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not fsres) {
-    err << message::failure("Can't create '" + input_dir + "'\n");
-    return {};
-  }
-
-  try {
-    fsres = create_directory(output_dir);
-  } catch (const filesystem_error &error) {
-  }
-
-  if (not fsres) {
-    err << message::failure("Can't create '" + output_dir + "'\n");
-    return {};
+  auto directories = {input_dir, output_dir};
+  for (auto &dir : directories) {
+    out << message::info("Creating directory " + dir);
+    auto fs_res = fs::create_directory(input_dir);
+    if (not fs_res.ok) {
+      err << message::failure(fs_res.error_message);
+      return {};
+    }
   }
 
   if (source == "solutions/ERROR") {
@@ -121,15 +105,9 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
       for (auto [input, comment] : inputs) {
         std::string dest{input_dir + std::to_string(next++)};
 
-        bool res = false;
-        try {
-          res = copy_file(input, dest);
-        } catch (const filesystem_error &error) {
-        }
-
-        if (not res) {
-          err << message::failure("Can't copy input '" + input + "' on " +
-                                  dest + "!");
+        auto res = fs::copy(input, dest);
+        if (not res.ok) {
+          err << message::failure(res.error_message);
           return {};
         }
 
@@ -163,14 +141,10 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
 int build_tools(string &error, int tools, const string &where) {
   auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
-  bool fsres = false;
-  try {
-    fsres = create_directory(dest_dir);
-  } catch (const filesystem_error &error) {
+  auto fs_res = fs::create_directory(dest_dir);
+  if (not fs_res.ok) {
+    return fs_res.rc;
   }
-
-  if (not fsres)
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
 
   auto config = cptools::util::read_json_file("config.json");
 
@@ -226,26 +200,17 @@ int gen_exe(string &error, const string &source, const string &dest,
             const string &where) {
   auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
-  bool fsres = false;
-  try {
-    fsres = create_directory(dest_dir);
-  } catch (const filesystem_error &err) {
+  auto fs_res = fs::create_directory(dest_dir);
+  if (not fs_res.ok) {
+    return fs_res.rc;
   }
-
-  if (not fsres)
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
 
   auto program{dest_dir + dest};
 
-  bool removed = false;
-  try {
-    removed = std::filesystem::remove(program);
-  } catch (const std::filesystem::filesystem_error &err) {
-  }
-
-  if (not removed) {
-    error += message::failure("Can't remove file '" + program + "'!") + "\n";
-    return CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_FILE;
+  auto removed_result = fs::remove(program);
+  if (not removed_result.ok) {
+    error += message::failure(removed_result.error_message);
+    return removed_result.rc;
   }
 
   auto res = sh::build(program, source);
