@@ -26,16 +26,19 @@ bool test_connection(const Credentials &creds) {
 
 string sha_512(const string &s) {
   unsigned char hash[SHA512_DIGEST_LENGTH];
-  char output[129];
+  std::ostringstream output;
   SHA512_CTX sha512;
+
   SHA512_Init(&sha512);
   SHA512_Update(&sha512, s.c_str(), s.size());
   SHA512_Final(hash, &sha512);
+
+  output << std::hex << std::setfill('0');
   for (int i = 0; i < SHA512_DIGEST_LENGTH; i++) {
-    sprintf(output + (i * 2), "%02x", hash[i]);
+    output << std::setw(2) << (int)hash[i];
   }
-  output[128] = 0;
-  return string(output);
+
+  return output.str();
 }
 
 string generate_api_sig(const string &method_name,

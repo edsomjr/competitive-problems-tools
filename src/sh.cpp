@@ -1,4 +1,5 @@
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -18,6 +19,9 @@ using std::ostream;
 using std::ostringstream;
 using std::to_string;
 using std::vector;
+
+using std::filesystem::create_directory;
+using std::filesystem::filesystem_error;
 
 using timer = std::chrono::high_resolution_clock;
 
@@ -65,20 +69,13 @@ static int execute_command(const string &command, string &out) {
   return pclose(fp);
 }
 
-Result make_dir(const string &path) {
-  string command{"mkdir -p " + path + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CREATE_DIRECTORY, error};
-}
-
 Result copy_dir(const string &dest, const string &src) {
   string command{"cp -r -n " + src + "/* 2>&1 " + dest}, error;
 
   auto rc = execute_command(command, error);
 
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_DIRECTORY, error};
+  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY_DIRECTORY,
+          error};
 }
 
 Result remove_dir(const string &path) {
@@ -86,7 +83,9 @@ Result remove_dir(const string &path) {
 
   auto rc = execute_command(command, error);
 
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_DIRECTORY, error};
+  return {rc == 0 ? CP_TOOLS_OK
+                  : CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE_DIRECTORY,
+          error};
 }
 
 Result same_dirs(const string &dirA, const string &dirB) {
@@ -112,22 +111,6 @@ long int last_modified(const string &filepath) {
     return 0;
 
   return sb.st_atime;
-}
-
-Result copy_file(const string &dest, const string &src) {
-  string command{"cp " + src + " " + dest + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_COPY_FILE, error};
-}
-
-Result remove_file(const string &path) {
-  string command{"rm -f " + path + " 2>&1"}, error;
-
-  auto rc = execute_command(command, error);
-
-  return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_REMOVE_FILE, error};
 }
 
 Result is_file(const string &path) {
@@ -265,17 +248,21 @@ Info profile(const string &program, const string &args, int timeout,
              const string &infile, const string &outfile) {
   Info info;
 
-  // Prepara o arquivo que conterá a saída do comando /usr/bin/time
-  auto res = make_dir(CP_TOOLS_TEMP_DIR);
+  // Prepares the file which will have the output of the command /usr/bin/time
+  bool res = false;
+  try {
+    res = create_directory(CP_TOOLS_TEMP_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
-    info.rc = res.rc;
+  if (not res) {
+    info.rc = CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
     return info;
   }
 
   string out{string(CP_TOOLS_TEMP_DIR) + "/.time_output"};
 
-  // Prepara o comando para o terminal
+  // Prepares the command to the terminal
   string command{"/usr/bin/time -v -o " + out};
 
   if (timeout > 0)
@@ -303,7 +290,7 @@ Info profile(const string &program, const string &args, int timeout,
     return info;
   }
 
-  // Prepara o retorno
+  // Prepares to the return
   auto t =
       std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
 

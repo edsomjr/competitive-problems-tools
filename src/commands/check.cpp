@@ -1,19 +1,23 @@
+#include <filesystem>
+#include <getopt.h>
 #include <iostream>
 #include <sstream>
-
-#include <getopt.h>
 #include <unistd.h>
 
 #include "commands/check.h"
-#include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
+#include "fs.h"
 #include "message.h"
 #include "sh.h"
 #include "task.h"
+#include "util.h"
 
 using namespace std;
+
+using filesystem::create_directory;
+using filesystem::filesystem_error;
 
 // Raw strings
 static const std::string help_message{
@@ -72,26 +76,29 @@ std::string usage() {
 std::string help() { return usage() + help_message; }
 
 int validate_checker(std::ostream &out, std::ostream &err) {
-  auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
+  bool fsres = false;
+  try {
+    fsres = create_directory(CP_TOOLS_BUILD_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Error creating dir '" +
                             string(CP_TOOLS_BUILD_DIR) + "'\n");
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
   }
 
   auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::config::read("config.json");
-  auto source =
-      cptools::config::get(config, "tools|validator", std::string("ERROR"));
+  auto config = cptools::util::read_json_file("config.json");
+  auto source = cptools::util::get_json_value(config, "tools|validator",
+                                              std::string("ERROR"));
 
   if (source == "ERROR") {
     err << "[validate_validator] Validator file not found!\n";
     return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
   }
 
-  res = cptools::sh::build(validator, source);
+  auto res = cptools::sh::build(validator, source);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't compile validator '" + source + "'!")
@@ -100,7 +107,8 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  source = cptools::config::get(config, "tools|checker", std::string("ERROR"));
+  source = cptools::util::get_json_value(config, "tools|checker",
+                                         std::string("ERROR"));
 
   if (source == "ERROR") {
     err << "[validate_checker] Checker file not found!\n";
@@ -117,8 +125,9 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  source = "solutions/" + cptools::config::get(config, "solutions|default",
-                                               std::string("ERROR"));
+  source =
+      "solutions/" + cptools::util::get_json_value(config, "solutions|default",
+                                                   std::string("ERROR"));
 
   if (source == "solutions/ERROR") {
     err << "[validate_checker] Default solution file not found!\n";
@@ -135,7 +144,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  auto tests = cptools::config::get(
+  auto tests = cptools::util::get_json_value(
       config, "tests|checker",
       std::map<std::string, std::pair<std::string, std::string>>{});
 
@@ -199,26 +208,29 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 }
 
 int validate_validator(std::ostream &out, std::ostream &err) {
-  auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
+  bool fsres = false;
+  try {
+    fsres = create_directory(CP_TOOLS_BUILD_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Error creating dir '" +
                             string(CP_TOOLS_BUILD_DIR) + "'\n");
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::config::read("config.json");
-  auto source =
-      cptools::config::get(config, "tools|validator", std::string("ERROR"));
+  auto config = cptools::util::read_json_file("config.json");
+  auto source = cptools::util::get_json_value(config, "tools|validator",
+                                              std::string("ERROR"));
 
   if (source == "ERROR") {
     err << "[validate_validator] Default solution file not found!\n";
     return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
   }
 
-  res = cptools::sh::build(program, source);
+  auto res = cptools::sh::build(program, source);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't compile validator '" + source + "'!")
@@ -227,8 +239,8 @@ int validate_validator(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  auto tests = cptools::config::get(config, "tests|validator",
-                                    std::map<std::string, std::string>{});
+  auto tests = cptools::util::get_json_value(
+      config, "tests|validator", std::map<std::string, std::string>{});
 
   if (tests.empty()) {
     err << "[validate_validator] There are no tests for the validator\n";
@@ -260,26 +272,29 @@ int validate_validator(std::ostream &out, std::ostream &err) {
 }
 
 int validate_tests(std::ostream &out, std::ostream &err) {
-  auto res = sh::make_dir(CP_TOOLS_BUILD_DIR);
+  bool fsres = false;
+  try {
+    fsres = create_directory(CP_TOOLS_BUILD_DIR);
+  } catch (const filesystem_error &error) {
+  }
 
-  if (res.rc != CP_TOOLS_OK) {
+  if (not fsres) {
     err << message::failure("Error creating dir '" +
                             string(CP_TOOLS_BUILD_DIR) + "'\n");
-    err << message::trace(res.output) << '\n';
-    return res.rc;
+    return CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY;
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::config::read("config.json");
-  auto source =
-      cptools::config::get(config, "tools|validator", std::string("ERROR"));
+  auto config = cptools::util::read_json_file("config.json");
+  auto source = cptools::util::get_json_value(config, "tools|validator",
+                                              std::string("ERROR"));
 
   if (source == "ERROR") {
     err << message::failure("Default solution file not found!\n");
     return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
   }
 
-  res = cptools::sh::build(program, source);
+  auto res = cptools::sh::build(program, source);
 
   if (res.rc != CP_TOOLS_OK) {
     err << message::failure("Can't compile validator '" + source + "'!")
