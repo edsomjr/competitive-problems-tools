@@ -56,10 +56,6 @@ const Result exists(const std::string &path) {
 
 const Result copy(const std::string &src, const std::string &dst,
                   bool overwrite) {
-  if (overwrite and fs::exists(dst).ok) {
-    fs::remove(dst);
-  }
-
   using std::filesystem::copy_options;
   copy_options options = copy_options::recursive;
   if (overwrite)
