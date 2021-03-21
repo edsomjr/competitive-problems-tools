@@ -4,7 +4,7 @@
 #include <string>
 
 #include "catch.hpp"
-#include "commands/polygon.h"
+#include "commands/polygon/polygon.h"
 #include "error.h"
 #include "fs.h"
 #include "util.h"

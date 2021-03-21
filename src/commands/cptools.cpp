@@ -13,7 +13,7 @@
 #include "commands/gentex.h"
 #include "commands/init.h"
 #include "commands/judge.h"
-#include "commands/polygon.h"
+#include "commands/polygon/polygon.h"
 
 using std::unordered_map;
 

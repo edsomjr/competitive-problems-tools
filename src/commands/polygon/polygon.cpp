@@ -1,8 +1,10 @@
 #include <getopt.h>
 #include <iostream>
+#include <unordered_map>
 
 #include "api/polygon.h"
-#include "commands/polygon.h"
+#include "commands/polygon/polygon.h"
+#include "commands/polygon/pull.h"
 #include "defs.h"
 #include "error.h"
 #include "exceptions.h"
@@ -36,6 +38,9 @@ The options are:
 namespace cptools::commands::polygon {
 
 // Global variables
+std::unordered_map<string, int (*)(int, char *const[], ostream &, ostream &)>
+    commands{{"pull", pull::run}};
+
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {"key", required_argument, NULL, 'k'},
                                    {"secret", required_argument, NULL, 's'},
@@ -65,6 +70,13 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
   string creds_file{fs::get_default_config_path()};
   bool creds_from_cmd{false};
   bool creds_from_file{false};
+
+  if (argc >= 3) {
+    std::string command{argv[2]};
+    auto it = commands.find(command);
+    if (it != commands.end())
+      return commands[command](argc, argv, out, err);
+  }
 
   while ((option = getopt_long(argc, argv, "hk:s:c:", longopts, NULL)) != -1) {
     switch (option) {

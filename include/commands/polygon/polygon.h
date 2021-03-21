@@ -1,5 +1,5 @@
-#ifndef CP_TOOLS_POLYGON_H
-#define CP_TOOLS_POLYGON_H
+#ifndef CP_TOOLS_POLYGON_POLYGON_H
+#define CP_TOOLS_POLYGON_POLYGON_H
 
 #include <iostream>
 
