@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "commands/check.h"
+#include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
@@ -80,7 +81,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
   }
 
   auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::util::read_json_file("config.json");
+  auto config = cptools::config::read_config_file();
   auto source = cptools::util::get_json_value(config, "tools|validator",
                                               std::string("ERROR"));
 
@@ -207,7 +208,7 @@ int validate_validator(std::ostream &out, std::ostream &err) {
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::util::read_json_file("config.json");
+  auto config = cptools::config::read_config_file();
   auto source = cptools::util::get_json_value(config, "tools|validator",
                                               std::string("ERROR"));
 
@@ -266,7 +267,7 @@ int validate_tests(std::ostream &out, std::ostream &err) {
   }
 
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
-  auto config = cptools::util::read_json_file("config.json");
+  auto config = cptools::config::read_config_file();
   auto source = cptools::util::get_json_value(config, "tools|validator",
                                               std::string("ERROR"));
 

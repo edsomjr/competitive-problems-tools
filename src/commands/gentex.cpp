@@ -8,6 +8,7 @@
 
 #include "commands/gentex.h"
 #include "commands/init.h"
+#include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
@@ -151,7 +152,7 @@ int list_document_classes(ostream &out, ostream &err) {
 int generate_tutorial_latex(const string &doc_class, const string &language,
                             int flags, const string &label, ostream &out,
                             ostream &) {
-  auto config = util::read_json_file("config.json");
+  auto config = config::read_config_file();
 
   auto lang{languages.at(language)};
   auto event{util::get_json_value(config, "problem|contest", string())};
@@ -194,7 +195,7 @@ int generate_tutorial_latex(const string &doc_class, const string &language,
 
 int generate_latex(const string &doc_class, const string &language, int flags,
                    const string &label, ostream &out, ostream &err) {
-  auto config = util::read_json_file("config.json");
+  auto config = config::read_config_file();
 
   auto lang{languages.at(language)};
   auto event{util::get_json_value(config, "problem|contest", string())};

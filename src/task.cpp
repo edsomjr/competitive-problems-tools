@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include "config.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
@@ -28,7 +29,7 @@ generate_io_files(const std::string &testset, std::ostream &out,
   auto output_dir{std::string(CP_TOOLS_BUILD_DIR) + "/output/"};
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/solution"};
 
-  auto config = cptools::util::read_json_file("config.json");
+  auto config = cptools::config::read_config_file();
   auto source =
       "solutions/" + cptools::util::get_json_value(config, "solutions|default",
                                                    std::string("ERROR"));
@@ -146,7 +147,7 @@ int build_tools(string &error, int tools, const string &where) {
     return fs_res.rc;
   }
 
-  auto config = cptools::util::read_json_file("config.json");
+  auto config = cptools::config::read_config_file();
 
   for (int mask = 1; mask <= tools; mask <<= 1) {
     int tool = tools & mask;
