@@ -6,10 +6,17 @@
 
 namespace cptools::exceptions {
 struct inexistent_file_error : std::exception {
-  std::string path;
+  std::string what_message;
 
-  inexistent_file_error(const std::string &file_path) : path(file_path){};
-  const char *what() const noexcept;
+public:
+  inexistent_file_error(const std::string &file_path) {
+    this->what_message =
+        "File is inexistent or impossible to access: " + file_path;
+  }
+
+  const char *what() const noexcept override {
+    return this->what_message.c_str();
+  }
 };
 } // namespace cptools::exceptions
 
