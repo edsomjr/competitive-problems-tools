@@ -12,8 +12,7 @@ namespace cptools::commands::polygon {
 
 int run(int argc, char *const argv[], ostream &out, ostream &err);
 
-void get_credentials_from_file(const api::polygon::Credentials &creds,
-                               const string &filepath, ostream &out);
+api::polygon::Credentials get_credentials_from_file(const string &filepath);
 
 string help();
 string usage();

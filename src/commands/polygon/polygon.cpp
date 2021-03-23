@@ -15,7 +15,7 @@
 // Raw strings
 static const string help_message{
     R"message(
-Connects to the Polygon API using the credentials in ~/.cp-tools-config.json.
+Validates the connection to the Polygon API using the credentials in ~/.cp-tools-config.json.
 It is possible to define the credentials file or pass them in command line.
 The options are:
 
@@ -52,15 +52,16 @@ string usage() { return "Usage: " NAME " polygon [-h]"; }
 
 string help() { return usage() + help_message; }
 
-void get_credentials_from_file(api::polygon::Credentials &creds,
-                               const string &filepath, ostream &out) {
+api::polygon::Credentials get_credentials_from_file(const string &filepath) {
   nlohmann::json loaded_json;
-  out << message::info("Getting credentials from " + filepath + "\n");
   loaded_json = util::read_json_file(filepath);
 
+  api::polygon::Credentials creds;
   creds.key = util::get_json_value(loaded_json, "polygon|key", creds.key);
   creds.secret =
       util::get_json_value(loaded_json, "polygon|secret", creds.secret);
+
+  return creds;
 }
 
 // API functions
@@ -114,7 +115,7 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
 
   if (not creds_from_cmd) {
     try {
-      get_credentials_from_file(creds, creds_file, out);
+      creds = get_credentials_from_file(creds_file);
     } catch (const exceptions::inexistent_file_error &e) {
       err << message::failure(string(e.what()));
       return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
