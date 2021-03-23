@@ -17,6 +17,8 @@ string strip(const string &s, char c);
 
 nlohmann::json read_json_file(const std::string &config_file_path);
 
+string sha_512(const string &s);
+
 template <typename T>
 T get_json_value(const nlohmann::json &config, const std::string &fields,
                  T default_value) {

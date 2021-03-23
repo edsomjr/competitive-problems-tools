@@ -16,7 +16,8 @@ struct Credentials {
 
 bool test_connection(const Credentials &creds);
 
-string sha_512(const string &s);
+httplib::Result get(std::string method, const Credentials &creds,
+                    httplib::Params &params);
 
 string generate_api_sig(const string &method_name,
                         const httplib::Params &params,

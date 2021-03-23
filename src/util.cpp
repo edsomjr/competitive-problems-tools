@@ -1,5 +1,8 @@
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <openssl/ssl.h>
+#include <sstream>
 
 #include "exceptions.h"
 #include "fs.h"
@@ -58,6 +61,23 @@ vector<string> split(const string &s, char delim) {
   }
 
   return tokens;
+}
+
+string sha_512(const string &s) {
+  unsigned char hash[SHA512_DIGEST_LENGTH];
+  std::ostringstream output;
+  SHA512_CTX sha512;
+
+  SHA512_Init(&sha512);
+  SHA512_Update(&sha512, s.c_str(), s.size());
+  SHA512_Final(hash, &sha512);
+
+  output << std::hex << std::setfill('0');
+  for (int i = 0; i < SHA512_DIGEST_LENGTH; i++) {
+    output << std::setw(2) << (int)hash[i];
+  }
+
+  return output.str();
 }
 
 static string strip(const string &s, const string &delim) {
