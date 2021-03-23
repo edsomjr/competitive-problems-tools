@@ -4,6 +4,8 @@
 #include <exception>
 #include <string>
 
+#include "httplib.h"
+
 namespace cptools::exceptions {
 struct inexistent_file_error : std::exception {
   std::string what_message;
@@ -18,6 +20,22 @@ public:
     return this->what_message.c_str();
   }
 };
+
+struct polygon_api_error : std::exception {
+  std::string what_message;
+
+public:
+  polygon_api_error(const httplib::Result &result) {
+    this->what_message =
+        "Polygon API answered with " + std::to_string(result->status);
+    this->what_message += ": " + result->body;
+  }
+
+  const char *what() const noexcept override {
+    return this->what_message.c_str();
+  }
+};
+
 } // namespace cptools::exceptions
 
 #endif
