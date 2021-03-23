@@ -19,6 +19,9 @@ bool test_connection(const Credentials &creds);
 httplib::Result get(std::string method, const Credentials &creds,
                     httplib::Params &params);
 
+std::string get_problem_checker(const Credentials &creds,
+                                const std::string &problem_id);
+
 string generate_api_sig(const string &method_name,
                         const httplib::Params &params,
                         const Credentials &creds);

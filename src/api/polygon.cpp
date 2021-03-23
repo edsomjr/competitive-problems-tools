@@ -20,7 +20,15 @@ httplib::Result get(std::string method, const Credentials &creds,
   params.emplace("apiSig", generate_api_sig(method, params, creds));
 
   httplib::Client client{"https://polygon.codeforces.com"};
-  return client.Get(path.c_str(), params, httplib::Headers{});
+  auto result = client.Get(path.c_str(), params, httplib::Headers{});
+
+  auto status_json = nlohmann::json::parse(result->body);
+  auto status =
+      util::get_json_value<std::string>(status_json, "status", "FAILED");
+  if (status != "OK")
+    assert(0 == 1); // TODO THROW
+  
+  return result;
 }
 
 bool test_connection(const Credentials &creds) {
@@ -28,6 +36,14 @@ bool test_connection(const Credentials &creds) {
   auto result = get("problems.list", creds, params);
 
   return result->status == 200;
+}
+
+std::string get_problem_checker(const Credentials &creds,
+                                const std::string &problem_id) {
+  httplib::Params params;
+  params.emplace("problemId", problem_id);
+  auto result = get("problem.checker", creds, params);
+  return result->body;
 }
 
 string generate_api_sig(const string &method_name,
