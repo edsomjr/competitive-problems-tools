@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <fstream>
 #include <pwd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -123,6 +124,13 @@ const Result is_file(const std::string &path) {
   }
 
   return make_result(is_file);
+}
+
+void overwrite_file(const std::string dst, const std::string content) {
+  std::ofstream file;
+  file.open(dst);
+  file << content;
+  file.close();
 }
 
 std::string get_home_dir() {

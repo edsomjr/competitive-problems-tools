@@ -7,6 +7,7 @@
 #include "api/polygon.h"
 #include "exceptions.h"
 #include "httplib.h"
+#include "json.hpp"
 #include "util.h"
 
 namespace cptools::api::polygon {
@@ -23,11 +24,9 @@ httplib::Result get(std::string method, const Credentials &creds,
   httplib::Client client{"https://polygon.codeforces.com"};
   auto result = client.Get(path.c_str(), params, httplib::Headers{});
 
-  auto status_json = nlohmann::json::parse(result->body);
-  auto status =
-      util::get_json_value<std::string>(status_json, "status", "FAILED");
-  if (status != "OK")
+  if (result->status != 200) {
     throw(exceptions::polygon_api_error(result));
+  }
 
   return result;
 }
@@ -44,6 +43,16 @@ std::string get_problem_checker(const Credentials &creds,
   httplib::Params params;
   params.emplace("problemId", problem_id);
   auto result = get("problem.checker", creds, params);
+
+  auto request_json = nlohmann::json::parse(result->body);
+  auto checker_name = util::get_json_value<std::string>(request_json, "result",
+                                                        "nocheckerdefined");
+
+  params.clear();
+  params.emplace("problemId", problem_id);
+  params.emplace("type", "source");
+  params.emplace("name", checker_name);
+  result = get("problem.viewFile", creds, params);
   return result->body;
 }
 
@@ -53,19 +62,24 @@ string generate_api_sig(const string &method_name,
   string params_str;
   string delimiters{"?&"};
 
-  auto rand_int = rand() % 1000000 + 100000;
-  rand_int = std::max(rand_int, 999999);
-  string rand_str{std::to_string(rand_int)};
+  auto rand_int = rand() % 1000000;
+
+  string rand_str = std::to_string(rand_int);
+  string zero_padding;
+  zero_padding.append(6 - rand_str.size(), '0');
+  zero_padding += rand_str;
 
   for (const auto &[key, val] : params) {
     auto delimiter = delimiters[params_str.size() > 0];
-    params_str += delimiter + key + "=" + val;
+    auto val_encoded = httplib::detail::encode_query_param(val);
+    params_str += delimiter + key + "=" + val_encoded;
   }
 
-  string hashed = util::sha_512(rand_str + "/" + method_name + params_str +
-                                "#" + creds.secret);
+  auto to_hash =
+      zero_padding + "/" + method_name + params_str + "#" + creds.secret;
+  string hashed = util::sha_512(to_hash);
 
-  return rand_str + hashed;
+  return zero_padding + hashed;
 }
 
 } // namespace cptools::api::polygon
