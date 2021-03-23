@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "api/polygon.h"
+#include "exceptions.h"
 #include "httplib.h"
 #include "util.h"
 
@@ -26,8 +27,8 @@ httplib::Result get(std::string method, const Credentials &creds,
   auto status =
       util::get_json_value<std::string>(status_json, "status", "FAILED");
   if (status != "OK")
-    assert(0 == 1); // TODO THROW
-  
+    throw(exceptions::polygon_api_error(result));
+
   return result;
 }
 

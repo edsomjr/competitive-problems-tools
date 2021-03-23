@@ -61,6 +61,9 @@ api::polygon::Credentials get_credentials_from_file(const string &filepath) {
   creds.secret =
       util::get_json_value(loaded_json, "polygon|secret", creds.secret);
 
+  creds.key = util::strip(creds.key);
+  creds.secret = util::strip(creds.secret);
+
   return creds;
 }
 
