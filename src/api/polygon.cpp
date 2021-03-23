@@ -45,13 +45,36 @@ std::string get_problem_checker(const Credentials &creds,
   auto result = get("problem.checker", creds, params);
 
   auto request_json = nlohmann::json::parse(result->body);
-  auto checker_name = util::get_json_value<std::string>(request_json, "result",
-                                                        "nocheckerdefined");
+  auto checker_name =
+      util::get_json_value<std::string>(request_json, "result", "");
 
   params.clear();
   params.emplace("problemId", problem_id);
   params.emplace("type", "source");
   params.emplace("name", checker_name);
+  result = get("problem.viewFile", creds, params);
+  return result->body;
+}
+
+std::string get_problem_validator(const Credentials &creds,
+                                  const std::string &problem_id) {
+  httplib::Params params;
+  params.emplace("problemId", problem_id);
+  auto result = get("problem.validator", creds, params);
+
+  auto request_json = nlohmann::json::parse(result->body);
+  auto validator_name =
+      util::get_json_value<std::string>(request_json, "result", "");
+
+  if (validator_name == "" || validator_name == "std::none") {
+    throw(exceptions::polygon_api_error(
+        "Expected a valid validator but got \"" + validator_name + "\""));
+  }
+
+  params.clear();
+  params.emplace("problemId", problem_id);
+  params.emplace("type", "source");
+  params.emplace("name", validator_name);
   result = get("problem.viewFile", creds, params);
   return result->body;
 }

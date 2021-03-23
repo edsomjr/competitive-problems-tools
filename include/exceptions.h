@@ -25,9 +25,11 @@ struct polygon_api_error : std::exception {
   std::string what_message;
 
 public:
+  polygon_api_error(const std::string &msg)
+      : what_message("Polygon API: " + msg) {}
+
   polygon_api_error(const httplib::Result &result) {
-    this->what_message =
-        "Polygon API answered with " + std::to_string(result->status);
+    this->what_message = "Polygon API: " + std::to_string(result->status);
     this->what_message += ": " + result->body;
   }
 

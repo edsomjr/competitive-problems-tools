@@ -22,6 +22,9 @@ httplib::Result get(std::string method, const Credentials &creds,
 std::string get_problem_checker(const Credentials &creds,
                                 const std::string &problem_id);
 
+std::string get_problem_validator(const Credentials &creds,
+                                  const std::string &problem_id);
+
 string generate_api_sig(const string &method_name,
                         const httplib::Params &params,
                         const Credentials &creds);

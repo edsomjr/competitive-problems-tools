@@ -21,4 +21,11 @@ std::string get_checker_file_name(nlohmann::json json_object) {
   return checker_file_name;
 }
 
+std::string get_validator_file_name(nlohmann::json json_object) {
+  const std::string path = "tools|validator";
+  const std::string validator_file_name =
+      util::get_json_value<std::string>(json_object, path, "");
+  return validator_file_name;
+}
+
 } // namespace cptools::config
