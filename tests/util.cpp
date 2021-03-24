@@ -127,7 +127,7 @@ SCENARIO("Utilitary functions", "[util]") {
           {"problem|title|en_US", "Title"},
           {"problem|contest",
            "Evento onde o problema foi aplicado pela primeira vez"},
-          {"solutions|default", "solution.cpp"},
+          {"solutions|default", "solutions/solution.cpp"},
           {"tools|checker", "tools/checker.cpp"},
           {"tools|generator", "tools/generator.cpp"},
           {"tools|validator", "tools/validator.cpp"},
@@ -181,10 +181,10 @@ SCENARIO("Utilitary functions", "[util]") {
 
     WHEN("There is a list field") {
       std::map<std::string, std::vector<std::string>> fields{
-          {"solutions|ac", {"AC.java", "ac.py"}},
-          {"solutions|pe", {"pe.cpp"}},
-          {"solutions|wa", {"wa.cpp"}},
-          {"solutions|tle", {"tle.cpp"}},
+          {"solutions|ac", {"solutions/AC.java", "solutions/ac.py"}},
+          {"solutions|pe", {"solutions/pe.cpp"}},
+          {"solutions|wa", {"solutions/wa.cpp"}},
+          {"solutions|tle", {"solutions/tle.cpp"}},
           {"tests|random", {"10 10", "100 100", "50 1000"}},
       };
 

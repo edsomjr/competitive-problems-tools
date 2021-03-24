@@ -8,6 +8,8 @@
 #include "exceptions.h"
 #include "fs.h"
 #include "message.h"
+#include "types/polygon.h"
+#include "util.h"
 
 namespace cptools::commands::polygon::pull {
 
@@ -29,13 +31,47 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
 
 // Functions
 void get_tool_file(const std::string tool_name,
-                   const api::polygon::Credentials &creds,
+                   const types::polygon::Credentials &creds,
                    const std::string &problem_id) {
-  auto file_content =
-      api::polygon::get_problem_file(tool_name, creds, problem_id);
+  auto polygon_file_name =
+      api::polygon::get_problem_file_name(tool_name, creds, problem_id);
+  auto file_content = api::polygon::get_problem_file(
+      polygon_file_name, tool_name, creds, problem_id);
   auto config = config::read_config_file();
-  auto file_name = config::get_tool_file_name(config, tool_name);
-  fs::overwrite_file(file_name, file_content);
+  auto local_file_name = config::get_tool_file_name(config, tool_name);
+  fs::overwrite_file(local_file_name, file_content);
+}
+
+void get_solutions(const types::polygon::Credentials &creds,
+                   const std::string &problem_id) {
+  auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
+  for (const auto &solution : solutions) {
+    save_solution(solution, creds, problem_id);
+  }
+}
+
+void save_solution(const types::polygon::Solution &s,
+                   const types::polygon::Credentials &creds,
+                   const std::string &problem_id) {
+  auto config = config::read_config_file();
+  auto files_with_same_tag = config::get_solutions_file_names(config, s.tag);
+  auto file_content =
+      api::polygon::get_problem_file(s.name, "solution", creds, problem_id);
+
+  // TODO: if the solution has tag default (main solution) and the config.json
+  // default solution is not the same name, the overwrite doesnt happen
+
+  for (const auto &file_name : files_with_same_tag) {
+    auto splitted_file_name = util::split(file_name, '/');
+    auto real_file_name = splitted_file_name.back();
+    if (real_file_name != s.name)
+      continue;
+    fs::overwrite_file(file_name, file_content);
+  }
+
+  // TODO: if got here then that's a new file, we have to add to config.json
+  // right tag, and then write the content to it. If the problem's tag is
+  // default we overwrite the value instead of appending.
 }
 
 // API
@@ -75,8 +111,8 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
   try {
     get_tool_file("checker", creds, problem_id);
     get_tool_file("validator", creds, problem_id);
+    get_solutions(creds, problem_id);
     // get_tests();
-    // get_solutions();
   } catch (const exceptions::polygon_api_error &e) {
     err << message::failure(e.what());
     return CP_TOOLS_ERROR_POLYGON_API;

@@ -30,9 +30,8 @@ generate_io_files(const std::string &testset, std::ostream &out,
   auto program{std::string(CP_TOOLS_BUILD_DIR) + "/solution"};
 
   auto config = cptools::config::read_config_file();
-  auto source =
-      "solutions/" + cptools::util::get_json_value(config, "solutions|default",
-                                                   std::string("ERROR"));
+  auto source = cptools::util::get_json_value(config, "solutions|default",
+                                              std::string("ERROR"));
 
   auto directories = {input_dir, output_dir};
   for (auto &dir : directories) {
@@ -44,7 +43,7 @@ generate_io_files(const std::string &testset, std::ostream &out,
     }
   }
 
-  if (source == "solutions/ERROR") {
+  if (source == "ERROR") {
     err << message::failure("Default solution file not found!\n");
     return {};
   }

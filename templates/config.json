@@ -15,15 +15,16 @@
         "timelimit": 1000,
         "memory_limit": 256,
         "tags": [ "greedy", "sorting", "ad-hoc" ],
-        "contest": "Evento onde o problema foi aplicado pela primeira vez"
+        "contest": "Evento onde o problema foi aplicado pela primeira vez",
+        "polygonId": "123456"
     },
 
     "solutions": {
-        "default": "solution.cpp",
-        "ac": [ "AC.java", "ac.py" ],
-        "pe": [ "pe.cpp" ],
-        "wa": [ "wa.cpp" ],
-        "tle": [ "tle.cpp" ]
+        "default": "solutions/solution.cpp",
+        "ac": [ "solutions/AC.java", "solutions/ac.py" ],
+        "pe": [ "solutions/pe.cpp" ],
+        "wa": [ "solutions/wa.cpp" ],
+        "tle": [ "solutions/tle.cpp" ]
     },
 
     "tools": {

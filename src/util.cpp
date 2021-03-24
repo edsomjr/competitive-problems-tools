@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -91,6 +92,13 @@ std::string strip(const std::string &s) { return strip(s, " \t\n\r\b"); }
 
 std::string strip(const std::string &s, char c) {
   return strip(s, string(1, c));
+}
+
+std::string lower_string(const string &s) {
+  auto s_copy = std::string(s);
+  std::transform(s.begin(), s.end(), s_copy.begin(),
+                 [](unsigned char c) { return std::tolower(c); });
+  return s_copy;
 }
 
 nlohmann::json read_json_file(const std::string &config_file_path) {

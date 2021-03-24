@@ -52,11 +52,11 @@ string usage() { return "Usage: " NAME " polygon [-h]"; }
 
 string help() { return usage() + help_message; }
 
-api::polygon::Credentials get_credentials_from_file(const string &filepath) {
+types::polygon::Credentials get_credentials_from_file(const string &filepath) {
   nlohmann::json loaded_json;
   loaded_json = util::read_json_file(filepath);
 
-  api::polygon::Credentials creds;
+  types::polygon::Credentials creds;
   creds.key = util::get_json_value(loaded_json, "polygon|key", creds.key);
   creds.secret =
       util::get_json_value(loaded_json, "polygon|secret", creds.secret);
@@ -70,7 +70,7 @@ api::polygon::Credentials get_credentials_from_file(const string &filepath) {
 // API functions
 int run(int argc, char *const argv[], ostream &out, ostream &err) {
   int option = -1;
-  api::polygon::Credentials creds;
+  types::polygon::Credentials creds;
   string creds_file{fs::get_default_config_path()};
   bool creds_from_cmd{false};
   bool creds_from_file{false};

@@ -117,11 +117,10 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return res.rc;
   }
 
-  source =
-      "solutions/" + cptools::util::get_json_value(config, "solutions|default",
-                                                   std::string("ERROR"));
+  source = cptools::util::get_json_value(config, "solutions|default",
+                                         std::string("ERROR"));
 
-  if (source == "solutions/ERROR") {
+  if (source == "ERROR") {
     err << "[validate_checker] Default solution file not found!\n";
     return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
   }

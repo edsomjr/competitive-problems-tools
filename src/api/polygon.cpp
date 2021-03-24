@@ -12,7 +12,8 @@
 
 namespace cptools::api::polygon {
 
-httplib::Result get(std::string method, const Credentials &creds,
+httplib::Result get(std::string method,
+                    const types::polygon::Credentials &creds,
                     httplib::Params &params) {
   std::time_t now{std::time(nullptr)};
   std::string path{"/api/" + method};
@@ -31,25 +32,25 @@ httplib::Result get(std::string method, const Credentials &creds,
   return result;
 }
 
-bool test_connection(const Credentials &creds) {
+bool test_connection(const types::polygon::Credentials &creds) {
   httplib::Params params{};
   auto result = get("problems.list", creds, params);
 
   return result->status == 200;
 }
 
-std::string get_problem_file(const std::string &tool_name,
-                             const Credentials &creds,
-                             const std::string &problem_id) {
+std::string get_problem_file_name(const std::string &tool_type,
+                                  const types::polygon::Credentials &creds,
+                                  const std::string &problem_id) {
   const std::vector<std::string> valid_tools = {"checker", "validator"};
-  auto found = std::find(valid_tools.begin(), valid_tools.end(), tool_name);
+  auto found = std::find(valid_tools.begin(), valid_tools.end(), tool_type);
   if (found == valid_tools.end())
     throw(exceptions::polygon_api_error(
-        "Trying to get file for invalid resource: " + tool_name));
+        "Trying to get file for invalid resource: " + tool_type));
 
   httplib::Params params;
   params.emplace("problemId", problem_id);
-  auto result = get("problem." + tool_name, creds, params);
+  auto result = get("problem." + tool_type, creds, params);
 
   auto request_json = nlohmann::json::parse(result->body);
   auto file_name =
@@ -57,21 +58,49 @@ std::string get_problem_file(const std::string &tool_name,
 
   if (file_name == "" || file_name == "std::none") {
     throw(exceptions::polygon_api_error("Expected a valid file name for " +
-                                        tool_name + " but got \"" + file_name +
+                                        tool_type + " but got \"" + file_name +
                                         "\""));
   }
 
-  params.clear();
+  return file_name;
+}
+
+std::string get_problem_file(const std::string &file_name,
+                             const std::string &tool_type,
+                             const types::polygon::Credentials &creds,
+                             const std::string &problem_id) {
+  httplib::Params params;
   params.emplace("problemId", problem_id);
   params.emplace("type", "source");
   params.emplace("name", file_name);
-  result = get("problem.viewFile", creds, params);
+
+  std::string method = "problem.view";
+  if (tool_type == "solution")
+    method.append("Solution");
+  else
+    method.append("File");
+
+  auto result = get(method, creds, params);
+
   return result->body;
+}
+
+std::vector<types::polygon::Solution>
+get_problem_solutions(const types::polygon::Credentials &creds,
+                      const std::string problem_id) {
+  httplib::Params params;
+  params.emplace("problemId", problem_id);
+  auto result = get("problem.solutions", creds, params);
+
+  auto solutions_json = nlohmann::json::parse(result->body).at("result");
+  auto solutions = solutions_json.get<types::polygon::SolutionsVector>();
+
+  return solutions;
 }
 
 string generate_api_sig(const string &method_name,
                         const httplib::Params &params,
-                        const Credentials &creds) {
+                        const types::polygon::Credentials &creds) {
   string params_str;
   string delimiters{"?&"};
 
