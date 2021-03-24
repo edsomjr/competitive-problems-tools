@@ -28,20 +28,14 @@ The options are:
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
 
 // Functions
-void get_checker(const api::polygon::Credentials &creds,
-                 const std::string &problem_id) {
-  auto checker = api::polygon::get_problem_checker(creds, problem_id);
-  auto config = config::read_config_file();
-  auto checker_file_name = config::get_checker_file_name(config);
-  fs::overwrite_file(checker_file_name, checker);
-}
-
-void get_validator(const api::polygon::Credentials &creds,
+void get_tool_file(const std::string tool_name,
+                   const api::polygon::Credentials &creds,
                    const std::string &problem_id) {
-  auto validator = api::polygon::get_problem_validator(creds, problem_id);
+  auto file_content =
+      api::polygon::get_problem_file(tool_name, creds, problem_id);
   auto config = config::read_config_file();
-  auto validator_file_name = config::get_validator_file_name(config);
-  fs::overwrite_file(validator_file_name, validator);
+  auto file_name = config::get_tool_file_name(config, tool_name);
+  fs::overwrite_file(file_name, file_content);
 }
 
 // API
@@ -79,8 +73,8 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
   auto creds = polygon::get_credentials_from_file(config_path);
 
   try {
-    get_checker(creds, problem_id);
-    get_validator(creds, problem_id);
+    get_tool_file("checker", creds, problem_id);
+    get_tool_file("validator", creds, problem_id);
     // get_tests();
     // get_solutions();
   } catch (const exceptions::polygon_api_error &e) {
