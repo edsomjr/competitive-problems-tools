@@ -128,7 +128,13 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
   creds.key = util::strip(creds.key);
   creds.secret = util::strip(creds.secret);
 
-  auto connected = api::polygon::test_connection(creds);
+  bool connected = false;
+  try {
+    connected = api::polygon::test_connection(creds);
+  } catch (const exceptions::polygon_api_error &e) {
+    err << message::trace(e.what());
+    connected = false;
+  }
 
   if (not connected) {
     err << message::failure("Could not connect with the given credentials.");
