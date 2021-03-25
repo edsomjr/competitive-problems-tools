@@ -15,7 +15,11 @@ vector<string> split(const string &s, char delim = ' ');
 string strip(const string &s);
 string strip(const string &s, char c);
 
+std::string lower_string(const string &s);
+
 nlohmann::json read_json_file(const std::string &config_file_path);
+
+string sha_512(const string &s);
 
 template <typename T>
 T get_json_value(const nlohmann::json &config, const std::string &fields,

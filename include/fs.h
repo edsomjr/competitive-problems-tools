@@ -26,6 +26,8 @@ const Result equivalent(const std::string &p1, const std::string &p2);
 const Result is_directory(const std::string &path);
 const Result is_file(const std::string &path);
 
+void overwrite_file(const std::string dst, const std::string content);
+
 std::string get_home_dir();
 std::string get_default_config_path();
 

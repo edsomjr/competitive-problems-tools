@@ -1,8 +1,10 @@
 #include <getopt.h>
 #include <iostream>
+#include <unordered_map>
 
 #include "api/polygon.h"
-#include "commands/polygon.h"
+#include "commands/polygon/polygon.h"
+#include "commands/polygon/pull.h"
 #include "defs.h"
 #include "error.h"
 #include "exceptions.h"
@@ -13,7 +15,7 @@
 // Raw strings
 static const string help_message{
     R"message(
-Connects to the Polygon API using the credentials in ~/.cp-tools-config.json.
+Validates the connection to the Polygon API using the credentials in ~/.cp-tools-config.json.
 It is possible to define the credentials file or pass them in command line.
 The options are:
 
@@ -36,6 +38,9 @@ The options are:
 namespace cptools::commands::polygon {
 
 // Global variables
+std::unordered_map<string, int (*)(int, char *const[], ostream &, ostream &)>
+    commands{{"pull", pull::run}};
+
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {"key", required_argument, NULL, 'k'},
                                    {"secret", required_argument, NULL, 's'},
@@ -47,24 +52,35 @@ string usage() { return "Usage: " NAME " polygon [-h]"; }
 
 string help() { return usage() + help_message; }
 
-void get_credentials_from_file(api::polygon::Credentials &creds,
-                               const string &filepath, ostream &out) {
+types::polygon::Credentials get_credentials_from_file(const string &filepath) {
   nlohmann::json loaded_json;
-  out << message::info("Getting credentials from " + filepath + "\n");
   loaded_json = util::read_json_file(filepath);
 
+  types::polygon::Credentials creds;
   creds.key = util::get_json_value(loaded_json, "polygon|key", creds.key);
   creds.secret =
       util::get_json_value(loaded_json, "polygon|secret", creds.secret);
+
+  creds.key = util::strip(creds.key);
+  creds.secret = util::strip(creds.secret);
+
+  return creds;
 }
 
 // API functions
 int run(int argc, char *const argv[], ostream &out, ostream &err) {
   int option = -1;
-  api::polygon::Credentials creds;
+  types::polygon::Credentials creds;
   string creds_file{fs::get_default_config_path()};
   bool creds_from_cmd{false};
   bool creds_from_file{false};
+
+  if (argc >= 3) {
+    std::string command{argv[2]};
+    auto it = commands.find(command);
+    if (it != commands.end())
+      return commands[command](argc, argv, out, err);
+  }
 
   while ((option = getopt_long(argc, argv, "hk:s:c:", longopts, NULL)) != -1) {
     switch (option) {
@@ -102,7 +118,7 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
 
   if (not creds_from_cmd) {
     try {
-      get_credentials_from_file(creds, creds_file, out);
+      creds = get_credentials_from_file(creds_file);
     } catch (const exceptions::inexistent_file_error &e) {
       err << message::failure(string(e.what()));
       return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
@@ -112,7 +128,13 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
   creds.key = util::strip(creds.key);
   creds.secret = util::strip(creds.secret);
 
-  auto connected = api::polygon::test_connection(creds);
+  bool connected = false;
+  try {
+    connected = api::polygon::test_connection(creds);
+  } catch (const exceptions::polygon_api_error &e) {
+    err << message::trace(e.what());
+    connected = false;
+  }
 
   if (not connected) {
     err << message::failure("Could not connect with the given credentials.");

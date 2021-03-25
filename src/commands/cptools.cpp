@@ -1,4 +1,4 @@
-#include <map>
+#include <unordered_map>
 
 #include <getopt.h>
 #include <unistd.h>
@@ -13,9 +13,9 @@
 #include "commands/gentex.h"
 #include "commands/init.h"
 #include "commands/judge.h"
-#include "commands/polygon.h"
+#include "commands/polygon/polygon.h"
 
-using std::map;
+using std::unordered_map;
 
 // Raw strings
 static const string help_message{
@@ -45,11 +45,13 @@ Written by Edson Alves.)body"};
 namespace cptools::commands {
 
 // Global variables
-map<string, int (*)(int, char *const[], ostream &, ostream &)> commands{
-    {"init", init::run},       {"check", check::run},   {"clean", clean::run},
-    {"gentex", gentex::run},   {"genpdf", genpdf::run}, {"judge", judge::run},
-    {"polygon", polygon::run},
-};
+unordered_map<string, int (*)(int, char *const[], ostream &, ostream &)>
+    commands{
+        {"init", init::run},       {"check", check::run},
+        {"clean", clean::run},     {"gentex", gentex::run},
+        {"genpdf", genpdf::run},   {"judge", judge::run},
+        {"polygon", polygon::run},
+    };
 
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {"version", no_argument, NULL, 'v'},
@@ -66,10 +68,11 @@ string version() { return version_header + version_body; }
 int run(int argc, char *const argv[], ostream &out, ostream &err) {
   if (argc >= 2) {
     string command{argv[1]};
+    auto it = commands.find(command);
 
-    for (const auto &[cmd, exec] : commands)
-      if (cmd == command)
-        return exec(argc, argv, out, err);
+    if (it != commands.end()) {
+      return commands[command](argc, argv, out, err);
+    }
 
     if (command.front() != '-') {
       err << NAME << ": invalid action '" << command << "'\n";
