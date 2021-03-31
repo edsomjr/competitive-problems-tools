@@ -22,27 +22,26 @@ nlohmann::json read_json_file(const std::string &config_file_path);
 string sha_512(const string &s);
 
 template <typename T>
-T get_json_value(const nlohmann::json &config, const std::string &fields,
-                 T default_value) {
-  auto fs = util::split(fields, '|');
-  auto js = config;
+T get_json_value(const nlohmann::json &config, const std::string &fields, T default_value) {
+    auto fs = util::split(fields, '|');
+    auto js = config;
 
-  for (const auto &f : fs) {
-    auto it = js.find(f);
+    for (const auto &f : fs) {
+        auto it = js.find(f);
 
-    if (it == js.end())
-      return default_value;
-    else
-      js = *it;
-  }
+        if (it == js.end())
+            return default_value;
+        else
+            js = *it;
+    }
 
-  try {
-    auto value = js.get<T>();
-    return value;
-  } catch (std::exception &e) {
-  }
+    try {
+        auto value = js.get<T>();
+        return value;
+    } catch (std::exception &e) {
+    }
 
-  return default_value;
+    return default_value;
 }
 
 } // namespace cptools::util

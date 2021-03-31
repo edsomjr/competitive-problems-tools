@@ -34,20 +34,20 @@ static map<long long, string> codes{
 };
 
 string apply(const string &text, long long specs, size_t size) {
-  ostringstream oss;
+    ostringstream oss;
 
-  for (long long mask = 1024; mask <= specs; mask <<= 1)
-    if (mask & specs)
-      oss << codes[mask];
+    for (long long mask = 1024; mask <= specs; mask <<= 1)
+        if (mask & specs)
+            oss << codes[mask];
 
-  if (specs & align::LEFT)
-    oss << left;
+    if (specs & align::LEFT)
+        oss << left;
 
-  size = max(size, text.size());
+    size = max(size, text.size());
 
-  oss << setw(size) << text << codes[END];
+    oss << setw(size) << text << codes[END];
 
-  return oss.str();
+    return oss.str();
 }
 
 } // namespace cptools::format

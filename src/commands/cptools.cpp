@@ -45,17 +45,14 @@ Written by Edson Alves.)body"};
 namespace cptools::commands {
 
 // Global variables
-unordered_map<string, int (*)(int, char *const[], ostream &, ostream &)>
-    commands{
-        {"init", init::run},       {"check", check::run},
-        {"clean", clean::run},     {"gentex", gentex::run},
-        {"genpdf", genpdf::run},   {"judge", judge::run},
-        {"polygon", polygon::run},
-    };
+unordered_map<string, int (*)(int, char *const[], ostream &, ostream &)> commands{
+    {"init", init::run},       {"check", check::run},   {"clean", clean::run},
+    {"gentex", gentex::run},   {"genpdf", genpdf::run}, {"judge", judge::run},
+    {"polygon", polygon::run},
+};
 
-static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
-                                   {"version", no_argument, NULL, 'v'},
-                                   {0, 0, 0, 0}};
+static struct option longopts[] = {
+    {"help", no_argument, NULL, 'h'}, {"version", no_argument, NULL, 'v'}, {0, 0, 0, 0}};
 
 // Auxiliary routines
 string usage() { return "Usage: " NAME " [-h] [-v] action"; }
@@ -66,39 +63,39 @@ string version() { return version_header + version_body; }
 
 // API functions
 int run(int argc, char *const argv[], ostream &out, ostream &err) {
-  if (argc >= 2) {
-    string command{argv[1]};
-    auto it = commands.find(command);
+    if (argc >= 2) {
+        string command{argv[1]};
+        auto it = commands.find(command);
 
-    if (it != commands.end()) {
-      return commands[command](argc, argv, out, err);
+        if (it != commands.end()) {
+            return commands[command](argc, argv, out, err);
+        }
+
+        if (command.front() != '-') {
+            err << NAME << ": invalid action '" << command << "'\n";
+            return CP_TOOLS_ERROR_INVALID_COMMAND;
+        }
     }
 
-    if (command.front() != '-') {
-      err << NAME << ": invalid action '" << command << "'\n";
-      return CP_TOOLS_ERROR_INVALID_COMMAND;
+    int option = -1;
+
+    while ((option = getopt_long(argc, argv, "hv", longopts, NULL)) != -1) {
+        switch (option) {
+        case 'h':
+            out << help() << '\n';
+            return CP_TOOLS_OK;
+
+        case 'v':
+            out << version() << '\n';
+            return CP_TOOLS_OK;
+
+        default:
+            err << help() << '\n';
+            return CP_TOOLS_ERROR_INVALID_OPTION;
+        }
     }
-  }
 
-  int option = -1;
-
-  while ((option = getopt_long(argc, argv, "hv", longopts, NULL)) != -1) {
-    switch (option) {
-    case 'h':
-      out << help() << '\n';
-      return CP_TOOLS_OK;
-
-    case 'v':
-      out << version() << '\n';
-      return CP_TOOLS_OK;
-
-    default:
-      err << help() << '\n';
-      return CP_TOOLS_ERROR_INVALID_OPTION;
-    }
-  }
-
-  out << usage() << '\n';
-  return CP_TOOLS_OK;
+    out << usage() << '\n';
+    return CP_TOOLS_OK;
 }
 } // namespace cptools::commands

@@ -21,14 +21,11 @@ constexpr int INTERACTOR = 8;
 constexpr int ALL = CHECKER | VALIDATOR | GENERATOR | INTERACTOR;
 } // namespace tools
 
-vector<pair<string, string>> generate_io_files(const string &testset,
-                                               ostream &out, ostream &err,
+vector<pair<string, string>> generate_io_files(const string &testset, ostream &out, ostream &err,
                                                bool gen_output = true);
 
-int build_tools(string &error, int tools = tools::ALL,
-                const string &where = ".");
-int gen_exe(string &error, const string &source, const string &dest,
-            const string &where = ".");
+int build_tools(string &error, int tools = tools::ALL, const string &where = ".");
+int gen_exe(string &error, const string &source, const string &dest, const string &where = ".");
 
 } // namespace cptools::task
 

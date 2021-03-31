@@ -1,0 +1,6 @@
+---
+Language:        Cpp
+BasedOnStyle:  LLVM
+AlignConsecutiveMacros: true
+ColumnLimit:     100
+IndentWidth:     4

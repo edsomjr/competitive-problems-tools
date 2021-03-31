@@ -10,14 +10,14 @@
 namespace cptools::types::polygon {
 
 struct Credentials {
-  std::string key;
-  std::string secret;
+    std::string key;
+    std::string secret;
 };
 
 struct Solution {
-  std::string name;
-  std::time_t modification_time;
-  std::string tag;
+    std::string name;
+    std::time_t modification_time;
+    std::string tag;
 };
 using SolutionsVector = std::vector<Solution>;
 
