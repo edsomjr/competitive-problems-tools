@@ -54,10 +54,9 @@ const Result exists(const std::string &path) {
 }
 
 const Result copy(const std::string &src, const std::string &dst, bool overwrite) {
-    using std::filesystem::copy_options;
-    copy_options options = copy_options::recursive;
+    std::filesystem::copy_options options = std::filesystem::copy_options::recursive;
     if (overwrite)
-        options |= copy_options::overwrite_existing;
+        options |= std::filesystem::copy_options::overwrite_existing;
 
     try {
         std::filesystem::copy(src, dst, options);

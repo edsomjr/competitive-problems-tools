@@ -9,8 +9,6 @@
 #include "task.h"
 #include "util.h"
 
-using std::to_string;
-
 namespace cptools::task {
 
 std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string &testset,
@@ -134,7 +132,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
     return io_files;
 }
 
-int build_tools(string &error, int tools, const string &where) {
+int build_tools(std::string &error, int tools, const std::string &where) {
     auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
     auto fs_res = fs::create_directory(dest_dir);
@@ -146,7 +144,7 @@ int build_tools(string &error, int tools, const string &where) {
 
     for (int mask = 1; mask <= tools; mask <<= 1) {
         int tool = tools & mask;
-        string program = "";
+        std::string program = "";
 
         switch (tool) {
         case tools::VALIDATOR:
@@ -166,7 +164,7 @@ int build_tools(string &error, int tools, const string &where) {
             break;
 
         default:
-            error = "Invalid tool required: (" + to_string(tools) + ")";
+            error = "Invalid tool required: (" + std::to_string(tools) + ")";
             return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
         }
 
@@ -191,7 +189,8 @@ int build_tools(string &error, int tools, const string &where) {
     return CP_TOOLS_OK;
 }
 
-int gen_exe(string &error, const string &source, const string &dest, const string &where) {
+int gen_exe(std::string &error, const std::string &source, const std::string &dest,
+            const std::string &where) {
     auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
     auto fs_res = fs::create_directory(dest_dir);

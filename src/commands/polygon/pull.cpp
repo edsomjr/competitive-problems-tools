@@ -14,7 +14,7 @@
 namespace cptools::commands::polygon::pull {
 
 // Static variables
-static const string help_message{
+static const std::string help_message{
     R"message(
 Pulls a problem checker, validator and tests from the Polygon problem
 set in config.json. It uses the credentials in ~/.cp-tools-config.json to

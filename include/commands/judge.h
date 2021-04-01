@@ -3,9 +3,6 @@
 
 #include <iostream>
 
-using std::ostream;
-using std::string;
-
 namespace cptools::commands::judge {
 namespace verdict {
 extern const int AC;
@@ -20,14 +17,14 @@ extern const int UNDEF;
 } // namespace verdict
 
 // Main routine
-int run(int argc, char *const argv[], ostream &out, ostream &err);
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
 
 // Auxiliary routines
-string help();
-string usage();
+std::string help();
+std::string usage();
 
 // Judge solution
-int judge(const string &solution_path, ostream &out, ostream &err);
+int judge(const std::string &solution_path, std::ostream &out, std::ostream &err);
 } // namespace cptools::commands::judge
 
 #endif

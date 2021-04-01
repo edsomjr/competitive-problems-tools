@@ -17,10 +17,6 @@
 #include "task.h"
 #include "util.h"
 
-using std::map;
-using std::max;
-using std::to_string;
-
 // Raw strings
 static const std::string help_message{
     R"message(
@@ -51,7 +47,7 @@ const int FAIL = 8;
 // Global variables
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'}, {0, 0, 0, 0}};
 
-map<int, std::string> ver_string{
+std::map<int, std::string> ver_string{
     {verdict::AC, "Accepted"},
     {verdict::PE, "Presentation Error"},
     {verdict::WA, "Wrong Answer"},
@@ -63,7 +59,7 @@ map<int, std::string> ver_string{
     {verdict::UNDEF, "Undefined Error"},
 };
 
-const map<int, long long> ver_style{
+const std::map<int, long long> ver_style{
     {verdict::AC, format::style::AC},       {verdict::PE, format::style::PE},
     {verdict::WA, format::style::WA},       {verdict::CE, format::style::CE},
     {verdict::TLE, format::style::TLE},     {verdict::RTE, format::style::RTE},
@@ -87,7 +83,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
     out << message::info("Judging solution '" + solution_path + "'...") << "\n";
 
     // Constrói as ferramentas necessárias
-    string error;
+    std::string error;
     auto rc = task::build_tools(error, task::tools::VALIDATOR | task::tools::CHECKER);
 
     if (rc != CP_TOOLS_OK) {
@@ -121,7 +117,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         char buffer[64];
         sprintf(buffer, "%.*f", places, x);
 
-        return string(buffer);
+        return std::string(buffer);
     };
 
     for (auto [input, answer] : files) {
@@ -174,9 +170,9 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
             };
         }
 
-        ans = max(ans, ver);
-        tmax = max(tmax, info.elapsed);
-        mmax = max(mmax, info.memory);
+        ans = std::max(ans, ver);
+        tmax = std::max(tmax, info.elapsed);
+        mmax = std::max(mmax, info.memory);
         passed += ver == verdict::AC ? 1 : 0;
 
         report.add_row({{number, format::style::COUNTER},
@@ -193,7 +189,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         << format::apply(ver_string[ans], ver_style.at(ans) + format::align::LEFT) << '\n';
 
     out << format::apply("Passed:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(to_string(passed), format::style::INT) << '\n';
+        << format::apply(std::to_string(passed), format::style::INT) << '\n';
 
     out << format::apply("Max time:", format::emph::BOLD + format::align::LEFT, col_size)
         << format::apply(as_string(tmax, 6), format::style::FLOAT) << '\n';

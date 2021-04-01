@@ -6,8 +6,6 @@
 #include "commands/cptools.h"
 #include "error.h"
 
-using std::ostringstream;
-
 SCENARIO("Command line options", "[cptools]") {
     GIVEN("An execution of cp-tools from command line") {
         WHEN("There is no option") {
@@ -16,7 +14,7 @@ SCENARIO("Command line options", "[cptools]") {
             optind = 1; // getopt library must be reseted between tests
 
             THEN("The output must be the usage message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);
 
@@ -32,7 +30,7 @@ SCENARIO("Command line options", "[cptools]") {
             optind = 1; // getopt library must be reseted between tests
 
             THEN("The output must be the help message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);
 
@@ -48,7 +46,7 @@ SCENARIO("Command line options", "[cptools]") {
             optind = 1;
 
             THEN("The output must be the version message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);
 
@@ -65,7 +63,7 @@ SCENARIO("Command line options", "[cptools]") {
             opterr = 0; // Suppress getopt_long error message
 
             THEN("The error output must be the help message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);
 
@@ -82,7 +80,7 @@ SCENARIO("Command line options", "[cptools]") {
                     char *const argv[]{(char *)"cp-tools", (char *)"-h", (char *)"-v"};
                     optind = 1;
 
-                    ostringstream out, err;
+                    std::ostringstream out, err;
 
                     auto rc = cptools::commands::run(argc, argv, out, err);
 
@@ -96,7 +94,7 @@ SCENARIO("Command line options", "[cptools]") {
                     char *const argv[]{(char *)"cp-tools", (char *)"-v", (char *)"-h"};
                     optind = 1;
 
-                    ostringstream out, err;
+                    std::ostringstream out, err;
 
                     auto rc = cptools::commands::run(argc, argv, out, err);
 

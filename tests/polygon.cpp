@@ -89,15 +89,15 @@ SCENARIO("Command polygon", "[polygon]") {
             auto polygon_secret_env = getenv("POLYGON_SECRET");
             bool use_env = polygon_key_env && polygon_secret_env;
 
-            string polygon_key, polygon_secret;
+            std::string polygon_key, polygon_secret;
             if (not use_env) {
                 auto config = cptools::util::read_json_file(config_bkp);
-                polygon_key = cptools::util::get_json_value<string>(config, "polygon|key", "");
+                polygon_key = cptools::util::get_json_value<std::string>(config, "polygon|key", "");
                 polygon_secret =
-                    cptools::util::get_json_value<string>(config, "polygon|secret", "");
+                    cptools::util::get_json_value<std::string>(config, "polygon|secret", "");
             } else {
-                polygon_key = string(polygon_key_env);
-                polygon_secret = string(polygon_secret_env);
+                polygon_key = std::string(polygon_key_env);
+                polygon_secret = std::string(polygon_secret_env);
             }
 
             AND_WHEN("They are in a valid credentials file in user's home") {

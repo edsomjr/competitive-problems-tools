@@ -10,8 +10,6 @@
 #include "fs.h"
 #include "sh.h"
 
-using namespace std;
-
 SCENARIO("Command init", "[init]") {
     GIVEN("An execution of the command init with options") {
         WHEN("The option -o is used") {
@@ -23,7 +21,7 @@ SCENARIO("Command init", "[init]") {
                 auto res = cptools::fs::remove(CP_TOOLS_TEMP_DIR);
                 REQUIRE(res.rc == CP_TOOLS_OK);
 
-                ostringstream out, err;
+                std::ostringstream out, err;
                 REQUIRE(cptools::commands::init::run(argc, argv, out, err) == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
 
@@ -41,7 +39,7 @@ SCENARIO("Command init", "[init]") {
             optind = 1;
 
             THEN("The output is the help message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::init::run(argc, argv, out, err);
 
@@ -60,7 +58,7 @@ SCENARIO("Command init", "[init]") {
             opterr = 0;
 
             THEN("The error output is the help message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::init::run(argc, argv, out, err);
 

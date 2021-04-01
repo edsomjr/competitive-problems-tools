@@ -3,16 +3,13 @@
 
 #include <iostream>
 
-using std::ostream;
-using std::string;
-
 namespace cptools::commands {
 
-int run(int argc, char *const argv[], ostream &out, ostream &err);
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
 
-string help();
-string usage();
-string version();
+std::string help();
+std::string usage();
+std::string version();
 
 } // namespace cptools::commands
 

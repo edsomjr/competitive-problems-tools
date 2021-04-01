@@ -16,10 +16,8 @@
 #include "task.h"
 #include "util.h"
 
-using namespace std;
-
 // Raw strings
-static const string help_message{
+static const std::string help_message{
     R"message(
 Generate a PDF file from the problem description. The options are:
 
@@ -67,15 +65,16 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {0, 0, 0, 0}};
 
 // Auxiliary routines
-string usage() {
+std::string usage() {
     return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] "
            "[-g lang] [-l] [-t] [--no-author] [--no-contest]";
 }
 
-string help() { return usage() + help_message; }
+std::string help() { return usage() + help_message; }
 
-int generate_pdf(const string &doc_class, const string &language, int flags, const string &label,
-                 const string &outfile, bool tutorial, ostream &out, ostream &err) {
+int generate_pdf(const std::string &doc_class, const std::string &language, int flags,
+                 const std::string &label, const std::string &outfile, bool tutorial,
+                 std::ostream &out, std::ostream &err) {
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
         err << message::failure(fs_res.error_message);
@@ -83,14 +82,15 @@ int generate_pdf(const string &doc_class, const string &language, int flags, con
     }
 
     // Generates the tex file that will be used to build the pdf file
-    string texfile_path{string(CP_TOOLS_BUILD_DIR) + (tutorial ? "/tutorial.tex" : "/problem.tex")};
+    std::string texfile_path{std::string(CP_TOOLS_BUILD_DIR) +
+                             (tutorial ? "/tutorial.tex" : "/problem.tex")};
     auto removed_result = fs::remove(texfile_path);
     if (not removed_result.ok) {
         err << message::failure(removed_result.error_message);
         return removed_result.rc;
     }
 
-    ofstream tex_file(texfile_path);
+    std::ofstream tex_file(texfile_path);
 
     if (not tex_file) {
         err << message::failure("Error opening file '" + texfile_path) << "'\n";
@@ -108,7 +108,8 @@ int generate_pdf(const string &doc_class, const string &language, int flags, con
     tex_file.close();
 
     // Generates the PDF file 'problem.pdf' on CP_TOOLS_BUILD_DIR
-    string pdf_file{string(CP_TOOLS_BUILD_DIR) + (tutorial ? "/tutorial.pdf" : "/problem.pdf")};
+    std::string pdf_file{std::string(CP_TOOLS_BUILD_DIR) +
+                         (tutorial ? "/tutorial.pdf" : "/problem.pdf")};
 
     auto res = sh::build(pdf_file, texfile_path);
 
@@ -131,13 +132,13 @@ int generate_pdf(const string &doc_class, const string &language, int flags, con
 }
 
 // API functions
-int run(int argc, char *const argv[], ostream &out, ostream &err) {
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
     bool tutorial = false;
 
     int flags = gentex::flag::INCLUDE_AUTHOR | gentex::flag::INCLUDE_CONTEST;
 
-    string document_class{"cp_modern"}, outfile{"problem.pdf"}, language{"pt_BR"}, label{"A"};
+    std::string document_class{"cp_modern"}, outfile{"problem.pdf"}, language{"pt_BR"}, label{"A"};
 
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
@@ -146,22 +147,22 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
             return 0;
 
         case 'b':
-            label = string(optarg);
+            label = std::string(optarg);
             break;
 
         case 'o':
-            outfile = string(optarg);
+            outfile = std::string(optarg);
             break;
 
         case 'c':
-            document_class = string(optarg);
+            document_class = std::string(optarg);
             break;
 
         case 'l':
             return gentex::list_document_classes(out, err);
 
         case 'g': {
-            language = string(optarg);
+            language = std::string(optarg);
 
             if (not gentex::validate_language(language)) {
                 err << message::failure("Language '" + language + "' not find or supported\n");

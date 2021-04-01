@@ -3,17 +3,15 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace cptools::table {
 
-ostream &operator<<(ostream &os, const Table &t) {
+std::ostream &operator<<(std::ostream &os, const Table &t) {
     int total = 0, N = t.header.size();
 
     for (auto col : t.header)
         total += (3 + col.size);
 
-    string hline(total + 1, '-');
+    std::string hline(total + 1, '-');
 
     os << hline << '\n';
 
@@ -39,6 +37,8 @@ ostream &operator<<(ostream &os, const Table &t) {
     return os;
 }
 
-void Table::add_row(const vector<pair<string, long long>> &row) { rows.push_back(row); }
+void Table::add_row(const std::vector<std::pair<std::string, long long>> &row) {
+    rows.push_back(row);
+}
 
 } // namespace cptools::table

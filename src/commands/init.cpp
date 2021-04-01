@@ -12,7 +12,7 @@
 #include "sh.h"
 
 // Raw strings
-static const string help_message{
+static const std::string help_message{
     R"message(
 Initialize an empty directory with template files. If a file already exists, it is not overridden.
 
@@ -33,11 +33,11 @@ static struct option longopts[] = {
     {"help", no_argument, NULL, 'h'}, {"output", required_argument, NULL, 'o'}, {0, 0, 0, 0}};
 
 // Auxiliary routines
-string usage() { return "Usage: " NAME " init [-h] [-o output_dir]"; }
+std::string usage() { return "Usage: " NAME " init [-h] [-o output_dir]"; }
 
-string help() { return usage() + help_message; }
+std::string help() { return usage() + help_message; }
 
-int copy_template_files(const string &dest, ostream &out, ostream &err) {
+int copy_template_files(const std::string &dest, std::ostream &out, std::ostream &err) {
     out << message::info("Initializing directory '" + dest + "' ...") << "\n";
 
     // Copy templates to the directory
@@ -51,9 +51,9 @@ int copy_template_files(const string &dest, ostream &out, ostream &err) {
 }
 
 // API functions
-int run(int argc, char *const argv[], ostream &out, ostream &err) {
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
-    string dest{"."};
+    std::string dest{"."};
 
     while ((option = getopt_long(argc, argv, "ho:", longopts, NULL)) != -1) {
         switch (option) {
@@ -62,7 +62,7 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
             return 0;
 
         case 'o':
-            dest = string(optarg);
+            dest = std::string(optarg);
             break;
 
         default:

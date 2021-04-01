@@ -3,14 +3,12 @@
 
 #include <string>
 
-using std::string;
-
 // Functions that emulates shell commands
 namespace cptools::sh {
 
 struct Result {
     int rc;
-    string output;
+    std::string output;
 };
 
 struct Info {
@@ -19,15 +17,15 @@ struct Info {
     double memory;
 };
 
-Result diff_dirs(const string &dirA, const string &dirB);
+Result diff_dirs(const std::string &dirA, const std::string &dirB);
 
-Result build(const string &output, const string &src);
+Result build(const std::string &output, const std::string &src);
 
-Result execute(const string &program, const string &args, const string &infile = "",
-               const string &outfile = "/dev/null", int timeout = 3);
+Result execute(const std::string &program, const std::string &args, const std::string &infile = "",
+               const std::string &outfile = "/dev/null", int timeout = 3);
 
-Info profile(const string &program, const string &args, int timeout = 3, const string &infile = "",
-             const string &outfile = "/dev/null");
+Info profile(const std::string &program, const std::string &args, int timeout = 3,
+             const std::string &infile = "", const std::string &outfile = "/dev/null");
 } // namespace cptools::sh
 
 #endif

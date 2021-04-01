@@ -8,8 +8,6 @@
 #include "catch.hpp"
 #include "util.h"
 
-using std::string;
-
 SCENARIO("Utilitary functions", "[util]") {
     GIVEN("A string") {
         WHEN("There is a prefix composed by blank characters") {
@@ -86,26 +84,29 @@ SCENARIO("Utilitary functions", "[util]") {
 
         WHEN("The string s has no occurrence of delimiter") {
             THEN("The split() method return just one token: s") {
-                REQUIRE(cptools::util::split("abc", '.') == vector<string>{"abc"});
-                REQUIRE(cptools::util::split("a b c", '.') == vector<string>{"a b c"});
-                REQUIRE(cptools::util::split("abd", 'c') == vector<string>{"abd"});
+                REQUIRE(cptools::util::split("abc", '.') == std::vector<std::string>{"abc"});
+                REQUIRE(cptools::util::split("a b c", '.') == std::vector<std::string>{"a b c"});
+                REQUIRE(cptools::util::split("abd", 'c') == std::vector<std::string>{"abd"});
             }
         }
 
         WHEN("The string s is composed by n occurrences of delimiter") {
             THEN("The split() method return a empty token list") {
-                REQUIRE(cptools::util::split(".....", '.') == vector<string>{});
-                REQUIRE(cptools::util::split("a", 'a') == vector<string>{});
+                REQUIRE(cptools::util::split(".....", '.') == std::vector<std::string>{});
+                REQUIRE(cptools::util::split("a", 'a') == std::vector<std::string>{});
             }
         }
 
         WHEN("The string s has r occurrences of delimiter") {
             THEN("The split() method return a vector with (r + 1) tokens") {
-                REQUIRE(cptools::util::split("a.b.c", '.') == (vector<string>{"a", "b", "c"}));
-                REQUIRE(cptools::util::split("a b", 'a') == vector<string>{" b"});
-                REQUIRE(cptools::util::split("a b", 'b') == vector<string>{"a "});
-                REQUIRE(cptools::util::split("a    b", ' ') == (vector<string>{"a", "b"}));
-                REQUIRE(cptools::util::split("  a    b  ", ' ') == (vector<string>{"a", "b"}));
+                REQUIRE(cptools::util::split("a.b.c", '.') ==
+                        (std::vector<std::string>{"a", "b", "c"}));
+                REQUIRE(cptools::util::split("a b", 'a') == std::vector<std::string>{" b"});
+                REQUIRE(cptools::util::split("a b", 'b') == std::vector<std::string>{"a "});
+                REQUIRE(cptools::util::split("a    b", ' ') ==
+                        (std::vector<std::string>{"a", "b"}));
+                REQUIRE(cptools::util::split("  a    b  ", ' ') ==
+                        (std::vector<std::string>{"a", "b"}));
             }
         }
     }

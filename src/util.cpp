@@ -12,7 +12,7 @@
 
 namespace cptools::util {
 
-vector<string> split(const string &s, char delim) {
+std::vector<std::string> split(const std::string &s, char delim) {
     enum State { NONE, ESCAPED, TOKEN };
     enum State state = NONE;
 
@@ -64,7 +64,7 @@ vector<string> split(const string &s, char delim) {
     return tokens;
 }
 
-string sha_512(const string &s) {
+std::string sha_512(const std::string &s) {
     unsigned char hash[SHA512_DIGEST_LENGTH];
     std::ostringstream output;
     SHA512_CTX sha512;
@@ -81,18 +81,18 @@ string sha_512(const string &s) {
     return output.str();
 }
 
-static string strip(const string &s, const string &delim) {
+static std::string strip(const std::string &s, const std::string &delim) {
     auto i = s.find_first_not_of(delim);
     auto j = s.find_last_not_of(delim);
 
-    return (i == string::npos or j < i) ? "" : s.substr(i, j - i + 1);
+    return (i == std::string::npos or j < i) ? "" : s.substr(i, j - i + 1);
 }
 
 std::string strip(const std::string &s) { return strip(s, " \t\n\r\b"); }
 
-std::string strip(const std::string &s, char c) { return strip(s, string(1, c)); }
+std::string strip(const std::string &s, char c) { return strip(s, std::string(1, c)); }
 
-std::string lower_string(const string &s) {
+std::string lower_string(const std::string &s) {
     auto s_copy = std::string(s);
     std::transform(s.begin(), s.end(), s_copy.begin(),
                    [](unsigned char c) { return std::tolower(c); });

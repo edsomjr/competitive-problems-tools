@@ -10,9 +10,6 @@
 #include "fs.h"
 #include "sh.h"
 
-using std::ostringstream;
-using std::string;
-
 SCENARIO("Command clean", "[clean]") {
     GIVEN("An execution of the command clean with options") {
         WHEN("There is no option") {
@@ -20,7 +17,7 @@ SCENARIO("Command clean", "[clean]") {
             char *const argv[]{(char *)"cp-tools", (char *)"clean"};
 
             THEN("The the auto-generated files in current directory is deleted") {
-                ostringstream out, err;
+                std::ostringstream out, err;
                 REQUIRE(cptools::commands::clean::run(argc, argv, out, err) == CP_TOOLS_OK);
             }
         }
@@ -38,7 +35,7 @@ SCENARIO("Command clean", "[clean]") {
             optind = 1;
 
             THEN("The subdirectory with the auto-generated files is deleted") {
-                ostringstream out, err;
+                std::ostringstream out, err;
                 REQUIRE(cptools::commands::clean::run(argc, argv, out, err) == CP_TOOLS_OK);
             }
         }
@@ -51,7 +48,7 @@ SCENARIO("Command clean", "[clean]") {
             optind = 1;
 
             THEN("The output is the help message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::clean::run(argc, argv, out, err);
 
@@ -69,7 +66,7 @@ SCENARIO("Command clean", "[clean]") {
             opterr = 0;
 
             THEN("The error output is the help message") {
-                ostringstream out, err;
+                std::ostringstream out, err;
 
                 auto rc = cptools::commands::clean::run(argc, argv, out, err);
 

@@ -17,7 +17,7 @@
 #include "util.h"
 
 // Raw strings
-static const string help_message{
+static const std::string help_message{
     R"message(
 Generate a LaTeX file from the problem description. The options are:
 
@@ -65,23 +65,23 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {"no_contest", no_argument, NULL, NO_CONTEST},
                                    {0, 0, 0, 0}};
 
-static const map<string, string> languages{
+static const std::map<std::string, std::string> languages{
     {"en_US", "english"},
     {"pt_BR", "portuguese"},
 };
 
 // Auxiliary routines
-string usage() {
+std::string usage() {
     return "Usage: " NAME " gentex [-h] [-o outfile] [-c doc_class] [-l list] "
            "[-g lang] [-b label] [--no_author] [--no_contest]";
 }
 
-string help() { return usage() + help_message; }
+std::string help() { return usage() + help_message; }
 
-bool validate_language(const string &lang) { return languages.find(lang) != languages.end(); }
+bool validate_language(const std::string &lang) { return languages.find(lang) != languages.end(); }
 
-int list_document_classes(ostream &out, ostream &err) {
-    string classes_dir{CP_TOOLS_CLASSES_DIR};
+int list_document_classes(std::ostream &out, std::ostream &err) {
+    std::string classes_dir{CP_TOOLS_CLASSES_DIR};
     DIR *d = opendir(classes_dir.c_str());
 
     if (d == nullptr) {
@@ -99,7 +99,7 @@ int list_document_classes(ostream &out, ostream &err) {
         if (dir->d_name[0] == '.')
             continue;
 
-        string filename{dir->d_name};
+        std::string filename{dir->d_name};
         auto tokens = util::split(filename, '.');
 
         if (tokens.size() != 2)
@@ -111,8 +111,8 @@ int list_document_classes(ostream &out, ostream &err) {
         if (ext != "cls" or name.empty() or name.front() == '.')
             continue;
 
-        ifstream in(classes_dir + "/" + filename);
-        string line;
+        std::ifstream in(classes_dir + "/" + filename);
+        std::string line;
 
         if (!in)
             continue;
@@ -125,7 +125,7 @@ int list_document_classes(ostream &out, ostream &err) {
         // % is the LaTeX line comment char
         auto pos = line.find('%');
 
-        if (pos == string::npos)
+        if (pos == std::string::npos)
             continue;
 
         line = util::strip(line.substr(pos + 1));
@@ -146,14 +146,14 @@ int list_document_classes(ostream &out, ostream &err) {
     return CP_TOOLS_OK;
 }
 
-int generate_tutorial_latex(const string &doc_class, const string &language, int flags,
-                            const string &label, ostream &out, ostream &) {
+int generate_tutorial_latex(const std::string &doc_class, const std::string &language, int flags,
+                            const std::string &label, std::ostream &out, std::ostream &) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
-    auto event{util::get_json_value(config, "problem|contest", string())};
-    auto author{util::get_json_value(config, "problem|author", string())};
-    auto title{util::get_json_value(config, "problem|title|" + language, string("Título"))};
+    auto event{util::get_json_value(config, "problem|contest", std::string())};
+    auto author{util::get_json_value(config, "problem|author", std::string())};
+    auto title{util::get_json_value(config, "problem|title|" + language, std::string("Título"))};
 
     if ((not(flags & flag::INCLUDE_CONTEST)) or
         (not util::get_json_value(config, "PDF|include_contest", false)))
@@ -188,19 +188,19 @@ int generate_tutorial_latex(const string &doc_class, const string &language, int
     return CP_TOOLS_OK;
 }
 
-int generate_latex(const string &doc_class, const string &language, int flags, const string &label,
-                   ostream &out, ostream &err) {
+int generate_latex(const std::string &doc_class, const std::string &language, int flags,
+                   const std::string &label, std::ostream &out, std::ostream &err) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
-    auto event{util::get_json_value(config, "problem|contest", string())};
-    auto author{util::get_json_value(config, "problem|author", string())};
-    auto title{util::get_json_value(config, "problem|title|" + language, string("Título"))};
+    auto event{util::get_json_value(config, "problem|contest", std::string())};
+    auto author{util::get_json_value(config, "problem|author", std::string())};
+    auto title{util::get_json_value(config, "problem|title|" + language, std::string("Título"))};
     auto timelimit{util::get_json_value(config, "problem|timelimit", 1.0)};
     int memorylimit = round(util::get_json_value(config, "problem|memory_limit", 256.0));
 
-    auto c1_size = util::get_json_value(config, "PDF|first_column_size", string("6cm"));
-    auto c2_size = util::get_json_value(config, "PDF|second_column_size", string("8cm"));
+    auto c1_size = util::get_json_value(config, "PDF|first_column_size", std::string("6cm"));
+    auto c2_size = util::get_json_value(config, "PDF|second_column_size", std::string("8cm"));
 
     if ((not(flags & flag::INCLUDE_CONTEST)) or
         (not util::get_json_value(config, "PDF|include_contest", false)))
@@ -216,8 +216,8 @@ int generate_latex(const string &doc_class, const string &language, int flags, c
     out << "\\header{" << event << "}{" << author << "}\n\n";
 
     out.precision(1);
-    out << "\\begin{problem}{" << label << "}{" << title << "}{" << fixed << (timelimit / 1000.0)
-        << "}{" << memorylimit << "}\n\n";
+    out << "\\begin{problem}{" << label << "}{" << title << "}{" << std::fixed
+        << (timelimit / 1000.0) << "}{" << memorylimit << "}\n\n";
     out << "\\input{tex/" << language << "/statement}\n\n";
     out << "\\begin{probleminput}{tex/" << language << "/input}\n";
     out << "\\end{probleminput}\n\n";
@@ -246,10 +246,10 @@ int generate_latex(const string &doc_class, const string &language, int flags, c
 }
 
 // API functions
-int run(int argc, char *const argv[], ostream &out, ostream &err) {
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
 
-    string document_class{"cp_modern"}, outfile, language{"pt_BR"}, label{"A"};
+    std::string document_class{"cp_modern"}, outfile, language{"pt_BR"}, label{"A"};
     int flags = flag::INCLUDE_AUTHOR | flag::INCLUDE_CONTEST;
 
     auto f = generate_latex;
@@ -261,22 +261,22 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
             return 0;
 
         case 'b':
-            label = string(optarg);
+            label = std::string(optarg);
             break;
 
         case 'o':
-            outfile = string(optarg);
+            outfile = std::string(optarg);
             break;
 
         case 'c':
-            document_class = string(optarg);
+            document_class = std::string(optarg);
             break;
 
         case 'l':
             return list_document_classes(out, err);
 
         case 'g': {
-            language = string(optarg);
+            language = std::string(optarg);
 
             if (not validate_language(language)) {
                 err << message::failure("Language " + language + " not find or supported\n");
@@ -305,7 +305,7 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
     }
 
     if (not outfile.empty()) {
-        ofstream of(outfile);
+        std::ofstream of(outfile);
 
         if (!of)
             return CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE;

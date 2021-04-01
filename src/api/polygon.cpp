@@ -93,15 +93,15 @@ get_problem_solutions(const types::polygon::Credentials &creds, const std::strin
     return solutions;
 }
 
-string generate_api_sig(const string &method_name, const httplib::Params &params,
-                        const types::polygon::Credentials &creds) {
-    string params_str;
-    string delimiters{"?&"};
+std::string generate_api_sig(const std::string &method_name, const httplib::Params &params,
+                             const types::polygon::Credentials &creds) {
+    std::string params_str;
+    std::string delimiters{"?&"};
 
     auto rand_int = rand() % 1000000;
 
-    string rand_str = std::to_string(rand_int);
-    string zero_padding;
+    std::string rand_str = std::to_string(rand_int);
+    std::string zero_padding;
     zero_padding.append(6 - rand_str.size(), '0');
     zero_padding += rand_str;
 
@@ -112,7 +112,7 @@ string generate_api_sig(const string &method_name, const httplib::Params &params
     }
 
     auto to_hash = zero_padding + "/" + method_name + params_str + "#" + creds.secret;
-    string hashed = util::sha_512(to_hash);
+    std::string hashed = util::sha_512(to_hash);
 
     return zero_padding + hashed;
 }

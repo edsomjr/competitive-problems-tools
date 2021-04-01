@@ -13,7 +13,7 @@
 #include "util.h"
 
 // Raw strings
-static const string help_message{
+static const std::string help_message{
     R"message(
 Validates the connection to the Polygon API using the credentials in ~/.cp-tools-config.json.
 It is possible to define the credentials file or pass them in command line.
@@ -38,8 +38,8 @@ The options are:
 namespace cptools::commands::polygon {
 
 // Global variables
-std::unordered_map<string, int (*)(int, char *const[], ostream &, ostream &)> commands{
-    {"pull", pull::run}};
+std::unordered_map<std::string, int (*)(int, char *const[], std::ostream &, std::ostream &)>
+    commands{{"pull", pull::run}};
 
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {"key", required_argument, NULL, 'k'},
@@ -48,11 +48,11 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {0, 0, 0, 0}};
 
 // Auxiliary routines
-string usage() { return "Usage: " NAME " polygon [-h]"; }
+std::string usage() { return "Usage: " NAME " polygon [-h]"; }
 
-string help() { return usage() + help_message; }
+std::string help() { return usage() + help_message; }
 
-types::polygon::Credentials get_credentials_from_file(const string &filepath) {
+types::polygon::Credentials get_credentials_from_file(const std::string &filepath) {
     nlohmann::json loaded_json;
     loaded_json = util::read_json_file(filepath);
 
@@ -67,10 +67,10 @@ types::polygon::Credentials get_credentials_from_file(const string &filepath) {
 }
 
 // API functions
-int run(int argc, char *const argv[], ostream &out, ostream &err) {
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
     types::polygon::Credentials creds;
-    string creds_file{fs::get_default_config_path()};
+    std::string creds_file{fs::get_default_config_path()};
     bool creds_from_cmd{false};
     bool creds_from_file{false};
 
@@ -88,17 +88,17 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
             return 0;
 
         case 'k':
-            creds.key = string(optarg);
+            creds.key = std::string(optarg);
             creds_from_cmd = true;
             break;
 
         case 's':
-            creds.secret = string(optarg);
+            creds.secret = std::string(optarg);
             creds_from_cmd = true;
             break;
 
         case 'c':
-            creds_file = string(optarg);
+            creds_file = std::string(optarg);
             creds_from_file = true;
             break;
 
@@ -119,7 +119,7 @@ int run(int argc, char *const argv[], ostream &out, ostream &err) {
         try {
             creds = get_credentials_from_file(creds_file);
         } catch (const exceptions::inexistent_file_error &e) {
-            err << message::failure(string(e.what()));
+            err << message::failure(std::string(e.what()));
             return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
         }
     }

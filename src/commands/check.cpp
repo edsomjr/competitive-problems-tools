@@ -14,8 +14,6 @@
 #include "task.h"
 #include "util.h"
 
-using namespace std;
-
 // Raw strings
 static const std::string help_message{
     R"message(
@@ -137,7 +135,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
-    out << message::info("Testing the checker (" + to_string(tests.size()) + " tests) ...\n");
+    out << message::info("Testing the checker (" + std::to_string(tests.size()) + " tests) ...\n");
 
     for (auto [input, data] : tests) {
         auto [output, verdict] = data;
@@ -170,7 +168,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
         auto got = sh::execute(checker, args, "", "");
 
         if (got.rc != expected) {
-            ostringstream oss;
+            std::ostringstream oss;
 
             oss << got.output;
             oss << "Got: " << mcodes[got.rc] << ", expected: " << mcodes[expected] << '\n';
@@ -220,12 +218,13 @@ int validate_validator(std::ostream &out, std::ostream &err) {
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
-    out << message::info("Testing the validator (" + to_string(tests.size()) + " tests) ...\n");
+    out << message::info("Testing the validator (" + std::to_string(tests.size()) +
+                         " tests) ...\n");
 
     for (auto [input, verdict] : tests) {
         auto result = sh::execute(program, "", input, "");
 
-        string res = (result.output.find("FAIL") == string::npos ? "OK" : "INVALID");
+        std::string res = (result.output.find("FAIL") == std::string::npos ? "OK" : "INVALID");
 
         if (verdict != res) {
             err << message::failure("Input '" + input + " is invalid: expected = '" + verdict +
@@ -272,7 +271,7 @@ int validate_tests(std::ostream &out, std::ostream &err) {
         return CP_TOOLS_ERROR_CHECK_MISSING_IO_FILES;
     }
 
-    out << message::info("Validating the input files (" + to_string(io_files.size()) +
+    out << message::info("Validating the input files (" + std::to_string(io_files.size()) +
                          " tests) ...\n");
 
     for (auto [input, _] : io_files) {
