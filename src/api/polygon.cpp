@@ -41,12 +41,6 @@ bool test_connection(const types::polygon::Credentials &creds) {
 std::string get_problem_file_name(const std::string &tool_type,
                                   const types::polygon::Credentials &creds,
                                   const std::string &problem_id) {
-    const std::vector<std::string> valid_tools = {"checker", "validator"};
-    auto found = std::find(valid_tools.begin(), valid_tools.end(), tool_type);
-    if (found == valid_tools.end())
-        throw(
-            exceptions::polygon_api_error("Trying to get file for invalid resource: " + tool_type));
-
     httplib::Params params;
     params.emplace("problemId", problem_id);
     auto result = get("problem." + tool_type, creds, params);
@@ -107,8 +101,7 @@ std::string generate_api_sig(const std::string &method_name, const httplib::Para
 
     for (const auto &[key, val] : params) {
         auto delimiter = delimiters[params_str.size() > 0];
-        auto val_encoded = httplib::detail::encode_query_param(val);
-        params_str += delimiter + key + "=" + val_encoded;
+        params_str += delimiter + key + "=" + val;
     }
 
     auto to_hash = zero_padding + "/" + method_name + params_str + "#" + creds.secret;
