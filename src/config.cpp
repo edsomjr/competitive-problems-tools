@@ -24,8 +24,6 @@ std::vector<std::string> get_solutions_file_names(const nlohmann::json &json_obj
 
     if (tag == "default") {
         auto file_name = util::get_json_value<std::string>(json_object, path, "");
-        if (file_name == "")
-            throw(exceptions::invalid_config_error("No valid default solution found"));
         return std::vector<std::string>{file_name};
     }
 

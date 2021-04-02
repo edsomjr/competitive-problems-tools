@@ -32,15 +32,6 @@ struct polygon_api_error : std::exception {
     const char *what() const noexcept override { return this->what_message.c_str(); }
 };
 
-struct invalid_config_error : std::exception {
-    std::string what_message;
-
-  public:
-    invalid_config_error(const std::string &msg) : what_message("Invalid config.json: " + msg) {}
-
-    const char *what() const noexcept override { return this->what_message.c_str(); }
-};
-
 } // namespace cptools::exceptions
 
 #endif
