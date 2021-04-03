@@ -17,7 +17,8 @@ SCENARIO("Command polygon", "[polygon]") {
 
     GIVEN("An execution of the command") {
         std::filesystem::remove(user_config_path + ".bkp");
-        std::filesystem::copy_file(user_config_path, user_config_path + ".bkp");
+        if(std::filesystem::exists(user_config_path))
+            std::filesystem::copy_file(user_config_path, user_config_path + ".bkp");
 
         WHEN("There is no options") {
             AND_WHEN("There's no credentials file in user's home") {
@@ -123,7 +124,8 @@ SCENARIO("Command polygon", "[polygon]") {
         }
 
         std::filesystem::remove(user_config_path);
-        std::filesystem::copy_file(user_config_path + ".bkp", user_config_path);
+        if(std::filesystem::exists(user_config_path + ".bkp"))
+            std::filesystem::copy_file(user_config_path + ".bkp", user_config_path);
         std::filesystem::remove(user_config_path + ".bkp");
     }
 }
