@@ -2,10 +2,6 @@
 #define CP_TOOLS_FORMAT_H
 
 #include <string>
-#include <vector>
-
-using std::string;
-using std::vector;
 
 namespace cptools::format {
 
@@ -55,7 +51,7 @@ constexpr long long FLOAT = color::BEIGE;
 constexpr long long COUNTER = color::CYAN;
 } // namespace style
 
-string apply(const string &text, long long specs, size_t size = 0);
+std::string apply(const std::string &text, long long specs, size_t size = 0);
 
 } // namespace cptools::format
 

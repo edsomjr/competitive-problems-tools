@@ -4,18 +4,11 @@
 #include <map>
 #include <sstream>
 
-using std::istringstream;
-using std::left;
-using std::map;
-using std::max;
-using std::ostringstream;
-using std::setw;
-
 namespace cptools::format {
 
 static constexpr long long END = 0;
 
-static map<long long, string> codes{
+static std::map<long long, std::string> codes{
     {END, "\033[0m"},
     {color::BLACK, "\033[30m"},
     {color::RED, "\033[91m"},
@@ -33,21 +26,21 @@ static map<long long, string> codes{
     {emph::UNDERLINE, "\033[4m"},
 };
 
-string apply(const string &text, long long specs, size_t size) {
-  ostringstream oss;
+std::string apply(const std::string &text, long long specs, size_t size) {
+    std::ostringstream oss;
 
-  for (long long mask = 1024; mask <= specs; mask <<= 1)
-    if (mask & specs)
-      oss << codes[mask];
+    for (long long mask = 1024; mask <= specs; mask <<= 1)
+        if (mask & specs)
+            oss << codes[mask];
 
-  if (specs & align::LEFT)
-    oss << left;
+    if (specs & align::LEFT)
+        oss << std::left;
 
-  size = max(size, text.size());
+    size = std::max(size, text.size());
 
-  oss << setw(size) << text << codes[END];
+    oss << std::setw(size) << text << codes[END];
 
-  return oss.str();
+    return oss.str();
 }
 
 } // namespace cptools::format

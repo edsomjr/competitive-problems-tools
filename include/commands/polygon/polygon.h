@@ -6,17 +6,14 @@
 #include "api/polygon.h"
 #include "types/polygon.h"
 
-using std::ostream;
-using std::string;
-
 namespace cptools::commands::polygon {
 
-int run(int argc, char *const argv[], ostream &out, ostream &err);
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
 
-types::polygon::Credentials get_credentials_from_file(const string &filepath);
+types::polygon::Credentials get_credentials_from_file(const std::string &filepath);
 
-string help();
-string usage();
+std::string help();
+std::string usage();
 
 } // namespace cptools::commands::polygon
 

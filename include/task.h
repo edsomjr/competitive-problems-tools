@@ -5,11 +5,6 @@
 #include <string>
 #include <vector>
 
-using std::ostream;
-using std::pair;
-using std::string;
-using std::vector;
-
 // Problem preparation related tasks
 namespace cptools::task {
 
@@ -21,14 +16,14 @@ constexpr int INTERACTOR = 8;
 constexpr int ALL = CHECKER | VALIDATOR | GENERATOR | INTERACTOR;
 } // namespace tools
 
-vector<pair<string, string>> generate_io_files(const string &testset,
-                                               ostream &out, ostream &err,
-                                               bool gen_output = true);
+std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string &testset,
+                                                                   std::ostream &out,
+                                                                   std::ostream &err,
+                                                                   bool gen_output = true);
 
-int build_tools(string &error, int tools = tools::ALL,
-                const string &where = ".");
-int gen_exe(string &error, const string &source, const string &dest,
-            const string &where = ".");
+int build_tools(std::string &error, int tools = tools::ALL, const std::string &where = ".");
+int gen_exe(std::string &error, const std::string &source, const std::string &dest,
+            const std::string &where = ".");
 
 } // namespace cptools::task
 
