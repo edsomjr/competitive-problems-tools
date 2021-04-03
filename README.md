@@ -125,9 +125,9 @@ $ ./cp-run_tests
 
 ### Polygon connection tests
 
-If you are using Travis on your own fork you must add the environment variables `POLYGON_KEY` and `POLYGON_SECRET` following the [official tutorial](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings).
+On a local run of the tests you need to set both environment variables: `POLYGON_KEY` and `POLYGON_SECRET`.
 
-On a local run it will prioritize the environment variables described above, but having valid credentials in your `~/.cp-tools-config.json` will work also.
+If you are using Travis on your own fork you must add the environment variables `POLYGON_KEY` and `POLYGON_SECRET` following the [official tutorial](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings).
 
 ## Technologies
 
