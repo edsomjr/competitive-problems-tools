@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <getopt.h>
 #include <string>
 
@@ -49,25 +50,31 @@ void get_solutions(const types::polygon::Credentials &creds, const std::string &
 
 void save_solution(const types::polygon::Solution &s, const types::polygon::Credentials &creds,
                    const std::string &problem_id) {
-    auto config = config::read_config_file();
-    auto files_with_same_tag = config::get_solutions_file_names(config, s.tag);
+    auto config_file = config::read_config_file();
+    auto files_with_same_tag = config::get_solutions_file_names(s.tag);
     auto file_content = api::polygon::get_problem_file(s.name, "solution", creds, problem_id);
 
-    // TODO: if the solution has tag default (main solution) and the config.json
-    // default solution is not the same name, the overwrite doesnt happen.
-    // It is also possible for the default to have an empty string as return.
-
-    for (const auto &file_name : files_with_same_tag) {
-        auto splitted_file_name = util::split(file_name, '/');
-        auto real_file_name = splitted_file_name.back();
-        if (real_file_name != s.name)
-            continue;
-        fs::overwrite_file(file_name, file_content);
+    if (s.tag == "default") {
+        const auto current_default = files_with_same_tag[0];
+        const auto file_path = std::filesystem::path(current_default);
+        if (file_path.filename() != s.name) {
+            fs::remove(current_default);
+            config::modify_config_file("solutions|default", s.name);
+        }
+        fs::overwrite_file(file_path, file_content);
+        return;
     }
 
-    // TODO: if got here then that's a new file, we have to add to config.json
-    // right tag, and then write the content to it. If the problem's tag is
-    // default we overwrite the value instead of appending.
+    for (const auto &file_name : files_with_same_tag) {
+        auto file_path = std::filesystem::path(file_name);
+        if (file_path.filename() != s.name)
+            continue;
+        fs::overwrite_file(file_name, file_content);
+        return;
+    }
+
+    config::modify_config_file("solutions|" + s.tag, s.name, "add");
+    fs::overwrite_file("solutions/" + s.name, file_content);
 }
 
 // API

@@ -15,8 +15,7 @@ nlohmann::json read_config_file();
 std::string get_polygon_problem_id(const nlohmann::json &json_object);
 std::string get_tool_file_name(const nlohmann::json &json_object, const std::string &tool);
 
-std::vector<std::string> get_solutions_file_names(const nlohmann::json &json_object,
-                                                  const std::string &tag);
+std::vector<std::string> get_solutions_file_names(const std::string &tag);
 
 template <typename T>
 void modify_config_file(const std::string &path, T new_value, const std::string &op = "replace") {

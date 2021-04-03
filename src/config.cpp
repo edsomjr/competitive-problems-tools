@@ -18,8 +18,8 @@ std::string get_tool_file_name(const nlohmann::json &json_object, const std::str
     return file_name;
 }
 
-std::vector<std::string> get_solutions_file_names(const nlohmann::json &json_object,
-                                                  const std::string &tag) {
+std::vector<std::string> get_solutions_file_names(const std::string &tag) {
+    const auto config_json = read_config_file();
     const std::string path = "solutions|" + tag;
 
     if (tag == "default") {
@@ -27,7 +27,7 @@ std::vector<std::string> get_solutions_file_names(const nlohmann::json &json_obj
         return std::vector<std::string>{file_name};
     }
 
-    auto file_names = util::get_json_value<std::vector<std::string>>(json_object, path, {});
+    auto file_names = util::get_json_value<std::vector<std::string>>(config_json, path, {});
     return file_names;
 }
 
