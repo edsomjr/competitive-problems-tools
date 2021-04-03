@@ -33,9 +33,14 @@ httplib::Result get(std::string method, const types::polygon::Credentials &creds
 
 bool test_connection(const types::polygon::Credentials &creds) {
     httplib::Params params{};
-    auto result = get("problems.list", creds, params);
 
-    return result->status == 200;
+    try {
+        get("problems.list", creds, params);
+    } catch (const exceptions::polygon_api_error &e) {
+        return false;
+    }
+
+    return true;
 }
 
 std::string get_problem_file_name(const std::string &tool_type,
