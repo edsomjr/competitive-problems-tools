@@ -112,4 +112,18 @@ nlohmann::json read_json_file(const std::string &config_file_path) {
     return config;
 }
 
+std::string to_json_pointer(const std::string &s) {
+    if (not s.length())
+        return s;
+
+    std::string pointer;
+    if (s[0] != '/')
+        pointer += "/";
+
+    pointer.append(s);
+    std::replace(pointer.begin(), pointer.end(), '|', '/');
+
+    return pointer;
+}
+
 } // namespace cptools::util
