@@ -54,7 +54,8 @@ void save_solution(const types::polygon::Solution &s, const types::polygon::Cred
     auto file_content = api::polygon::get_problem_file(s.name, "solution", creds, problem_id);
 
     // TODO: if the solution has tag default (main solution) and the config.json
-    // default solution is not the same name, the overwrite doesnt happen
+    // default solution is not the same name, the overwrite doesnt happen.
+    // It is also possible for the default to have an empty string as return.
 
     for (const auto &file_name : files_with_same_tag) {
         auto splitted_file_name = util::split(file_name, '/');
