@@ -43,9 +43,9 @@ int copy_template_files(const std::string &dest, std::ostream &out, std::ostream
     // Copy templates to the directory
     auto res = cptools::fs::copy(CP_TOOLS_TEMPLATES_DIR, dest, true);
     if (not res.ok)
-        err << message::failure(res.error_message);
+        err << message::failure(res.error_message) << "\n";
     else
-        out << message::success();
+        out << message::success() << "\n";
 
     return res.rc;
 }

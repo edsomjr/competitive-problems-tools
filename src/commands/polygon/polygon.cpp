@@ -119,7 +119,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         try {
             creds = get_credentials_from_file(creds_file);
         } catch (const exceptions::inexistent_file_error &e) {
-            err << message::failure(std::string(e.what()));
+            err << message::failure(std::string(e.what())) << "\n";
             return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
         }
     }
