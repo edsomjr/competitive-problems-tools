@@ -12,7 +12,7 @@
 namespace cptools::task {
 
 std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string &testset,
-                                                                   std::ostream &out,
+                                                                   std::ostream &,
                                                                    std::ostream &err,
                                                                    bool gen_output) {
     std::vector<std::string> sets{"samples", "manual", "random"};
@@ -33,8 +33,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
 
     auto directories = {input_dir, output_dir};
     for (auto &dir : directories) {
-        out << message::info("Creating directory " + dir);
-        auto fs_res = fs::create_directory(input_dir);
+        auto fs_res = fs::create_directory(dir);
         if (not fs_res.ok) {
             err << message::failure(fs_res.error_message);
             return {};
@@ -101,7 +100,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
             for (auto [input, comment] : inputs) {
                 std::string dest{input_dir + std::to_string(next++)};
 
-                auto res = fs::copy(input, dest);
+                auto res = fs::copy(input, dest, true);
                 if (not res.ok) {
                     err << message::failure(res.error_message);
                     return {};
