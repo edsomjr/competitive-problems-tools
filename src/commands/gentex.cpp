@@ -234,8 +234,21 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 
     out << "\\end{samples}\n\n";
 
-    out << "\\begin{problemnotes}{tex/" << language << "/notes}\n";
-    out << "\\end{problemnotes}\n\n";
+    auto notes { util::get_json_value(config, "problem|notes",
+        std::vector<std::string> { "Notas", "Notes" }) }; 
+
+    out << "\% notes: ";
+    for (auto x : notes)
+        out << x << " ";
+    out << '\n';
+
+    if (notes.front() == "Notas") {
+        out << "\\begin{problemnotes}{tex/" << language << "/notes}\n";
+        out << "\\end{problemnotes}\n\n";
+    } else {
+        out << "\\begin{customnotes}{" << notes.front() << "}{" << notes.back() << "}{tex/" << language << "/notes}\n";
+        out << "\\end{customnotes}\n\n";
+    }
 
     out << "\\trailer{" << event << "}{" << author << "}\n\n";
 

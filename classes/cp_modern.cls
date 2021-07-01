@@ -136,3 +136,14 @@
 }
 {
 }
+
+\newenvironment{customnotes}[3]{
+	\bigskip
+	\begin{large}
+		\textbf{\translate{#1}{#2}} \\
+	\end{large}
+
+    \input{#3}
+}
+{
+}
