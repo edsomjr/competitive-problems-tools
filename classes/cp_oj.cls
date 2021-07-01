@@ -119,10 +119,10 @@
 }
 
 \newenvironment{customnotes}[3]{
-	\bigskip
-	\begin{large}
-		\textbf{\translate{#1}{#2}} \\
-	\end{large}
+
+	\begin{flushleft}
+		\textcolor{red}{\textbf{\translate{#1}{#2}}} \\
+	\end{flushleft}
 
     \input{#3}
 }

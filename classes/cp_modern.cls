@@ -139,9 +139,9 @@
 
 \newenvironment{customnotes}[3]{
 	\bigskip
-	\begin{large}
+	\begin{flushleft}
 		\textbf{\translate{#1}{#2}} \\
-	\end{large}
+	\end{flushleft}
 
     \input{#3}
 }
