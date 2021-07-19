@@ -15,6 +15,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
                                                                    std::ostream &,
                                                                    std::ostream &err,
                                                                    bool gen_output) {
+
     std::vector<std::string> sets{"samples", "manual", "random"};
 
     auto it = std::find(sets.begin(), sets.end(), testset);
@@ -30,6 +31,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
 
     auto config = cptools::config::read_config_file();
     auto source = cptools::util::get_json_value(config, "solutions|default", std::string("ERROR"));
+    source = "solutions/" + source;
 
     auto directories = {input_dir, output_dir};
     for (auto &dir : directories) {
