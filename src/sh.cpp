@@ -164,7 +164,8 @@ Result build(const std::string &output, const std::string &src) {
     auto res = fs::is_file(src);
 
     if (not res.ok)
-        return {CP_TOOLS_ERROR_SH_FILE_NOT_FOUND, std::string("File ") + src + std::string(" not found")};
+        return {CP_TOOLS_ERROR_SH_FILE_NOT_FOUND,
+                std::string("File ") + src + std::string(" not found")};
 
     if (x <= y) {
         return {CP_TOOLS_OK, ""};
