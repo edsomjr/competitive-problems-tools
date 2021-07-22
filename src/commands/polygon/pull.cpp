@@ -37,7 +37,7 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
     auto file_content =
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
     auto config = config::read_config_file();
-    auto local_file_name = config::pull_tool_file_name(config, tool_name);
+    auto local_file_name = config::get_tool_file_name(config, tool_name);
     fs::overwrite_file(local_file_name, file_content);
 }
 
@@ -51,18 +51,18 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
 
     for (const auto &solution : solutions) {
-        auto files_with_same_tag = config::get_solutions_file_names(s.tag);
+        auto files_with_same_tag = config::get_solutions_file_names(solution.tag);
         auto file_content = 
             api::polygon::get_problem_file(solution.name, "solution", creds, problem_id);
 
         fs::overwrite_file(solution.name, file_content);
 
-        auto found = std::find(files_with_same_tag.begin(), files_with_same_tag.end(), s.name);
+        auto found = std::find(files_with_same_tag.begin(), files_with_same_tag.end(), solution.name);
 
         if (solution.tag == "default") {
-            config::modify_config_file("solutions|default", s.name);
+            config::modify_config_file("solutions|default", solution.name);
         } else if (found == files_with_same_tag.end()) {
-            config::modify_config_file("solutions|" + s.tag, s.name, "add");
+            config::modify_config_file("solutions|" + solution.tag, solution.name, "add");
         }
     }
 }
