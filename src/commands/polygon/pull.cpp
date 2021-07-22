@@ -31,50 +31,60 @@ The options are:
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
 
 // Functions
-void get_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
-                   const std::string &problem_id) {
+void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
+                    const std::string &problem_id) {
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
     auto file_content =
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
     auto config = config::read_config_file();
-    auto local_file_name = config::get_tool_file_name(config, tool_name);
+    auto local_file_name = config::pull_tool_file_name(config, tool_name);
     fs::overwrite_file(local_file_name, file_content);
 }
 
-void get_solutions(const types::polygon::Credentials &creds, const std::string &problem_id) {
+/**
+ * @brief Get the solutions objects from the Polygon API and writes them to the filesystem.
+ *
+ * @param creds credentials data structure.
+ * @param problem_id` Polygon's problem ID.
+ */
+void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id) {
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
+
     for (const auto &solution : solutions) {
-        save_solution(solution, creds, problem_id);
+        auto files_with_same_tag = config::get_solutions_file_names(s.tag);
+        auto file_content = 
+            api::polygon::get_problem_file(solution.name, "solution", creds, problem_id);
+
+        fs::overwrite_file(solution.name, file_content);
+
+        auto found = std::find(files_with_same_tag.begin(), files_with_same_tag.end(), s.name);
+
+        if (solution.tag == "default") {
+            config::modify_config_file("solutions|default", s.name);
+        } else if (found == files_with_same_tag.end()) {
+            config::modify_config_file("solutions|" + s.tag, s.name, "add");
+        }
     }
 }
 
+/**
+ * @brief Receives a Polygon problem solution and saves it to the local file system.
+ *
+ * @param s solution data structure.
+ * @param creds credentials data structure.
+ * @param problem_id Polygon's problem ID.
+ */
 void save_solution(const types::polygon::Solution &s, const types::polygon::Credentials &creds,
                    const std::string &problem_id) {
-    auto config_file = config::read_config_file();
     auto files_with_same_tag = config::get_solutions_file_names(s.tag);
     auto file_content = api::polygon::get_problem_file(s.name, "solution", creds, problem_id);
 
-    if (s.tag == "default") {
-        const auto current_default = files_with_same_tag[0];
-        const auto file_path = std::filesystem::path(current_default);
-        if (file_path.filename() != s.name) {
-            fs::remove(current_default);
-            config::modify_config_file("solutions|default", s.name);
-        }
-        fs::overwrite_file(file_path, file_content);
-        return;
-    }
+    fs::overwrite_file(s.name, file_content);
 
-    for (const auto &file_name : files_with_same_tag) {
-        auto file_path = std::filesystem::path(file_name);
-        if (file_path.filename() != s.name)
-            continue;
-        fs::overwrite_file(file_name, file_content);
-        return;
+    auto found = std::find(files_with_same_tag.begin(), files_with_same_tag.end(), s.name);
+    if (found != files_with_same_tag.end()) {
+        config::modify_config_file("solutions|" + s.tag, s.name, "add");
     }
-
-    config::modify_config_file("solutions|" + s.tag, s.name, "add");
-    fs::overwrite_file("solutions/" + s.name, file_content);
 }
 
 // API
@@ -111,9 +121,9 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     auto creds = polygon::get_credentials_from_file(config_path);
 
     try {
-        get_tool_file("checker", creds, problem_id);
-        get_tool_file("validator", creds, problem_id);
-        get_solutions(creds, problem_id);
+        pull_tool_file("checker", creds, problem_id);
+        pull_tool_file("validator", creds, problem_id);
+        pull_solutions(creds, problem_id);
         // get_tests();
     } catch (const exceptions::polygon_api_error &e) {
         err << message::failure(e.what());
