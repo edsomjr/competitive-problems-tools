@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <getopt.h>
+#include <set>
 #include <string>
 
 #include "commands/polygon/polygon.h"
@@ -52,17 +53,21 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
 
     for (const auto &solution : solutions) {
         auto files_with_same_tag = config::get_solutions_file_names(solution.tag);
-        auto file_content = 
+        auto file_content =
             api::polygon::get_problem_file(solution.name, "solution", creds, problem_id);
 
         fs::overwrite_file(solution.name, file_content);
 
-        auto found = std::find(files_with_same_tag.begin(), files_with_same_tag.end(), solution.name);
+        auto found =
+            std::find(files_with_same_tag.begin(), files_with_same_tag.end(), solution.name);
 
         if (solution.tag == "default") {
             config::modify_config_file("solutions|default", solution.name);
         } else if (found == files_with_same_tag.end()) {
-            config::modify_config_file("solutions|" + solution.tag, solution.name, "add");
+            std::set<std::string> files(files_with_same_tag.begin(), files_with_same_tag.end());
+            files.insert(solution.name);
+
+            config::modify_config_file("solutions|" + solution.tag, files);
         }
     }
 }
