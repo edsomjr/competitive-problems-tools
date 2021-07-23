@@ -30,7 +30,7 @@ const Result create_directory(const std::string &path) {
 
     bool created = false;
     try {
-        created = std::filesystem::create_directory(path);
+        created = std::filesystem::create_directories(path);
     } catch (const std::filesystem::filesystem_error &err) {
         return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY, err);
     }
