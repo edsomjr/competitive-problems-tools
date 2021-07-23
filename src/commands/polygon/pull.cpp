@@ -72,26 +72,6 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
     }
 }
 
-/**
- * @brief Receives a Polygon problem solution and saves it to the local file system.
- *
- * @param s solution data structure.
- * @param creds credentials data structure.
- * @param problem_id Polygon's problem ID.
- */
-void save_solution(const types::polygon::Solution &s, const types::polygon::Credentials &creds,
-                   const std::string &problem_id) {
-    auto files_with_same_tag = config::get_solutions_file_names(s.tag);
-    auto file_content = api::polygon::get_problem_file(s.name, "solution", creds, problem_id);
-
-    fs::overwrite_file(s.name, file_content);
-
-    auto found = std::find(files_with_same_tag.begin(), files_with_same_tag.end(), s.name);
-    if (found != files_with_same_tag.end()) {
-        config::modify_config_file("solutions|" + s.tag, s.name, "add");
-    }
-}
-
 // API
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
