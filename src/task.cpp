@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <fstream>
 
 #include "config.h"
 #include "dirs.h"
@@ -31,18 +30,15 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
     auto config = cptools::config::read_config_file();
     auto source = cptools::util::get_json_value(config, "solutions|default", std::string("ERROR"));
 
-std::ofstream log("log.txt");
-log << "[GenIO] Aqui\n"; 
     auto directories = {input_dir, output_dir};
     for (auto &dir : directories) {
-        log << "   criando diretório " << dir << '\n';
         auto fs_res = fs::create_directory(dir);
         if (not fs_res.ok) {
             err << message::failure(fs_res.error_message);
             return {};
         }
     }
-log.close();
+
     if (source == "ERROR") {
         err << message::failure("Default solution file not found!\n");
         return {};
