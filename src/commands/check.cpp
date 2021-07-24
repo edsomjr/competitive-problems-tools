@@ -308,6 +308,16 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         case 'v':
             return validate_validator(out, err);
 
+        case 'a':
+            for(auto func : { validate_checker, validate_tests, validate_validator}) {
+                auto rtn = func(out, err);
+
+                if(rtn) {
+                    return rtn;
+                }
+            }
+            return 0;
+
         default:
             err << help() << '\n';
             return CP_TOOLS_ERROR_CLEAN_INVALID_OPTION;
