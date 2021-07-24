@@ -33,7 +33,7 @@ Generate a LaTeX file from the problem description. The options are:
     -c              Document class that will be used. The default value
     --class         is 'cp_modern'.
 
-    -g              Problem language. The default value is 'en_US'.
+    -g              Problem language. The default value is 'pt_BR'.
     --lang
 
     -l              Lists all available document classes.
