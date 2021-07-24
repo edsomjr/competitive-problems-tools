@@ -22,12 +22,12 @@ static const std::string help_message{
 Generate a PDF file from the problem description. The options are:
 
     -b              Defines the problem label. The default value is 'A'.
-    --label         
+    --label
 
-    -c              Document class that will be used. The default value 
+    -c              Document class that will be used. The default value
     --class         is 'cp_modern'.
 
-    -g              Problem language. The default value is 'en_US'.
+    -g              Problem language. The default value is 'pt_BR'.
     --lang
 
     -h              Displays this help.
@@ -37,7 +37,7 @@ Generate a PDF file from the problem description. The options are:
     --list
 
     -o              Output file. If omitted, the output will be the file 'problem.pdf'.
-    --output        
+    --output
 
     -t              Generates the PDF for the problem's tutorial.
     --tutorial

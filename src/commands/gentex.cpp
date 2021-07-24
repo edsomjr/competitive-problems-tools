@@ -25,15 +25,15 @@ Generate a LaTeX file from the problem description. The options are:
     --help
 
     -o              Output file. If omitted, the output will be written on stdout.
-    --output        
+    --output
 
     -b              Defines the problem label. The default value is 'A'.
-    --label         
+    --label
 
     -c              Document class that will be used. The default value
     --class         is 'cp_modern'.
 
-    -g              Problem language. The default value is 'en_US'.
+    -g              Problem language. The default value is 'pt_BR'.
     --lang
 
     -l              Lists all available document classes.
@@ -194,10 +194,10 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 
     auto lang{languages.at(language)};
     auto event{util::get_json_value(config, "problem|contest", std::string())};
-    auto author{util::get_json_value(config, "problem|author", std::string())};
+    auto author{util::get_json_value(config, "author|name", std::string())};
     auto title{util::get_json_value(config, "problem|title|" + language, std::string("Título"))};
-    auto timelimit{util::get_json_value(config, "problem|timelimit", 1.0)};
-    int memorylimit = round(util::get_json_value(config, "problem|memory_limit", 256.0));
+    auto timelimit{util::get_json_value(config, "problem|timelimit", 1)};
+    auto memorylimit = round(util::get_json_value(config, "problem|memory_limit", 256));
 
     auto c1_size = util::get_json_value(config, "PDF|first_column_size", std::string("6cm"));
     auto c2_size = util::get_json_value(config, "PDF|second_column_size", std::string("8cm"));
