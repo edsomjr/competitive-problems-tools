@@ -35,7 +35,6 @@ The options are:
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
 
 // Functions
-
 /**
  * @brief Pulls from the Polygon API the file for the given tool.
  *
@@ -47,7 +46,8 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
                     const std::string &problem_id, bool forced) {
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
-    auto local_file_name = config::get_tool_file_name(tool_name);
+    auto local_file_name =
+        config::get_tool_file_name(tool_name); // TODO: dir/file must be transformed to file
 
     auto file_content =
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
@@ -58,12 +58,22 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
     auto different_hashes = local_file_sha_512 != polygon_file_sha_512;
     auto equal_names = !fs::equivalent(local_file_name, polygon_file_name).ok;
 
+    // different_hashes and equal_names
+    // 1 1 -> same names and different content -> conflict
+    // 0 1 -> same content and equal names -> do nothing
+    // 1 0 -> different content and different names -> create new file and leave old one
+    // 0 0 -> same content and different names -> create new file and delete old one
     if (forced) {
-        fs::overwrite_file(local_file_name, file_content);
+        // fs::remove(local_file_name);
+        // TODO: save to the right dir, there's no default dir yet
+        // fs::overwrite_file(local_file_name, file_content);
     } else if (different_hashes and equal_names) {
         // TODO: conflict, same names but different content
     } else if (not equal_names) {
-        // TODO: conflict, different names
+        // TODO: create new file and write to it
+        if (not different_hashes) {
+            // TODO: erase old file
+        }
     }
 }
 
