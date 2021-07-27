@@ -27,29 +27,59 @@ The options are:
 
     -h              Generates this help message.
     --help
+
+    -f              Overwrites the existing problem's files.
+    --force
 )message"};
 
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
 
 // Functions
+
+/**
+ * @brief Pulls from the Polygon API the file for the given tool.
+ *
+ * @param tool_name name of the tool to pull
+ * @param creds credentials data structure
+ * @param problem_id Polygon's problem ID
+ * @param forced if it should overwrite the existing files
+ */
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
-                    const std::string &problem_id) {
+                    const std::string &problem_id, bool forced) {
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
+    auto local_file_name = config::get_tool_file_name(tool_name);
+
     auto file_content =
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
-    auto config = config::read_config_file();
-    auto local_file_name = config::get_tool_file_name(config, tool_name);
-    fs::overwrite_file(local_file_name, file_content);
+
+    auto local_file_sha_512 = fs::sha_512_file(local_file_name);
+    auto polygon_file_sha_512 = util::sha_512(file_content);
+
+    auto different_hashes = local_file_sha_512 != polygon_file_sha_512;
+    auto equal_names = !fs::equivalent(local_file_name, polygon_file_name).ok;
+
+    if (forced) {
+        fs::overwrite_file(local_file_name, file_content);
+    } else if (different_hashes and equal_names) {
+        // TODO: conflict, same names but different content
+    } else if (not equal_names) {
+        // TODO: conflict, different names
+    }
 }
 
 /**
  * @brief Get the solutions objects from the Polygon API and writes them to the filesystem.
  *
- * @param creds credentials data structure.
- * @param problem_id` Polygon's problem ID.
+ * @param creds credentials data structure
+ * @param problem_id` Polygon's problem ID
+ * @param forced if it should overwrite the existing files
  */
-void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id) {
+void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id,
+                    bool forced) {
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
+
+    if (!forced)
+        return; // TODO
 
     for (const auto &solution : solutions) {
         auto files_with_same_tag = config::get_solutions_file_names(solution.tag);
@@ -75,11 +105,17 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
 // API
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
+    auto forced = false;
+
     while ((option = getopt_long(argc, argv, "h", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
             out << help_message << "\n";
             return CP_TOOLS_OK;
+
+        case 'f':
+            forced = true;
+            break;
 
         default:
             err << help_message << "\n";
@@ -105,10 +141,9 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     auto creds = polygon::get_credentials_from_file(config_path);
 
     try {
-        pull_tool_file("checker", creds, problem_id);
-        pull_tool_file("validator", creds, problem_id);
-        pull_solutions(creds, problem_id);
-        // get_tests();
+        pull_tool_file("checker", creds, problem_id, forced);
+        pull_tool_file("validator", creds, problem_id, forced);
+        pull_solutions(creds, problem_id, forced);
     } catch (const exceptions::polygon_api_error &e) {
         err << message::failure(e.what());
         return CP_TOOLS_ERROR_POLYGON_API;
