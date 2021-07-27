@@ -6,13 +6,15 @@ namespace cptools::config {
 
 nlohmann::json read_config_file() { return util::read_json_file(config_path_name); }
 
-std::string get_polygon_problem_id(const nlohmann::json &json_object) {
+std::string get_polygon_problem_id() {
+    const auto json_object = read_config_file();
     const std::string path = "problem|polygonId";
     const std::string problem_id = util::get_json_value<std::string>(json_object, path, "");
     return problem_id;
 }
 
-std::string get_tool_file_name(const nlohmann::json &json_object, const std::string &tool) {
+std::string get_tool_file_name(const std::string &tool) {
+    const auto json_object = read_config_file();
     const std::string path = "tools|" + tool;
     const auto file_name = util::get_json_value<std::string>(json_object, path, "");
     return file_name;

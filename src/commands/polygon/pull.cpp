@@ -90,8 +90,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     std::string problem_id = "";
 
     try {
-        auto config_json = config::read_config_file();
-        problem_id = config::get_polygon_problem_id(config_json);
+        problem_id = config::get_polygon_problem_id();
     } catch (const exceptions::inexistent_file_error &e) {
         err << message::failure(e.what()) << "\n";
         return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;

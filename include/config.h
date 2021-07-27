@@ -12,8 +12,8 @@ namespace cptools::config {
 const std::string config_path_name = "config.json";
 
 nlohmann::json read_config_file();
-std::string get_polygon_problem_id(const nlohmann::json &json_object);
-std::string get_tool_file_name(const nlohmann::json &json_object, const std::string &tool);
+std::string get_polygon_problem_id();
+std::string get_tool_file_name(const std::string &tool);
 
 std::vector<std::string> get_solutions_file_names(const std::string &tag);
 
