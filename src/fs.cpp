@@ -145,11 +145,23 @@ std::string get_default_config_path() {
     return config_path;
 }
 
+/**
+ * @brief Reads a file and returns the SHA512 hash of its content.
+ *
+ * @param filename path to the file to be hashed
+ * @return std::string
+ */
 std::string sha_512_file(std::string filename) {
     auto content = read_file(filename);
     return util::sha_512(content);
 }
 
+/**
+ * @brief Reads a file and returns its content as a string.
+ *
+ * @param filename path of the file to be read
+ * @return std::string
+ */
 std::string read_file(std::string filename) {
     std::ifstream file;
     file.open(filename);
