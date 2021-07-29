@@ -62,25 +62,20 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
     auto polygon_file_sha_512 = util::sha_512(file_content);
 
     auto different_hashes = local_file_sha_512 != polygon_file_sha_512;
-    auto equal_names = !fs::equivalent(local_file_path.filename(), polygon_file_path.filename()).ok;
+    auto equal_names = fs::equivalent(local_file_path.filename(), polygon_file_path.filename()).ok;
 
-    // different_hashes and equal_names
-    // 1 1 -> same names and different content -> conflict
-    // 0 1 -> same content and equal names -> do nothing
-    // 1 0 -> different content and different names -> create new file and leave old one
-    // 0 0 -> same content and different names -> create new file and delete old one
     if (forced) {
         fs::remove(local_file_path);
         fs::overwrite_file(new_file_path, file_content);
-        config::modify_config_file("tools|" + tool_name, new_file_path);
     } else if (different_hashes and equal_names) {
         // TODO: conflict, same names but different content
     } else if (not equal_names) {
-        // TODO: create new file and write to it
+        fs::overwrite_file(new_file_path, file_content);
         if (not different_hashes) {
-            // TODO: erase old file
+            fs::remove(local_file_path);
         }
     }
+    config::modify_config_file("tools|" + tool_name, new_file_path);
 }
 
 /**
