@@ -32,7 +32,8 @@ The options are:
     --force
 )message"};
 
-static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
+static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
+                                   {"force", no_argument, NULL, 'f'}};
 
 // Functions
 /**
@@ -46,17 +47,22 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'}};
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
                     const std::string &problem_id, bool forced) {
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
-    auto local_file_name =
-        config::get_tool_file_name(tool_name); // TODO: dir/file must be transformed to file
+    auto local_file_name = config::get_tool_file_name(tool_name);
+
+    auto local_file_path = std::filesystem::path{local_file_name};
+    auto polygon_file_path = std::filesystem::path{polygon_file_name};
+
+    auto new_file_path = std::filesystem::path{local_file_name};
+    new_file_path.replace_filename(polygon_file_path.filename());
 
     auto file_content =
-        api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
+        api::polygon::get_problem_file(polygon_file_path, tool_name, creds, problem_id);
 
-    auto local_file_sha_512 = fs::sha_512_file(local_file_name);
+    auto local_file_sha_512 = fs::sha_512_file(local_file_path);
     auto polygon_file_sha_512 = util::sha_512(file_content);
 
     auto different_hashes = local_file_sha_512 != polygon_file_sha_512;
-    auto equal_names = !fs::equivalent(local_file_name, polygon_file_name).ok;
+    auto equal_names = !fs::equivalent(local_file_path.filename(), polygon_file_path.filename()).ok;
 
     // different_hashes and equal_names
     // 1 1 -> same names and different content -> conflict
@@ -64,9 +70,9 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
     // 1 0 -> different content and different names -> create new file and leave old one
     // 0 0 -> same content and different names -> create new file and delete old one
     if (forced) {
-        // fs::remove(local_file_name);
-        // TODO: save to the right dir, there's no default dir yet
-        // fs::overwrite_file(local_file_name, file_content);
+        fs::remove(local_file_path);
+        fs::overwrite_file(new_file_path, file_content);
+        config::modify_config_file("tools|" + tool_name, new_file_path);
     } else if (different_hashes and equal_names) {
         // TODO: conflict, same names but different content
     } else if (not equal_names) {
@@ -117,7 +123,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
     auto forced = false;
 
-    while ((option = getopt_long(argc, argv, "h", longopts, NULL)) != -1) {
+    while ((option = getopt_long(argc, argv, "hf", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
             out << help_message << "\n";
