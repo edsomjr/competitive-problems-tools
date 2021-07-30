@@ -316,7 +316,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
                     return rtn;
                 }
             }
-            return 0;
+            return CP_TOOLS_OK;
 
         default:
             err << help() << '\n';
