@@ -99,17 +99,7 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
 
         fs::overwrite_file(solution.name, file_content);
 
-        auto found =
-            std::find(files_with_same_tag.begin(), files_with_same_tag.end(), solution.name);
-
-        if (solution.tag == "default") {
-            config::modify_config_file("solutions|default", solution.name);
-        } else if (found == files_with_same_tag.end()) {
-            std::set<std::string> files(files_with_same_tag.begin(), files_with_same_tag.end());
-            files.insert(solution.name);
-
-            config::modify_config_file("solutions|" + solution.tag, files);
-        }
+        config::insert_solution_file_name(solution.tag, solution.name);
     }
 }
 

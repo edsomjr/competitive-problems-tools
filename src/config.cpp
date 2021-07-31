@@ -21,6 +21,31 @@ std::string get_tool_file_name(const std::string &tool) {
 }
 
 /**
+ * @brief Inserts a solution file name in the config file.
+ *
+ * @param tag solution's tag
+ * @param file_name solution's file name
+ */
+void insert_solution_file_name(const std::string &tag, const std::string &file_name) {
+    const auto json_object = read_config_file();
+    const std::string path = "solutions|" + tag;
+
+    auto files_with_tag = get_solutions_file_names(tag);
+    auto found = std::find(files_with_tag.begin(), files_with_tag.end(), file_name);
+
+    if (tag == "default") {
+        modify_config_file(path, file_name);
+        return;
+    }
+
+    if (found == files_with_tag.end()) {
+        files_with_tag.push_back(file_name);
+    }
+
+    modify_config_file(path, files_with_tag);
+}
+
+/**
  * @brief Returns a vector with the obtained values found on config.json file using the
  *        tag string.
  *
