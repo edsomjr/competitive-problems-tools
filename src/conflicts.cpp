@@ -7,8 +7,9 @@
 namespace cptools::conflicts {
 
 /**
- * @brief Deals with conflicts between the current and the new file. Returns the file path of the new file.
- * 
+ * @brief Deals with conflicts between the current and the new file. Returns the file path of the
+ * new file.
+ *
  * @param local_file_name path to the local file
  * @param remote_file_name path to the remote file
  * @param remote_file_content content of the remote file
@@ -16,7 +17,7 @@ namespace cptools::conflicts {
  * @return std::string name of the new file
  */
 std::string solve_files(std::string local_file_name, std::string remote_file_name,
-                 std::string remote_file_content, bool forced) {
+                        std::string remote_file_content, bool forced) {
     auto local_file_path = std::filesystem::path(local_file_name);
     auto remote_file_path = std::filesystem::path(remote_file_name);
 

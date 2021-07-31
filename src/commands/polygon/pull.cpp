@@ -6,11 +6,11 @@
 #include "commands/polygon/polygon.h"
 #include "commands/polygon/pull.h"
 #include "config.h"
+#include "conflicts.h"
 #include "error.h"
 #include "exceptions.h"
 #include "fs.h"
 #include "message.h"
-#include "conflicts.h"
 #include "types/polygon.h"
 #include "util.h"
 
@@ -52,7 +52,8 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
     auto local_file_name = config::get_tool_file_name(tool_name);
 
-    auto new_file_path = conflicts::solve_files(local_file_name, polygon_file_name, polygon_file_content, forced);
+    auto new_file_path =
+        conflicts::solve_files(local_file_name, polygon_file_name, polygon_file_content, forced);
     config::modify_config_file("tools|" + tool_name, new_file_path);
 }
 
@@ -67,17 +68,21 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
                     bool forced) {
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
 
-    if (!forced)
-        return; // TODO
-
     for (const auto &solution : solutions) {
         auto files_with_same_tag = config::get_solutions_file_names(solution.tag);
         auto file_content =
             api::polygon::get_problem_file(solution.name, "solution", creds, problem_id);
+        auto remote_file_name = std::filesystem::path(solution.name).filename().string();
 
-        fs::overwrite_file(solution.name, file_content);
+        auto file_exists = std::find(files_with_same_tag.begin(), files_with_same_tag.end(),
+                                     remote_file_name) != files_with_same_tag.end();
 
-        config::insert_solution_file_name(solution.tag, solution.name);
+        if (!file_exists) {
+            fs::overwrite_file(remote_file_name, "");
+        }
+        auto new_file_path =
+            conflicts::solve_files(remote_file_name, remote_file_name, file_content, forced);
+        config::insert_solution_file_name(solution.tag, new_file_path);
     }
 }
 
