@@ -127,6 +127,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     try {
         pull_tool_file("checker", creds, problem_id, forced);
         pull_tool_file("validator", creds, problem_id, forced);
+        pull_tool_file("generator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
     } catch (const exceptions::polygon_api_error &e) {
         err << message::failure(e.what());
