@@ -10,6 +10,7 @@
 #include "exceptions.h"
 #include "fs.h"
 #include "message.h"
+#include "conflicts.h"
 #include "types/polygon.h"
 #include "util.h"
 
@@ -47,34 +48,11 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
                     const std::string &problem_id, bool forced) {
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
+    auto polygon_file_content =
+        api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
     auto local_file_name = config::get_tool_file_name(tool_name);
 
-    auto local_file_path = std::filesystem::path{local_file_name};
-    auto polygon_file_path = std::filesystem::path{polygon_file_name};
-
-    auto new_file_path = std::filesystem::path{local_file_name};
-    new_file_path.replace_filename(polygon_file_path.filename());
-
-    auto file_content =
-        api::polygon::get_problem_file(polygon_file_path, tool_name, creds, problem_id);
-
-    auto local_file_sha_512 = fs::sha_512_file(local_file_path);
-    auto polygon_file_sha_512 = util::sha_512(file_content);
-
-    auto different_hashes = local_file_sha_512 != polygon_file_sha_512;
-    auto equal_names = fs::equivalent(local_file_path.filename(), polygon_file_path.filename()).ok;
-
-    if (forced) {
-        fs::remove(local_file_path);
-        fs::overwrite_file(new_file_path, file_content);
-    } else if (different_hashes and equal_names) {
-        // TODO: conflict, same names but different content
-    } else if (not equal_names) {
-        fs::overwrite_file(new_file_path, file_content);
-        if (not different_hashes) {
-            fs::remove(local_file_path);
-        }
-    }
+    auto new_file_path = conflicts::solve_files(local_file_name, polygon_file_name, polygon_file_content, forced);
     config::modify_config_file("tools|" + tool_name, new_file_path);
 }
 
