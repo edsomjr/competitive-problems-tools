@@ -32,15 +32,14 @@ std::string solve_files(std::string local_file_name, std::string remote_file_nam
 
     if (forced) {
         fs::remove(local_file_path);
-        fs::overwrite_file(new_file_path, remote_file_content);
     } else if (different_hashes and equal_paths) {
-        // TODO: conflict, same names but different content
-    } else if (not equal_paths) {
-        fs::overwrite_file(new_file_path, remote_file_content);
-        if (not different_hashes) {
-            fs::remove(local_file_path);
-        }
+        std::filesystem::path target(local_file_path);
+        target.replace_extension(".old");
+        fs::copy(local_file_path, target);
+    } else if (not equal_paths and not different_hashes) {
+        fs::remove(local_file_path);
     }
+    fs::overwrite_file(new_file_path, remote_file_content);
 
     return new_file_path;
 }
