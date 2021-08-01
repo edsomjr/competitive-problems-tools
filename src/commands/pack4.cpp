@@ -40,37 +40,44 @@ std::string usage() { return "Usage: " NAME " check [-h] [-b]"; }
 
 std::string help() { return usage() + help_message; }
 
-// Essa função deve receber os objetos ostream?
+/**
+ * @brief Function that initializes the Boca package build directory. This function will
+ *        copy the boca package template files to a problem build directory
+ *
+ * @param out
+ * @param err
+ * @return int Returns CP_TOOLS_OK if everything goes as expected, or returns a specific
+ *             error code if a problem occurs.
+ */
 int create_build_dirs(std::ostream &err) {
-    std::vector<std::string> dirs{{"compare/"}, {"compile/"}, {"run/"}, {"description/"},
-                                  {"input/"}, {"limits/"}, {"output/"}, {"tests/"}};
+    std::string boca_build_dir{CP_TOOLS_BUILD_DIR  + std::string("/boca/")};
+    auto res_create = fs::create_directory(boca_build_dir);
 
-    for(const auto& dir : dirs) {
-        auto path{std::string(CP_TOOLS_BUILD_DIR) + "/boca/" + dir};
-        auto fs_res = fs::create_directory(path);
-
-        if (not fs_res.ok) {
-            err << message::failure(fs_res.error_message) << '\n';
-            return fs_res.rc;
-        }
+    if (not res_create.ok) {
+        err << message::failure(res_create.error_message);
+        return res_create.rc;
     }
 
-    return CP_TOOLS_OK;
+    auto res_copy = cptools::fs::copy(CP_TOOLS_BOCA_TEMPLATES_DIR, boca_build_dir, true);
+
+    if (not res_copy.ok)
+        err << message::failure(res_copy.error_message) << "\n";
+
+    return res_copy.rc;
 }
 
 int pack4_boca(std::ostream &out, std::ostream &err) {
 
-    // O que essa função deve retornar?
-    // A função deve abortar o programa?
-    auto res = create_build_dirs(err);
-
-    if(res != CP_TOOLS_OK) {
-        err << message::failure("Não foi possível criar ") << '\n';
-        return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
+    // Retornar int ou cptools::fs::Result?
+    // Se falhar deveriámos abortar o programa?
+    // Aqui não estou respeitando o padrão de sempre passar o out e o err
+    // Na função não uso o out, e isso gera um -Werror=unused-parameter no build
+    if(create_build_dirs(err) != CP_TOOLS_OK) {
+        // Qual erro deveria ser retornado aqui?
+        return -1;
     }
 
-    out << "Pacote Boca gerado com sucesso\n";
-
+    out << "Done" << std::endl;
     return CP_TOOLS_OK;
 }
 
