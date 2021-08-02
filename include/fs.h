@@ -28,6 +28,8 @@ void overwrite_file(const std::string dst, const std::string content);
 
 std::string get_home_dir();
 std::string get_default_config_path();
+std::string read_file(std::string filename);
+std::string sha_512_file(std::string filename);
 
 } // namespace cptools::fs
 

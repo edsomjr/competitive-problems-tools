@@ -89,7 +89,8 @@ all: format build tests
 
 
 format:
-	@-find $(INC_DIR) $(TESTS_DIR) $(SRC_DIR) -type f -name "*.cpp" -or -name "*.h" | xargs clang-format -i
+	-clang-format-10 --version
+	@-find $(INC_DIR) $(TESTS_DIR) $(SRC_DIR) -type f -name "*.cpp" -or -name "*.h" | xargs clang-format-10 -i
 
 
 build: $(PROJECT)

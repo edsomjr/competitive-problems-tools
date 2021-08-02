@@ -45,3 +45,5 @@ __py-cache__
 
 # Visual Code configurations
 .vscode
+
+.devcontainer

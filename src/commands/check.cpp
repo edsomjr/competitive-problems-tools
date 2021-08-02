@@ -309,10 +309,10 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             return validate_validator(out, err);
 
         case 'a':
-            for(auto func : { validate_checker, validate_tests, validate_validator}) {
+            for (auto func : {validate_checker, validate_tests, validate_validator}) {
                 auto rtn = func(out, err);
 
-                if(rtn) {
+                if (rtn) {
                     return rtn;
                 }
             }
