@@ -22,6 +22,8 @@ const std::unordered_map<log_level, formatter_t> formatters = {{DEBUG, message::
 
 void set_log_level(log_level level);
 
+void set_err_log_stream(std::ostream *stream);
+
 void set_log_stream(std::ostream *stream);
 
 void log(log_level level, const std::string &message);
