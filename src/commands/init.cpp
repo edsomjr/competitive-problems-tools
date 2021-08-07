@@ -38,13 +38,13 @@ std::string usage() { return "Usage: " NAME " init [-h] [-o output_dir]"; }
 
 std::string help() { return usage() + help_message; }
 
-int copy_template_files(const std::string &dest, std::ostream &out, std::ostream &err) {
+int copy_template_files(const std::string &dest, std::ostream &out) {
     logger::log(logger::INFO, "Initializing directory '" + dest + "' ...");
 
     // Copy templates to the directory
     auto res = cptools::fs::copy(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest, true);
     if (not res.ok)
-        err << logger::message::failure(res.error_message) << "\n";
+        logger::log(logger::ERROR, res.error_message);
     else
         out << logger::message::success() << "\n";
 
@@ -72,6 +72,6 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         }
     }
 
-    return copy_template_files(dest, out, err);
+    return copy_template_files(dest, out);
 }
 } // namespace cptools::commands::init

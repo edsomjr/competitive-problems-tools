@@ -13,7 +13,7 @@
 namespace cptools::task {
 
 std::vector<std::pair<std::string, std::string>>
-generate_io_files(const std::string &testset, std::ostream &, std::ostream &err, bool gen_output) {
+generate_io_files(const std::string &testset, std::ostream &, bool gen_output) {
 
     std::vector<std::string> sets{"samples", "manual", "random"};
 
@@ -35,20 +35,20 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
     for (auto &dir : directories) {
         auto fs_res = fs::create_directory(dir);
         if (not fs_res.ok) {
-            err << logger::message::failure(fs_res.error_message);
+            logger::log(logger::ERROR, fs_res.error_message);
             return {};
         }
     }
 
     if (source == "ERROR") {
-        err << logger::message::failure("Default solution file not found!\n");
+        logger::log(logger::ERROR, "Default solution file not found!\n");
         return {};
     }
 
     auto res = cptools::sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Can't compile solution '" + source + "'!") << "\n";
+        logger::log(logger::ERROR, "Can't compile solution '" + source + "'!");
         logger::log(logger::TRACE, res.output);
         return {};
     }
@@ -61,7 +61,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             source = cptools::util::get_json_value(config, "tools|generator", std::string("ERROR"));
 
             if (source == "tools/ERROR") {
-                err << logger::message::failure("Generator file not found!\n");
+                logger::log(logger::ERROR, "Generator file not found!\n");
                 return {};
             }
 
@@ -70,8 +70,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             res = cptools::sh::build(generator, source);
 
             if (res.rc != CP_TOOLS_OK) {
-                err << logger::message::failure("Can't compile generator '" + source + "'!")
-                    << "\n";
+                logger::log(logger::ERROR, "Can't compile generator '" + source + "'!");
                 logger::log(logger::TRACE, res.output);
                 return {};
             }
@@ -85,9 +84,8 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
                 auto res = sh::execute(generator, parameters, "", dest);
 
                 if (res.rc != CP_TOOLS_OK) {
-                    err << logger::message::failure("Error generating '" + dest +
-                                                    "' with parameters " + parameters)
-                        << "\n";
+                    logger::log(logger::ERROR,
+                                "Error generating '" + dest + "' with parameters " + parameters);
                     logger::log(logger::TRACE, res.output);
                     return {};
                 }
@@ -103,7 +101,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
 
                 auto res = fs::copy(input, dest, true);
                 if (not res.ok) {
-                    err << logger::message::failure(res.error_message);
+                    logger::log(logger::ERROR, res.error_message);
                     return {};
                 }
 
@@ -120,8 +118,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             auto res = cptools::sh::execute(program, "", input, output);
 
             if (res.rc != CP_TOOLS_OK) {
-                err << logger::message::failure("Can't generate output for input '" + input + "'!")
-                    << "\n";
+                logger::log(logger::ERROR, "Can't generate output for input '" + input + "'!");
                 logger::log(logger::TRACE, res.output);
                 return {};
             }
@@ -204,6 +201,7 @@ int gen_exe(std::string &error, const std::string &source, const std::string &de
 
     auto removed_result = fs::remove(program);
     if (not removed_result.ok) {
+        // TODO
         error += logger::message::failure(removed_result.error_message);
         return removed_result.rc;
     }

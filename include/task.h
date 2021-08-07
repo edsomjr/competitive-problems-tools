@@ -16,10 +16,8 @@ constexpr int INTERACTOR = 8;
 constexpr int ALL = CHECKER | VALIDATOR | GENERATOR | INTERACTOR;
 } // namespace tools
 
-std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string &testset,
-                                                                   std::ostream &out,
-                                                                   std::ostream &err,
-                                                                   bool gen_output = true);
+std::vector<std::pair<std::string, std::string>>
+generate_io_files(const std::string &testset, std::ostream &out, bool gen_output = true);
 
 int build_tools(std::string &error, int tools = tools::ALL, const std::string &where = ".");
 int gen_exe(std::string &error, const std::string &source, const std::string &dest,

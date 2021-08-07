@@ -9,6 +9,7 @@
 #include "error.h"
 #include "exceptions.h"
 #include "fs.h"
+#include "logger/logger.h"
 #include "logger/message.h"
 #include "util.h"
 
@@ -109,9 +110,8 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     }
 
     if (creds_from_file and creds_from_cmd) {
-        err << logger::message::failure(
-            "A file for the credentials was specified along credentials in command "
-            "line. Use only one method.\n");
+        logger::log(logger::ERROR, "A file for the credentials was specified along credentials in "
+                                   "command line. Use only one method");
         return CP_TOOLS_ERROR_POLYGON_MUTUAL_CHOICE_ERROR;
     }
 
@@ -119,7 +119,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         try {
             creds = get_credentials_from_file(creds_file);
         } catch (const exceptions::inexistent_file_error &e) {
-            err << logger::message::failure(std::string(e.what())) << "\n";
+            logger::log(logger::ERROR, std::string(e.what()));
             return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
         }
     }
@@ -130,7 +130,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     bool connected = api::polygon::test_connection(creds);
 
     if (not connected) {
-        err << logger::message::failure("Could not connect with the given credentials.");
+        logger::log(logger::ERROR, "Could not connect with the given credentials.");
         return CP_TOOLS_ERROR_POLYGON_CANT_CONNECT;
     }
 

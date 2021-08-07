@@ -69,11 +69,11 @@ std::string usage() { return "Usage: " NAME " check [-h] [-a] [-c] [-s] [-t] [-v
 
 std::string help() { return usage() + help_message; }
 
-int validate_checker(std::ostream &out, std::ostream &err) {
+int validate_checker(std::ostream &out) {
     logger::log(logger::INFO, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        err << logger::message::failure(fs_res.error_message);
+        logger::log(logger::ERROR, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -82,14 +82,14 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     auto source = cptools::util::get_json_value(config, "tools|validator", std::string("ERROR"));
 
     if (source == "ERROR") {
-        err << "[validate_validator] Validator file not found!\n";
+        logger::log(logger::ERROR, "[validate_validator] Validator file not found");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
     auto res = cptools::sh::build(validator, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Can't compile validator '" + source + "'!") << "\n";
+        logger::log(logger::ERROR, "Can't compile validator '" + source + "'!");
         logger::log(logger::TRACE, res.output);
         return res.rc;
     }
@@ -97,7 +97,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     source = cptools::util::get_json_value(config, "tools|checker", std::string("ERROR"));
 
     if (source == "ERROR") {
-        err << "[validate_checker] Checker file not found!\n";
+        logger::log(logger::ERROR, "[validate_checker] Checker file not found!");
         return CP_TOOLS_ERROR_CHECK_MISSING_CHECKER;
     }
 
@@ -106,7 +106,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     res = cptools::sh::build(checker, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Can't compile checker '" + source + "'!") << "\n";
+        logger::log(logger::ERROR, "Can't compile checker '" + source + "'!");
         logger::log(logger::TRACE, res.output);
         return res.rc;
     }
@@ -114,7 +114,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     source = cptools::util::get_json_value(config, "solutions|default", std::string("ERROR"));
 
     if (source == "ERROR") {
-        err << "[validate_checker] Default solution file not found!\n";
+        logger::log(logger::ERROR, "[validate_checker] Default solution file not found");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
@@ -123,7 +123,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     res = cptools::sh::build(solution, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Can't compile solution '" + source + "'!") << "\n";
+        logger::log(logger::ERROR, "Can't compile solution '" + source + "'!");
         logger::log(logger::TRACE, res.output);
         return res.rc;
     }
@@ -132,7 +132,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
         config, "tests|checker", std::map<std::string, std::pair<std::string, std::string>>{});
 
     if (tests.empty()) {
-        err << "[validate_checker] There are no tests for the validator\n";
+        logger::log(logger::ERROR, "[validate_checker] There are no tests for the validator");
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
@@ -143,14 +143,14 @@ int validate_checker(std::ostream &out, std::ostream &err) {
         auto [output, verdict] = data;
 
         if (rcodes.find(verdict) == rcodes.end()) {
-            err << "[validate_checker] Invalid verdict: '" << verdict << "'\n";
+            logger::log(logger::ERROR, "[validate_checker] Invalid verdict: '" + verdict + "'");
             return CP_TOOLS_ERROR_CHECK_INVALID_VEREDICT;
         }
 
         auto result = sh::execute(validator, "", input, "");
 
         if (result.rc != CP_TOOLS_OK) {
-            err << logger::message::failure("Input file '" + input + "' is invalid!") << "\n";
+            logger::log(logger::ERROR, "Input file '" + input + "' is invalid!");
             logger::log(logger::TRACE, result.output);
             return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
         }
@@ -160,8 +160,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
         result = sh::execute(solution, "", input, res);
 
         if (result.rc != CP_TOOLS_OK) {
-            err << logger::message::failure("Can't generatate output for input '" + input + "'!")
-                << "\n";
+            logger::log(logger::ERROR, "Can't generatate output for input '" + input + "'!");
             logger::log(logger::TRACE, result.output);
             return result.rc;
         }
@@ -176,7 +175,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
             oss << got.output;
             oss << "Got: " << mcodes[got.rc] << ", expected: " << mcodes[expected] << '\n';
 
-            err << logger::message::failure("Test '" + input + "' failed!") << "\n";
+            logger::log(logger::ERROR, "Test '" + input + "' failed!");
             logger::log(logger::TRACE, oss.str());
 
             return CP_TOOLS_ERROR_CHECK_TEST_FAILED;
@@ -188,11 +187,11 @@ int validate_checker(std::ostream &out, std::ostream &err) {
     return CP_TOOLS_OK;
 }
 
-int validate_validator(std::ostream &out, std::ostream &err) {
+int validate_validator(std::ostream &out) {
     logger::log(logger::INFO, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        err << logger::message::failure(fs_res.error_message);
+        logger::log(logger::ERROR, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -201,14 +200,14 @@ int validate_validator(std::ostream &out, std::ostream &err) {
     auto source = cptools::util::get_json_value(config, "tools|validator", std::string("ERROR"));
 
     if (source == "ERROR") {
-        err << "[validate_validator] Default solution file not found!\n";
+        logger::log(logger::ERROR, "[validate_validator] Default solution file not found");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
     auto res = cptools::sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Can't compile validator '" + source + "'!") << "\n";
+        logger::log(logger::ERROR, "Can't compile validator '" + source + "'!");
         logger::log(logger::TRACE, res.output);
         return res.rc;
     }
@@ -217,7 +216,7 @@ int validate_validator(std::ostream &out, std::ostream &err) {
                                                std::map<std::string, std::string>{});
 
     if (tests.empty()) {
-        err << "[validate_validator] There are no tests for the validator\n";
+        logger::log(logger::ERROR, "[validate_validator] There are no tests for the validator");
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
@@ -230,8 +229,8 @@ int validate_validator(std::ostream &out, std::ostream &err) {
         std::string res = (result.output.find("FAIL") == std::string::npos ? "OK" : "INVALID");
 
         if (verdict != res) {
-            err << logger::message::failure("Input '" + input + " is invalid: expected = '" +
-                                            verdict + "', got = '" + res + "'\n");
+            logger::log(logger::ERROR, "Input '" + input + " is invalid: expected = '" + verdict +
+                                           "', got = '" + res + "'\n");
             logger::log(logger::TRACE, result.output.empty() ? "Test valid!" : result.output);
             return result.rc;
         }
@@ -242,11 +241,11 @@ int validate_validator(std::ostream &out, std::ostream &err) {
     return CP_TOOLS_OK;
 }
 
-int validate_tests(std::ostream &out, std::ostream &err) {
+int validate_tests(std::ostream &out) {
     logger::log(logger::INFO, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        err << logger::message::failure(fs_res.error_message);
+        logger::log(logger::ERROR, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -255,22 +254,22 @@ int validate_tests(std::ostream &out, std::ostream &err) {
     auto source = cptools::util::get_json_value(config, "tools|validator", std::string("ERROR"));
 
     if (source == "ERROR") {
-        err << logger::message::failure("Default solution file not found!\n");
+        logger::log(logger::ERROR, "Default solution file not found!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
     auto res = cptools::sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Can't compile validator '" + source + "'!") << "\n";
+        logger::log(logger::ERROR, "Can't compile validator '" + source + "'!");
         logger::log(logger::TRACE, res.output);
         return res.rc;
     }
 
-    auto io_files = task::generate_io_files("all", out, err, false);
+    auto io_files = task::generate_io_files("all", out, false);
 
     if (io_files.empty()) {
-        err << logger::message::failure("There are no io files to validate!\n");
+        logger::log(logger::ERROR, "There are no io files to validate!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_IO_FILES;
     }
 
@@ -281,7 +280,7 @@ int validate_tests(std::ostream &out, std::ostream &err) {
         auto result = sh::execute(program, "", input, "");
 
         if (result.rc != CP_TOOLS_OK) {
-            err << logger::message::failure("Input file '" + input + "' is invalid!\n");
+            logger::log(logger::ERROR, "Input file '" + input + "' is invalid!\n");
             logger::log(logger::TRACE, result.output);
             return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
         }
@@ -299,21 +298,21 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "achstv", longopts, NULL)) != -1) {
         switch (option) {
         case 'c':
-            return validate_checker(out, err);
+            return validate_checker(out);
 
         case 'h':
             out << help() << '\n';
             return 0;
 
         case 't':
-            return validate_tests(out, err);
+            return validate_tests(out);
 
         case 'v':
-            return validate_validator(out, err);
+            return validate_validator(out);
 
         case 'a':
             for (auto func : {validate_checker, validate_tests, validate_validator}) {
-                auto rtn = func(out, err);
+                auto rtn = func(out);
 
                 if (rtn) {
                     return rtn;

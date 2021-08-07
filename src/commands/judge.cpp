@@ -73,7 +73,7 @@ std::string usage() { return "Usage: " NAME " problem judge solution.[cpp|c|java
 
 std::string help() { return usage() + help_message; }
 
-int judge(const std::string &solution_path, std::ostream &out, std::ostream &err) {
+int judge(const std::string &solution_path, std::ostream &out) {
     table::Table report{{
         {"#", 4, logger::format::align::RIGHT | logger::format::emph::BOLD},
         {"Verdict", 32, logger::format::align::LEFT | logger::format::emph::BOLD},
@@ -88,7 +88,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
     auto rc = task::build_tools(error, task::tools::VALIDATOR | task::tools::CHECKER);
 
     if (rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Can't build the required tools") << '\n';
+        logger::log(logger::ERROR, "Can't build the required tools");
         logger::log(logger::TRACE, error);
         return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
     }
@@ -97,8 +97,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
     rc = task::gen_exe(error, solution_path, "sol");
 
     if (rc != CP_TOOLS_OK) {
-        err << logger::message::failure("Error on solution '" + solution_path + "' compilation")
-            << '\n';
+        logger::log(logger::ERROR, "Error on solution '" + solution_path + "' compilation");
         logger::log(logger::TRACE, error);
         return verdict::CE;
     }
@@ -111,7 +110,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
     auto program{std::string(CP_TOOLS_BUILD_DIR) + "/sol"};
     auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
 
-    auto files = task::generate_io_files("all", out, err);
+    auto files = task::generate_io_files("all", out);
     int ans = verdict::AC, passed = 0;
     double tmax = 0.0, mmax = 0.0;
 
@@ -129,7 +128,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         auto res = sh::execute(validator, "", input);
 
         if (res.rc != CP_TOOLS_OK) {
-            err << logger::message::failure("Input file '" + input + "' is invalid") << "\n";
+            logger::log(logger::ERROR, "Input file '" + input + "' is invalid");
             logger::log(logger::TRACE, res.output);
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
@@ -231,6 +230,6 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
 
     auto solution_path = argv[2];
 
-    return judge(solution_path, out, err);
+    return judge(solution_path, out);
 }
 } // namespace cptools::commands::judge

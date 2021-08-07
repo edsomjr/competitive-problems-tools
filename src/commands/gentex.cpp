@@ -81,12 +81,12 @@ std::string help() { return usage() + help_message; }
 
 bool validate_language(const std::string &lang) { return languages.find(lang) != languages.end(); }
 
-int list_document_classes(std::ostream &out, std::ostream &err) {
+int list_document_classes(std::ostream &out) {
     std::string classes_dir{CP_TOOLS_CLASSES_DIR};
     DIR *d = opendir(classes_dir.c_str());
 
     if (d == nullptr) {
-        err << logger::message::failure("Directory '" + classes_dir + "' does not exist\n");
+        logger::log(logger::ERROR, "Directory '" + classes_dir + "' does not exist\n");
         return CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES;
     }
 
@@ -148,7 +148,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
 }
 
 int generate_tutorial_latex(const std::string &doc_class, const std::string &language, int flags,
-                            const std::string &label, std::ostream &out, std::ostream &) {
+                            const std::string &label, std::ostream &out) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
@@ -190,7 +190,7 @@ int generate_tutorial_latex(const std::string &doc_class, const std::string &lan
 }
 
 int generate_latex(const std::string &doc_class, const std::string &language, int flags,
-                   const std::string &label, std::ostream &out, std::ostream &err) {
+                   const std::string &label, std::ostream &out) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
@@ -227,7 +227,7 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 
     out << "\\begin{samples}{" << c1_size << "}{" << c2_size << "}\n";
 
-    auto io_files = task::generate_io_files("samples", out, err);
+    auto io_files = task::generate_io_files("samples", out);
 
     for (auto [infile, outfile] : io_files)
         out << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" << infile << "}{" << outfile
@@ -288,14 +288,13 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         case 'l':
-            return list_document_classes(out, err);
+            return list_document_classes(out);
 
         case 'g': {
             language = std::string(optarg);
 
             if (not validate_language(language)) {
-                err << logger::message::failure("Language " + language +
-                                                " not find or supported\n");
+                logger::log(logger::ERROR, "Language " + language + " not find or supported\n");
                 return -1;
             }
 
@@ -326,10 +325,10 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         if (!of)
             return CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE;
 
-        return f(document_class, language, flags, label, of, err);
+        return f(document_class, language, flags, label, of);
     }
 
-    return f(document_class, language, flags, label, out, err);
+    return f(document_class, language, flags, label, out);
 }
 
 } // namespace cptools::commands::gentex
