@@ -8,7 +8,7 @@
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
-#include "message.h"
+#include "logger/message.h"
 #include "util.h"
 
 namespace cptools::fs {

@@ -1,11 +1,11 @@
-#include "message.h"
-#include "format.h"
+#include "logger/message.h"
+#include "logger/format.h"
 
 #include <iomanip>
 #include <map>
 #include <sstream>
 
-namespace cptools::message {
+namespace cptools::logger::message {
 
 std::string info(const std::string &text) {
     auto msg = format::apply(text, format::color::GRAY);
@@ -45,7 +45,7 @@ std::string trace(const std::string &errors) {
     std::ostringstream oss;
 
     oss << '\n';
-    oss << format::apply("Errors:", format::emph::BOLD + format::color::VIOLET) << '\n';
+    oss << format::apply("Tracing:", format::emph::BOLD + format::color::VIOLET) << '\n';
 
     std::string line;
 
@@ -55,4 +55,4 @@ std::string trace(const std::string &errors) {
     return oss.str();
 }
 
-} // namespace cptools::message
+} // namespace cptools::logger::message

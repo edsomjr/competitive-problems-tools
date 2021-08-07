@@ -10,8 +10,8 @@
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
-#include "format.h"
-#include "message.h"
+#include "logger/format.h"
+#include "logger/message.h"
 #include "sh.h"
 #include "table.h"
 #include "task.h"
@@ -60,11 +60,11 @@ std::map<int, std::string> ver_string{
 };
 
 const std::map<int, long long> ver_style{
-    {verdict::AC, format::style::AC},       {verdict::PE, format::style::PE},
-    {verdict::WA, format::style::WA},       {verdict::CE, format::style::CE},
-    {verdict::TLE, format::style::TLE},     {verdict::RTE, format::style::RTE},
-    {verdict::MLE, format::style::MLE},     {verdict::FAIL, format::style::FAIL},
-    {verdict::UNDEF, format::style::UNDEF},
+    {verdict::AC, logger::format::style::AC},       {verdict::PE, logger::format::style::PE},
+    {verdict::WA, logger::format::style::WA},       {verdict::CE, logger::format::style::CE},
+    {verdict::TLE, logger::format::style::TLE},     {verdict::RTE, logger::format::style::RTE},
+    {verdict::MLE, logger::format::style::MLE},     {verdict::FAIL, logger::format::style::FAIL},
+    {verdict::UNDEF, logger::format::style::UNDEF},
 };
 
 // Auxiliary routines
@@ -74,21 +74,21 @@ std::string help() { return usage() + help_message; }
 
 int judge(const std::string &solution_path, std::ostream &out, std::ostream &err) {
     table::Table report{{
-        {"#", 4, format::align::RIGHT | format::emph::BOLD},
-        {"Verdict", 32, format::align::LEFT | format::emph::BOLD},
-        {"Time (s)", 12, format::align::RIGHT | format::emph::BOLD},
-        {"Memory (MB)", 12, format::align::RIGHT | format::emph::BOLD},
+        {"#", 4, logger::format::align::RIGHT | logger::format::emph::BOLD},
+        {"Verdict", 32, logger::format::align::LEFT | logger::format::emph::BOLD},
+        {"Time (s)", 12, logger::format::align::RIGHT | logger::format::emph::BOLD},
+        {"Memory (MB)", 12, logger::format::align::RIGHT | logger::format::emph::BOLD},
     }};
 
-    out << message::info("Judging solution '" + solution_path + "'...") << "\n";
+    out << logger::message::info("Judging solution '" + solution_path + "'...") << "\n";
 
     // Constrói as ferramentas necessárias
     std::string error;
     auto rc = task::build_tools(error, task::tools::VALIDATOR | task::tools::CHECKER);
 
     if (rc != CP_TOOLS_OK) {
-        err << message::failure("Can't build the required tools") << '\n';
-        err << message::trace(error);
+        err << logger::message::failure("Can't build the required tools") << '\n';
+        err << logger::message::trace(error);
         return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
     }
 
@@ -96,8 +96,9 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
     rc = task::gen_exe(error, solution_path, "sol");
 
     if (rc != CP_TOOLS_OK) {
-        err << message::failure("Error on solution '" + solution_path + "' compilation") << '\n';
-        err << message::trace(error) << '\n';
+        err << logger::message::failure("Error on solution '" + solution_path + "' compilation")
+            << '\n';
+        err << logger::message::trace(error) << '\n';
         return verdict::CE;
     }
 
@@ -127,8 +128,8 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         auto res = sh::execute(validator, "", input);
 
         if (res.rc != CP_TOOLS_OK) {
-            err << message::failure("Input file '" + input + "' is invalid") << "\n";
-            err << message::trace(res.output) << '\n';
+            err << logger::message::failure("Input file '" + input + "' is invalid") << "\n";
+            err << logger::message::trace(res.output) << '\n';
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
 
@@ -175,27 +176,32 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         mmax = std::max(mmax, info.memory);
         passed += ver == verdict::AC ? 1 : 0;
 
-        report.add_row({{number, format::style::COUNTER},
+        report.add_row({{number, logger::format::style::COUNTER},
                         {ver_string[ver], ver_style.at(ver)},
-                        {as_string(info.elapsed, 6), format::style::FLOAT},
-                        {as_string(info.memory, 3), format::style::INT}});
+                        {as_string(info.elapsed, 6), logger::format::style::FLOAT},
+                        {as_string(info.memory, 3), logger::format::style::INT}});
     }
 
     out << report << '\n';
 
     int col_size = 12;
 
-    out << format::apply("Verdict:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(ver_string[ans], ver_style.at(ans) + format::align::LEFT) << '\n';
+    out << logger::format::apply(
+               "Verdict:", logger::format::emph::BOLD + logger::format::align::LEFT, col_size)
+        << logger::format::apply(ver_string[ans], ver_style.at(ans) + logger::format::align::LEFT)
+        << '\n';
 
-    out << format::apply("Passed:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(std::to_string(passed), format::style::INT) << '\n';
+    out << logger::format::apply(
+               "Passed:", logger::format::emph::BOLD + logger::format::align::LEFT, col_size)
+        << logger::format::apply(std::to_string(passed), logger::format::style::INT) << '\n';
 
-    out << format::apply("Max time:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(as_string(tmax, 6), format::style::FLOAT) << '\n';
+    out << logger::format::apply(
+               "Max time:", logger::format::emph::BOLD + logger::format::align::LEFT, col_size)
+        << logger::format::apply(as_string(tmax, 6), logger::format::style::FLOAT) << '\n';
 
-    out << format::apply("Max memory:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(as_string(mmax, 3), format::style::FLOAT) << '\n';
+    out << logger::format::apply(
+               "Max memory:", logger::format::emph::BOLD + logger::format::align::LEFT, col_size)
+        << logger::format::apply(as_string(mmax, 3), logger::format::style::FLOAT) << '\n';
 
     return ans;
 }

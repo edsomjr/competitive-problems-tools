@@ -8,7 +8,7 @@
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
-#include "message.h"
+#include "logger/message.h"
 #include "sh.h"
 
 // Raw strings
@@ -38,14 +38,14 @@ std::string usage() { return "Usage: " NAME " init [-h] [-o output_dir]"; }
 std::string help() { return usage() + help_message; }
 
 int copy_template_files(const std::string &dest, std::ostream &out, std::ostream &err) {
-    out << message::info("Initializing directory '" + dest + "' ...") << "\n";
+    out << logger::message::info("Initializing directory '" + dest + "' ...") << "\n";
 
     // Copy templates to the directory
     auto res = cptools::fs::copy(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest, true);
     if (not res.ok)
-        err << message::failure(res.error_message) << "\n";
+        err << logger::message::failure(res.error_message) << "\n";
     else
-        out << message::success() << "\n";
+        out << logger::message::success() << "\n";
 
     return res.rc;
 }

@@ -12,7 +12,7 @@
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
-#include "message.h"
+#include "logger/message.h"
 #include "task.h"
 #include "util.h"
 
@@ -85,12 +85,12 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
     DIR *d = opendir(classes_dir.c_str());
 
     if (d == nullptr) {
-        err << message::failure("Directory '" + classes_dir + "' does not exist\n");
+        err << logger::message::failure("Directory '" + classes_dir + "' does not exist\n");
         return CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES;
     }
 
     out << '\n';
-    out << message::header("    Class           Description\n\n");
+    out << logger::message::header("    Class           Description\n\n");
 
     while (auto dir = readdir(d)) {
         if (dir == nullptr)
@@ -130,7 +130,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
 
         line = util::strip(line.substr(pos + 1));
 
-        out << message::info("    " + name);
+        out << logger::message::info("    " + name);
         int count = 4 + name.size();
 
         while (count < 20) {
@@ -138,7 +138,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
             ++count;
         }
 
-        out << message::info(line) << '\n';
+        out << logger::message::info(line) << '\n';
     }
 
     out << '\n';
@@ -293,7 +293,8 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             language = std::string(optarg);
 
             if (not validate_language(language)) {
-                err << message::failure("Language " + language + " not find or supported\n");
+                err << logger::message::failure("Language " + language +
+                                                " not find or supported\n");
                 return -1;
             }
 

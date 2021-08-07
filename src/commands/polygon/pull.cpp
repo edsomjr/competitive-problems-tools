@@ -10,7 +10,7 @@
 #include "error.h"
 #include "exceptions.h"
 #include "fs.h"
-#include "message.h"
+#include "logger/message.h"
 #include "types/polygon.h"
 #include "util.h"
 
@@ -112,12 +112,12 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     try {
         problem_id = config::get_polygon_problem_id();
     } catch (const exceptions::inexistent_file_error &e) {
-        err << message::failure(e.what()) << "\n";
+        err << logger::message::failure(e.what()) << "\n";
         return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
     }
 
     if (problem_id == "") {
-        err << message::failure("Couldn't find the problem id in the configuration file.");
+        err << logger::message::failure("Couldn't find the problem id in the configuration file.");
         return CP_TOOLS_ERROR_POLYGON_NO_PROBLEM_ID;
     }
 
@@ -130,11 +130,11 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         pull_tool_file("generator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
     } catch (const exceptions::polygon_api_error &e) {
-        err << message::failure(e.what());
+        err << logger::message::failure(e.what());
         return CP_TOOLS_ERROR_POLYGON_API;
     }
 
-    out << message::success("Pull completed");
+    out << logger::message::success("Pull completed");
 
     return CP_TOOLS_OK;
 }

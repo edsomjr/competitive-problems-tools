@@ -1,9 +1,9 @@
-#ifndef CP_TOOLS_FORMAT_H
-#define CP_TOOLS_FORMAT_H
+#ifndef CP_TOOLS_LOGGER_FORMAT_H
+#define CP_TOOLS_LOGGER_FORMAT_H
 
 #include <string>
 
-namespace cptools::format {
+namespace cptools::logger::format {
 
 namespace color {
 constexpr long long BASE = (1 << 20);
@@ -53,6 +53,6 @@ constexpr long long COUNTER = color::CYAN;
 
 std::string apply(const std::string &text, long long specs, size_t size = 0);
 
-} // namespace cptools::format
+} // namespace cptools::logger::format
 
 #endif
