@@ -15,6 +15,7 @@
 #include "commands/judge.h"
 #include "commands/polygon/polygon.h"
 #include "commands/genboca.h"
+#include "logger/logger.h"
 
 // Raw strings
 static const std::string help_message{
@@ -64,6 +65,13 @@ std::string version() { return version_header + version_body; }
 
 // API functions
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+    logger::set_log_level(logger::DEBUG);
+    logger::set_log_stream(&std::cout);
+    logger::log(logger::DEBUG, "Starting cptools");
+    logger::log(logger::INFO, "Starting cptools");
+    logger::log(logger::WARNING, "Starting cptools");
+    logger::log(logger::ERROR, "Starting cptools");
+    logger::log(logger::FATAL, "Starting cptools");
     if (argc >= 2) {
         std::string command{argv[1]};
         auto it = commands.find(command);

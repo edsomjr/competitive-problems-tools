@@ -3,7 +3,7 @@
 namespace cptools::logger {
 
 u_int8_t current_log_level = INFO;
-std::ostream *current_log_stream = &std::cout;    
+std::ostream *current_log_stream = &std::cout;
 
 void set_log_level(log_level level) { current_log_level = level; }
 

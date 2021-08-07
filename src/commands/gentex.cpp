@@ -12,6 +12,7 @@
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
+#include "logger/logger.h"
 #include "logger/message.h"
 #include "task.h"
 #include "util.h"
@@ -130,7 +131,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
 
         line = util::strip(line.substr(pos + 1));
 
-        out << logger::message::info("    " + name);
+        logger::log(logger::INFO, "    " + name);
         int count = 4 + name.size();
 
         while (count < 20) {
@@ -138,7 +139,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
             ++count;
         }
 
-        out << logger::message::info(line) << '\n';
+        logger::log(logger::INFO, line);
     }
 
     out << '\n';

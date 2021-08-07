@@ -9,6 +9,7 @@
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
+#include "logger/logger.h"
 #include "logger/message.h"
 #include "sh.h"
 #include "task.h"
@@ -69,7 +70,7 @@ std::string usage() { return "Usage: " NAME " check [-h] [-a] [-c] [-s] [-t] [-v
 std::string help() { return usage() + help_message; }
 
 int validate_checker(std::ostream &out, std::ostream &err) {
-    out << logger::message::info("Creating directory " CP_TOOLS_BUILD_DIR);
+    logger::log(logger::INFO, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
         err << logger::message::failure(fs_res.error_message);
@@ -135,8 +136,8 @@ int validate_checker(std::ostream &out, std::ostream &err) {
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
-    out << logger::message::info("Testing the checker (" + std::to_string(tests.size()) +
-                                 " tests) ...\n");
+    logger::log(logger::INFO,
+                "Testing the checker (" + std::to_string(tests.size()) + " tests) ...\n");
 
     for (auto [input, data] : tests) {
         auto [output, verdict] = data;
@@ -188,7 +189,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 }
 
 int validate_validator(std::ostream &out, std::ostream &err) {
-    out << logger::message::info("Creating directory " CP_TOOLS_BUILD_DIR);
+    logger::log(logger::INFO, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
         err << logger::message::failure(fs_res.error_message);
@@ -220,8 +221,8 @@ int validate_validator(std::ostream &out, std::ostream &err) {
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
-    out << logger::message::info("Testing the validator (" + std::to_string(tests.size()) +
-                                 " tests) ...\n");
+    logger::log(logger::INFO,
+                "Testing the validator (" + std::to_string(tests.size()) + " tests) ...\n");
 
     for (auto [input, verdict] : tests) {
         auto result = sh::execute(program, "", input, "");
@@ -243,7 +244,7 @@ int validate_validator(std::ostream &out, std::ostream &err) {
 }
 
 int validate_tests(std::ostream &out, std::ostream &err) {
-    out << logger::message::info("Creating directory " CP_TOOLS_BUILD_DIR);
+    logger::log(logger::INFO, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
         err << logger::message::failure(fs_res.error_message);
@@ -274,8 +275,8 @@ int validate_tests(std::ostream &out, std::ostream &err) {
         return CP_TOOLS_ERROR_CHECK_MISSING_IO_FILES;
     }
 
-    out << logger::message::info("Validating the input files (" + std::to_string(io_files.size()) +
-                                 " tests) ...\n");
+    logger::log(logger::INFO,
+                "Validating the input files (" + std::to_string(io_files.size()) + " tests) ...\n");
 
     for (auto [input, _] : io_files) {
         auto result = sh::execute(program, "", input, "");

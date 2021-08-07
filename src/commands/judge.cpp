@@ -11,6 +11,7 @@
 #include "dirs.h"
 #include "error.h"
 #include "logger/format.h"
+#include "logger/logger.h"
 #include "logger/message.h"
 #include "sh.h"
 #include "table.h"
@@ -80,7 +81,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         {"Memory (MB)", 12, logger::format::align::RIGHT | logger::format::emph::BOLD},
     }};
 
-    out << logger::message::info("Judging solution '" + solution_path + "'...") << "\n";
+    logger::log(logger::INFO, "Judging solution '" + solution_path + "'...");
 
     // Constrói as ferramentas necessárias
     std::string error;
