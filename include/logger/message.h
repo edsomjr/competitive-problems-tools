@@ -5,6 +5,7 @@
 
 namespace cptools::logger::message {
 
+std::string debug(const std::string &text = "");
 std::string info(const std::string &text = "");
 std::string header(const std::string &text = "");
 std::string success(const std::string &text = "");

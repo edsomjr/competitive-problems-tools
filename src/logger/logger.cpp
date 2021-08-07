@@ -1,4 +1,5 @@
 #include "logger/logger.h"
+#include "logger/format.h"
 
 namespace cptools::logger {
 
@@ -12,15 +13,25 @@ void set_log_stream(std::ostream *stream) { current_log_stream = stream; }
 
 void set_err_log_stream(std::ostream *stream) { current_log_stream = stream; }
 
+std::string level_to_string(log_level level) {
+    auto name = level_names.at(level);
+    return name;
+}
+
 void log(log_level level, const std::string &message) {
     if (level < current_log_level)
         return;
 
-    auto formatter = formatters.find(level)->second;
+    std::string level_name = "[" + level_to_string(level) + "]";
+    auto level_formatted = format::apply(level_name, format::emph::BOLD + level_colors.at(level));
+
+    auto formatter = formatters.at(level);
+    auto formatted_msg = level_formatted + " " + formatter(message);
+
     if (level >= ERROR) {
-        *current_err_log_stream << formatter(message) << std::endl;
+        *current_err_log_stream << formatted_msg << std::endl;
     } else {
-        *current_log_stream << formatter(message) << std::endl;
+        *current_log_stream << formatted_msg << std::endl;
     }
 }
 

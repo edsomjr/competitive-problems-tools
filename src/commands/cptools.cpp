@@ -65,6 +65,7 @@ std::string version() { return version_header + version_body; }
 
 // API functions
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+    // TODO
     logger::set_log_level(logger::DEBUG);
     logger::set_log_stream(&std::cout);
     logger::log(logger::DEBUG, "Starting cptools");
@@ -72,6 +73,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     logger::log(logger::WARNING, "Starting cptools");
     logger::log(logger::ERROR, "Starting cptools");
     logger::log(logger::FATAL, "Starting cptools");
+    logger::log(logger::TRACE, "Trace 1\nTrace 2\nTrace 3");
     if (argc >= 2) {
         std::string command{argv[1]};
         auto it = commands.find(command);

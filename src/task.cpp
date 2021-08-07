@@ -181,6 +181,7 @@ int build_tools(std::string &error, int tools, const std::string &where) {
         auto res = cptools::sh::build(dest, source);
 
         if (res.rc != CP_TOOLS_OK) {
+            // TODO
             error + logger::message::failure("Can't compile '" + source + "'!") + "\n";
             error + logger::message::trace(res.output) + '\n';
             return res.rc;
@@ -210,6 +211,7 @@ int gen_exe(std::string &error, const std::string &source, const std::string &de
     auto res = sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
+        // TODO
         error += logger::message::failure("Can't build solution '" + source + "'!") + "\n";
         error += logger::message::trace(res.output) + '\n';
         return res.rc;
