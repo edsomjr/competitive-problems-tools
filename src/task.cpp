@@ -4,6 +4,7 @@
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
+#include "logger/logger.h"
 #include "logger/message.h"
 #include "sh.h"
 #include "task.h"
@@ -48,7 +49,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
 
     if (res.rc != CP_TOOLS_OK) {
         err << logger::message::failure("Can't compile solution '" + source + "'!") << "\n";
-        err << logger::message::trace(res.output) << '\n';
+        logger::log(logger::TRACE, res.output);
         return {};
     }
 
@@ -71,7 +72,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             if (res.rc != CP_TOOLS_OK) {
                 err << logger::message::failure("Can't compile generator '" + source + "'!")
                     << "\n";
-                err << logger::message::trace(res.output) << '\n';
+                logger::log(logger::TRACE, res.output);
                 return {};
             }
 
@@ -87,7 +88,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
                     err << logger::message::failure("Error generating '" + dest +
                                                     "' with parameters " + parameters)
                         << "\n";
-                    err << logger::message::trace(res.output) << '\n';
+                    logger::log(logger::TRACE, res.output);
                     return {};
                 }
 
@@ -121,7 +122,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             if (res.rc != CP_TOOLS_OK) {
                 err << logger::message::failure("Can't generate output for input '" + input + "'!")
                     << "\n";
-                err << logger::message::trace(res.output) << '\n';
+                logger::log(logger::TRACE, res.output);
                 return {};
             }
 

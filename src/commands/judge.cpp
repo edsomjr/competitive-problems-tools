@@ -89,7 +89,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
 
     if (rc != CP_TOOLS_OK) {
         err << logger::message::failure("Can't build the required tools") << '\n';
-        err << logger::message::trace(error);
+        logger::log(logger::TRACE, error);
         return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
     }
 
@@ -99,7 +99,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
     if (rc != CP_TOOLS_OK) {
         err << logger::message::failure("Error on solution '" + solution_path + "' compilation")
             << '\n';
-        err << logger::message::trace(error) << '\n';
+        logger::log(logger::TRACE, error);
         return verdict::CE;
     }
 
@@ -130,7 +130,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
 
         if (res.rc != CP_TOOLS_OK) {
             err << logger::message::failure("Input file '" + input + "' is invalid") << "\n";
-            err << logger::message::trace(res.output) << '\n';
+            logger::log(logger::TRACE, res.output);
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
 

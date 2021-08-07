@@ -90,7 +90,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 
     if (res.rc != CP_TOOLS_OK) {
         err << logger::message::failure("Can't compile validator '" + source + "'!") << "\n";
-        err << logger::message::trace(res.output) << '\n';
+        logger::log(logger::TRACE, res.output);
         return res.rc;
     }
 
@@ -107,7 +107,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 
     if (res.rc != CP_TOOLS_OK) {
         err << logger::message::failure("Can't compile checker '" + source + "'!") << "\n";
-        err << logger::message::trace(res.output) << '\n';
+        logger::log(logger::TRACE, res.output);
         return res.rc;
     }
 
@@ -124,7 +124,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 
     if (res.rc != CP_TOOLS_OK) {
         err << logger::message::failure("Can't compile solution '" + source + "'!") << "\n";
-        err << logger::message::trace(res.output) << '\n';
+        logger::log(logger::TRACE, res.output);
         return res.rc;
     }
 
@@ -151,7 +151,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
 
         if (result.rc != CP_TOOLS_OK) {
             err << logger::message::failure("Input file '" + input + "' is invalid!") << "\n";
-            err << logger::message::trace(result.output) << '\n';
+            logger::log(logger::TRACE, result.output);
             return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
         }
 
@@ -162,7 +162,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
         if (result.rc != CP_TOOLS_OK) {
             err << logger::message::failure("Can't generatate output for input '" + input + "'!")
                 << "\n";
-            err << logger::message::trace(result.output) << '\n';
+            logger::log(logger::TRACE, result.output);
             return result.rc;
         }
 
@@ -177,7 +177,7 @@ int validate_checker(std::ostream &out, std::ostream &err) {
             oss << "Got: " << mcodes[got.rc] << ", expected: " << mcodes[expected] << '\n';
 
             err << logger::message::failure("Test '" + input + "' failed!") << "\n";
-            err << logger::message::trace(oss.str());
+            logger::log(logger::TRACE, oss.str());
 
             return CP_TOOLS_ERROR_CHECK_TEST_FAILED;
         }
@@ -209,7 +209,7 @@ int validate_validator(std::ostream &out, std::ostream &err) {
 
     if (res.rc != CP_TOOLS_OK) {
         err << logger::message::failure("Can't compile validator '" + source + "'!") << "\n";
-        err << logger::message::trace(res.output) << '\n';
+        logger::log(logger::TRACE, res.output);
         return res.rc;
     }
 
@@ -232,8 +232,7 @@ int validate_validator(std::ostream &out, std::ostream &err) {
         if (verdict != res) {
             err << logger::message::failure("Input '" + input + " is invalid: expected = '" +
                                             verdict + "', got = '" + res + "'\n");
-            err << logger::message::trace(result.output.empty() ? "Test valid!" : result.output)
-                << '\n';
+            logger::log(logger::TRACE, result.output.empty() ? "Test valid!" : result.output);
             return result.rc;
         }
     }
@@ -264,7 +263,7 @@ int validate_tests(std::ostream &out, std::ostream &err) {
 
     if (res.rc != CP_TOOLS_OK) {
         err << logger::message::failure("Can't compile validator '" + source + "'!") << "\n";
-        err << logger::message::trace(res.output) << '\n';
+        logger::log(logger::TRACE, res.output);
         return res.rc;
     }
 
@@ -283,7 +282,7 @@ int validate_tests(std::ostream &out, std::ostream &err) {
 
         if (result.rc != CP_TOOLS_OK) {
             err << logger::message::failure("Input file '" + input + "' is invalid!\n");
-            err << logger::message::trace(result.output) << '\n';
+            logger::log(logger::TRACE, result.output);
             return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
         }
     }

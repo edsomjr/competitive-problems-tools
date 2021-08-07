@@ -12,13 +12,11 @@ namespace cptools::logger {
 
 typedef std::function<std::string(const std::string &)> formatter_t;
 
-enum log_level { DEBUG, INFO, WARNING, ERROR, FATAL };
+enum log_level { DEBUG, INFO, WARNING, ERROR, FATAL, TRACE };
 
-const std::unordered_map<log_level, formatter_t> formatters = {{DEBUG, message::trace},
-                                                               {INFO, message::info},
-                                                               {WARNING, message::warning},
-                                                               {ERROR, message::failure},
-                                                               {FATAL, message::failure}};
+const std::unordered_map<log_level, formatter_t> formatters = {
+    {DEBUG, message::info},    {INFO, message::info},     {WARNING, message::warning},
+    {ERROR, message::failure}, {FATAL, message::failure}, {TRACE, message::trace}};
 
 void set_log_level(log_level level);
 

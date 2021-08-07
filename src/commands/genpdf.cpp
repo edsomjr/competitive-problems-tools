@@ -11,6 +11,7 @@
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
+#include "logger/logger.h"
 #include "logger/message.h"
 #include "sh.h"
 #include "task.h"
@@ -117,7 +118,7 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
     if (res.rc != CP_TOOLS_OK) {
         err << logger::message::failure("Error generating the PDF file '" + pdf_file + "'!")
             << "\n";
-        err << logger::message::trace(res.output) << '\n';
+        logger::log(logger::TRACE, res.output);
         return res.rc;
     }
 
