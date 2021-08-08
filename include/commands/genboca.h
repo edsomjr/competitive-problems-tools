@@ -1,14 +1,17 @@
-#ifndef CP_TOOLS_PACK4_BOCA_H
-#define CP_TOOLS_PACK4_BOCA_H
+#ifndef CP_TOOLS_GENBOCA_H
+#define CP_TOOLS_GENBOCA_H
 
 #include <iostream>
 
-// Devo colocar cada comando de empacotamento no mesmo namespace ou em namespaces separados?
-// A função genboca deveria ser renomeada para `pack`?
-namespace cptools::commands::pack4 {
+namespace cptools::commands::genboca {
 
-int genboca(std::ostream &out, std::ostream &err);
+// Main routine
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
 
-} // namespace cptools::commands::pack4
+// Auxiliary routines
+std::string help();
+std::string usage();
+
+} // namespace cptools::commands::genboca
 
 #endif
