@@ -55,6 +55,9 @@ T get_json_value(const nlohmann::json &config, const std::string &fields, T defa
     return default_value;
 }
 
+std::string get_from_argv(int argc, char *const argv[], std::vector<std::string> keys,
+                          std::string default_value);
+
 } // namespace cptools::util
 
 #endif
