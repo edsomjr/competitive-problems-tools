@@ -41,7 +41,7 @@ int copy_template_files(const std::string &dest, std::ostream &out, std::ostream
     out << message::info("Initializing directory '" + dest + "' ...") << "\n";
 
     // Copy templates to the directory
-    auto res = cptools::fs::copy(CP_TOOLS_TEMPLATES_DIR, dest, true);
+    auto res = cptools::fs::copy(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest, true);
     if (not res.ok)
         err << message::failure(res.error_message) << "\n";
     else

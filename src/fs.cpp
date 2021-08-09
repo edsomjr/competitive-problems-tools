@@ -123,6 +123,15 @@ const Result is_file(const std::string &path) {
     return make_result(is_file);
 }
 
+const Result rename(const std::string old_path, const std::string new_path) {
+    try {
+        std::filesystem::rename(old_path, new_path);
+    } catch (const std::filesystem::filesystem_error &err) {
+        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_RENAME, err);
+    }
+    return make_result(true);
+}
+
 void overwrite_file(const std::string dst, const std::string content) {
     std::ofstream file;
     file.open(dst);

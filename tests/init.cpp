@@ -25,7 +25,7 @@ SCENARIO("Command init", "[init]") {
                 REQUIRE(cptools::commands::init::run(argc, argv, out, err) == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
 
-                auto res_same = cptools::sh::diff_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_TEMPLATES_DIR);
+                auto res_same = cptools::sh::diff_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_PROBLEM_TEMPLATE_DIR);
                 REQUIRE(res_same.rc == CP_TOOLS_TRUE);
                 REQUIRE(res_same.output.empty());
             }
