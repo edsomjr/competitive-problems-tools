@@ -7,11 +7,10 @@ env: CXX=g++-9
 addons:
     apt:
         update: true
-        sources:
-            - ubuntu-toolchain-r-test
         packages:
             - g++-9
             - libssl-dev
+            - clang-format-10
 
 script:
     - make -j 8

@@ -9,13 +9,11 @@ namespace cptools::commands::polygon::pull {
 
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
 
-void get_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
-                   const std::string &problem_id);
+void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
+                    const std::string &problem_id, bool forced);
 
-void get_solutions(const types::polygon::Credentials &creds, const std::string &problem_id);
-
-void save_solution(const types::polygon::Solution &s, const types::polygon::Credentials &creds,
-                   const std::string &problem_id);
+void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id,
+                    bool forced);
 
 } // namespace cptools::commands::polygon::pull
 

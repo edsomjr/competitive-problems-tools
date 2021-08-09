@@ -3,26 +3,21 @@ PROJECT=cp-tools
 
 # Compiler and flags variables
 CXX=g++
-CPPFLAGS=-W -Wall -Werror -std=c++17
+CPPFLAGS=-W -Wall -Werror
+CXXFLAGS=-std=c++17
 RELEASE_CPPFLAGS=-O2
 DEBUG_CPPFLAGS=-g -O0
 
 # Condition to check if is release or debug
 ifeq ($(MAKECMDGOALS),release)
-    CFLAGS+=$(RELEASE_CFLAGS)
+    CPPFLAGS+=$(RELEASE_CPPFLAGS)
 else
-    CFLAGS+=$(DEBUG_CFLAGS)
+    CPPFLAGS+=$(DEBUG_CPPFLAGS)
 endif
 
 # Environment variables
 INCLUDE_FLAG=-I
-LIBPATH_FLAG=-L
-EXT_LIBPATH_FLAG=-L
-LIBS_FLAG=-l
-EXT_LIBS_FLAG=-l
-OBJ_OUTPUT_FLAG=-o 
 OUTPUT_FLAG=-o 
-GEN_OBJECT_FLAG=-c
 STATIC_LIB_SUFFIX=.a
 STATIC_LIB_PREFIX=lib
 OBJ_EXTENSION=.o
@@ -89,7 +84,8 @@ all: format build tests
 
 
 format:
-	@-find $(INC_DIR) $(TESTS_DIR) $(SRC_DIR) -type f -name "*.cpp" -or -name "*.h" | xargs clang-format -i
+	-clang-format-10 --version
+	@-find $(INC_DIR) $(TESTS_DIR) $(SRC_DIR) -type f -name "*.cpp" -or -name "*.h" | xargs clang-format-10 -i
 
 
 build: $(PROJECT)

@@ -25,8 +25,8 @@ template <typename T>
 nlohmann::json create_json_operation(const std::string &json_pointer, const std::string &op,
                                      T new_value) {
     auto new_value_str = nlohmann::json(new_value).dump();
-    auto patch_str = "[{ \"op\": \"" + op + "\", \"path\": " + json_pointer +
-                     ", \"value\": " + new_value_str + " }]";
+    auto patch_str = "[{ \"op\": \"" + op + "\", \"path\": \"" + json_pointer +
+                     "\", \"value\": " + new_value_str + " }]";
     auto json_patch = nlohmann::json::parse(patch_str);
 
     return json_patch;
