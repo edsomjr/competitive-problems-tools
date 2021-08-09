@@ -6,6 +6,7 @@
 #include "dirs.h"
 #include "message.h"
 #include "config.h"
+#include "util.h"
 #include "commands/gentex.h"
 #include "commands/genpdf.h"
 
@@ -102,47 +103,48 @@ int create_build_dirs(std::ostream &, std::ostream &err) {
     return res_copy.rc;
 }
 
-
-int create_description_dir(std::ostream &out, std::ostream &err) {
-    std::string boca_desc_dir{CP_TOOLS_BOCA_BUILD_DIR  + std::string("description/")};
-
-    // A label deveria tá na config.json ou deveria vim do argv?
-    std::string label{"B"};
-
-    // Qual o nome do PDF deve ser dado? Nos exemplos do Ribas é a letra da questão (B.pdf)
-    std::string pdf_name{label + ".pdf"};
-
-    // Opção 1: Usar o genpdf::run
-    char *const argv[]{
-                        (char *)"cp-tools",
-                        (char *)"genpdf",
-                        (char *)"-o",
-                        (char *)".cp-build/boca/description/B.pdf"
-                    };
-    auto res_pdf = genpdf::run(4, argv, out, err);
-
-    // Opção 2: Usar diretamente o genpdf::generate_pdf
-    // std::string pdf_path{boca_desc_dir + pdf_name};
-    // int flags = gentex::flag::INCLUDE_AUTHOR | gentex::flag::INCLUDE_CONTEST;
-    // bool tutorial = false;
-    // auto res_pdf = cptools::commands::genpdf::generate_pdf("cp_modern", "pt_BR", flags, label, pdf_path, tutorial, out, err);
-
+int create_description_dir(int argc, char *const argv[],
+                           std::ostream &out, std::ostream &err) {
+    // optind is a built-in global variable.
+    // It is used to control the current position of argv.
+    optind = 1;
+    int res_pdf = genpdf::run(argc, argv, out, err);
     if(res_pdf != CP_TOOLS_OK) {
         return res_pdf;
+    }
+
+    // Generated pdf file name
+    std::string pdf_file = util::get_from_argv(argc, argv, {"--output", "-o"},
+                                               "problem.pdf");
+
+    std::string boca_desc_dir{CP_TOOLS_BOCA_BUILD_DIR  + std::string("description/")};
+
+    // Copy the pdf to boca's build directory
+    auto res_cpy = fs::copy(pdf_file, boca_desc_dir, true);
+    if (not res_cpy.ok) {
+        err << message::failure(res_cpy.error_message) << "\n";
+        return res_cpy.rc;
+    }
+
+    // Rename the copied file to <LABEL>.pdf
+    std::string label = util::get_from_argv(argc, argv, {"--label", "-b"}, "A");
+    auto res_rnm = fs::rename(boca_desc_dir + pdf_file, boca_desc_dir + label + ".pdf");
+    if (not res_rnm.ok) {
+        err << message::failure(res_rnm.error_message) << "\n";
+        return res_rnm.rc;
     }
 
     std::string problem_info{boca_desc_dir + std::string("problem.info")};
 
     auto config = config::read_config_file();
-    std::string default_title{"Título do problema"};
-    // Sempre em português?
-    std::string problem_fullname{util::get_json_value(config,
-                                                      "problem|title|pt_BR",
-                                                      default_title)};
+
+    std::string problem_fullname{util::get_json_value(config, "problem|title|pt_BR",
+                                                      std::string("Título do problema"))};
+
     std::string content{
         std::string("basename=") + label + '\n' +
         std::string("fullname=") + '\"' + problem_fullname + "\"\n" +
-        std::string("descfile=") + pdf_name + '\n'
+        std::string("descfile=") + label + ".pdf" + '\n'
     };
 
     fs::overwrite_file(problem_info, content);
@@ -150,100 +152,34 @@ int create_description_dir(std::ostream &out, std::ostream &err) {
     return CP_TOOLS_OK;
 }
 
-int genboca(const std::string &doc_class, const std::string &language, int flags,
-            const std::string &label, const std::string &outfile, bool tutorial,
-            std::ostream &out, std::ostream &err)
+int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err)
 {
     if(create_build_dirs(out, err) != CP_TOOLS_OK) {
-        return -1;
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_BUILD_DIRECTORY;
     }
 
-    std::string a{doc_class}; a+="a";
-    std::string b{language}; b+="b";
-    std::string c{label}; c+="c";
-    std::string d{outfile}; d+="d";
-    std::string e{doc_class}; e+="e";
-    flags++;
-    tutorial &= false;
+    if(create_description_dir(argc, argv, out, err) != CP_TOOLS_OK) {
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_DESCRIPTION_DIRECTORY;
+    }
 
-    // if(create_description_dir(out, err) != CP_TOOLS_OK) {
-    //     // Qual erro deveria ser retornado aqui?
-    //     return -1;
-    // }
-
-    // out << "Done" << std::endl;
     return CP_TOOLS_OK;
 }
-
 
 
 // API functions
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     int option = -1;
 
-    // tutorial faz sentido para o contexto do genboca?
-    bool tutorial = false;
-
-    int flags = gentex::flag::INCLUDE_AUTHOR | gentex::flag::INCLUDE_CONTEST;
-
-    std::string document_class{"cp_modern"},
-                outfile{"problem.pdf"},
-                language{"pt_BR"},
-                label{"A"};
-
+    // This command has many options, but only the `help` option is dealt with here.
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
             out << help() << '\n';
             return 0;
-
-        case 'b':
-            label = std::string(optarg);
-            break;
-
-        case 'o':
-            outfile = std::string(optarg);
-            break;
-
-        case 'c':
-            document_class = std::string(optarg);
-            break;
-
-        case 'l':
-            return gentex::list_document_classes(out, err);
-
-        case 'g': {
-            language = std::string(optarg);
-
-            if (not gentex::validate_language(language)) {
-                err << message::failure("Language '" + language + "' not find or supported\n");
-                return CP_TOOLS_ERROR_GENPDF_INVALID_LANGUAGE;
-            }
-
-            break;
-        }
-
-        case 't':
-            tutorial = true;
-            outfile = "tutorial.pdf";
-            break;
-
-        case NO_AUTHOR:
-            flags &= (~gentex::flag::INCLUDE_AUTHOR);
-            break;
-
-        case NO_CONTEST:
-            flags &= (~gentex::flag::INCLUDE_CONTEST);
-            break;
-
-        default:
-            err << help() << '\n';
-            return CP_TOOLS_ERROR_CLEAN_INVALID_OPTION;
         }
     }
 
-    return genboca(document_class, language, flags, label,
-                        outfile, tutorial, out, err);
+    return genboca(argc, argv, out, err);
 }
 
 } // namespace cptools::commands::genboca
