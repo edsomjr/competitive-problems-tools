@@ -4,6 +4,7 @@
 #include "fs.h"
 #include "error.h"
 #include "dirs.h"
+#include "task.h"
 #include "message.h"
 #include "config.h"
 #include "util.h"
@@ -152,6 +153,25 @@ int create_description_dir(int argc, char *const argv[],
     return CP_TOOLS_OK;
 }
 
+int create_io_dir(std::ostream &out, std::ostream &err) {
+    auto pairs = task::generate_io_files("all", out, err);
+
+    for(const auto& dir : {std::string("input/"), std::string("output/")}) {
+        
+        auto res_cpy = fs::copy(
+            CP_TOOLS_BUILD_DIR + std::string("/") + dir, 
+            CP_TOOLS_BOCA_BUILD_DIR + dir
+        );
+
+        if (not res_cpy.ok) {
+            err << message::failure(res_cpy.error_message) << "\n";
+            return res_cpy.rc;
+        }
+    }
+
+    return CP_TOOLS_OK;
+}
+
 int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err)
 {
     if(create_build_dirs(out, err) != CP_TOOLS_OK) {
@@ -160,6 +180,10 @@ int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err)
 
     if(create_description_dir(argc, argv, out, err) != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_DESCRIPTION_DIRECTORY;
+    }
+
+    if(create_io_dir(out, err) != CP_TOOLS_OK) {
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_IO_DIRECTORY;
     }
 
     return CP_TOOLS_OK;
