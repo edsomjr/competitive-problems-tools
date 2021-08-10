@@ -126,26 +126,24 @@ std::string to_json_pointer(const std::string &s) {
     return pointer;
 }
 
-
 /**
-  * @brief Gets the value associated with the key in argv
-  *
-  * @param key Associated key
-  * @param argc
-  * @param argv
-  * @return std::string. If the key exists in argv, the associated value is returned,
-  *                      otherwise an empty string is returned.
-  */
-std::string get_argv_value(std::string key, int argc, char *const argv[])
-{
-    for(int i=0; i<argc; i++) {
+ * @brief Gets the value associated with the key in argv
+ *
+ * @param key Associated key
+ * @param argc
+ * @param argv
+ * @return std::string. If the key exists in argv, the associated value is returned,
+ *                      otherwise an empty string is returned.
+ */
+std::string get_argv_value(std::string key, int argc, char *const argv[]) {
+    for (int i = 0; i < argc; i++) {
 
         std::string str(argv[i]);
 
-        if(str.rfind(key, 0) == 0) {
+        if (str.rfind(key, 0) == 0) {
 
             // if start with `--` it's need to get what comes after the` = `
-            if( str.rfind("--", 0) == 0) {
+            if (str.rfind("--", 0) == 0) {
                 size_t pos = str.find("=") + 1;
                 return std::string(str.begin() + pos, str.end());
             }
@@ -161,24 +159,21 @@ std::string get_argv_value(std::string key, int argc, char *const argv[])
 }
 
 /**
-  * @brief Get the first value associated with one of the keys
-  *
-  * @param keys Keys that will be searched from argv
-  * @param argc
-  * @param argv
-  * @param default_value Value returned if none of the keys are found
-  *
-  * @return std::string.
-  */
-std::string get_from_argv(int argc,
-                          char *const argv[],
-                          std::vector<std::string> keys,
-                          std::string default_value)
-{
-    for(const auto& key : keys) {
+ * @brief Get the first value associated with one of the keys
+ *
+ * @param keys Keys that will be searched from argv
+ * @param argc
+ * @param argv
+ * @param default_value Value returned if none of the keys are found
+ *
+ * @return std::string.
+ */
+std::string get_from_argv(int argc, char *const argv[], std::vector<std::string> keys,
+                          std::string default_value) {
+    for (const auto &key : keys) {
         std::string value = get_argv_value(key, argc, argv);
 
-        if(value.empty() == false) {
+        if (value.empty() == false) {
             return value;
         }
     }

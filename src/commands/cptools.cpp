@@ -9,12 +9,12 @@
 #include "commands/check.h"
 #include "commands/clean.h"
 #include "commands/cptools.h"
+#include "commands/genboca.h"
 #include "commands/genpdf.h"
 #include "commands/gentex.h"
 #include "commands/init.h"
 #include "commands/judge.h"
 #include "commands/polygon/polygon.h"
-#include "commands/genboca.h"
 
 // Raw strings
 static const std::string help_message{
@@ -46,11 +46,9 @@ namespace cptools::commands {
 
 // Global variables
 std::unordered_map<std::string, int (*)(int, char *const[], std::ostream &, std::ostream &)>
-    commands{
-        {"init", init::run},       {"check", check::run},   {"clean", clean::run},
-        {"gentex", gentex::run},   {"genpdf", genpdf::run}, {"judge", judge::run},
-        {"polygon", polygon::run}, {"genboca", genboca::run}
-    };
+    commands{{"init", init::run},       {"check", check::run},    {"clean", clean::run},
+             {"gentex", gentex::run},   {"genpdf", genpdf::run},  {"judge", judge::run},
+             {"polygon", polygon::run}, {"genboca", genboca::run}};
 
 static struct option longopts[] = {
     {"help", no_argument, NULL, 'h'}, {"version", no_argument, NULL, 'v'}, {0, 0, 0, 0}};

@@ -1,15 +1,15 @@
 #include <getopt.h>
 #include <iostream>
 
-#include "fs.h"
-#include "error.h"
-#include "dirs.h"
-#include "task.h"
-#include "message.h"
-#include "config.h"
-#include "util.h"
-#include "commands/gentex.h"
 #include "commands/genpdf.h"
+#include "commands/gentex.h"
+#include "config.h"
+#include "dirs.h"
+#include "error.h"
+#include "fs.h"
+#include "message.h"
+#include "task.h"
+#include "util.h"
 
 // Raw strings
 static const std::string help_message{
@@ -61,7 +61,6 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {"no_contest", no_argument, NULL, NO_CONTEST},
                                    {0, 0, 0, 0}};
 
-
 // Auxiliary routines
 std::string usage() {
     return "Usage: " NAME " genboca [-h] [-o outfile] [-b label] [-c doc_class] "
@@ -104,21 +103,19 @@ int create_build_dirs(std::ostream &, std::ostream &err) {
     return res_copy.rc;
 }
 
-int create_description_dir(int argc, char *const argv[],
-                           std::ostream &out, std::ostream &err) {
+int create_description_dir(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     // optind is a built-in global variable.
     // It is used to control the current position of argv.
     optind = 1;
     int res_pdf = genpdf::run(argc, argv, out, err);
-    if(res_pdf != CP_TOOLS_OK) {
+    if (res_pdf != CP_TOOLS_OK) {
         return res_pdf;
     }
 
     // Generated pdf file name
-    std::string pdf_file = util::get_from_argv(argc, argv, {"--output", "-o"},
-                                               "problem.pdf");
+    std::string pdf_file = util::get_from_argv(argc, argv, {"--output", "-o"}, "problem.pdf");
 
-    std::string boca_desc_dir{CP_TOOLS_BOCA_BUILD_DIR  + std::string("description/")};
+    std::string boca_desc_dir{CP_TOOLS_BOCA_BUILD_DIR + std::string("description/")};
 
     // Copy the pdf to boca's build directory
     auto res_cpy = fs::copy(pdf_file, boca_desc_dir, true);
@@ -139,14 +136,12 @@ int create_description_dir(int argc, char *const argv[],
 
     auto config = config::read_config_file();
 
-    std::string problem_fullname{util::get_json_value(config, "problem|title|pt_BR",
-                                                      std::string("Título do problema"))};
+    std::string problem_fullname{
+        util::get_json_value(config, "problem|title|pt_BR", std::string("Título do problema"))};
 
-    std::string content{
-        std::string("basename=") + label + '\n' +
-        std::string("fullname=") + '\"' + problem_fullname + "\"\n" +
-        std::string("descfile=") + label + ".pdf" + '\n'
-    };
+    std::string content{std::string("basename=") + label + '\n' + std::string("fullname=") + '\"' +
+                        problem_fullname + "\"\n" + std::string("descfile=") + label + ".pdf" +
+                        '\n'};
 
     fs::overwrite_file(problem_info, content);
 
@@ -156,12 +151,10 @@ int create_description_dir(int argc, char *const argv[],
 int create_io_dir(std::ostream &out, std::ostream &err) {
     auto pairs = task::generate_io_files("all", out, err);
 
-    for(const auto& dir : {std::string("input/"), std::string("output/")}) {
-        
-        auto res_cpy = fs::copy(
-            CP_TOOLS_BUILD_DIR + std::string("/") + dir, 
-            CP_TOOLS_BOCA_BUILD_DIR + dir
-        );
+    for (const auto &dir : {std::string("input/"), std::string("output/")}) {
+
+        auto res_cpy =
+            fs::copy(CP_TOOLS_BUILD_DIR + std::string("/") + dir, CP_TOOLS_BOCA_BUILD_DIR + dir);
 
         if (not res_cpy.ok) {
             err << message::failure(res_cpy.error_message) << "\n";
@@ -172,23 +165,21 @@ int create_io_dir(std::ostream &out, std::ostream &err) {
     return CP_TOOLS_OK;
 }
 
-int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err)
-{
-    if(create_build_dirs(out, err) != CP_TOOLS_OK) {
+int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+    if (create_build_dirs(out, err) != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_BUILD_DIRECTORY;
     }
 
-    if(create_description_dir(argc, argv, out, err) != CP_TOOLS_OK) {
+    if (create_description_dir(argc, argv, out, err) != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_DESCRIPTION_DIRECTORY;
     }
 
-    if(create_io_dir(out, err) != CP_TOOLS_OK) {
+    if (create_io_dir(out, err) != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_IO_DIRECTORY;
     }
 
     return CP_TOOLS_OK;
 }
-
 
 // API functions
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
