@@ -6,6 +6,7 @@
 #include "defs.h"
 #include "error.h"
 
+#include "cli/cli.h"
 #include "commands/check.h"
 #include "commands/clean.h"
 #include "commands/cptools.h"
@@ -71,7 +72,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         }
 
         if (command.front() != '-') {
-            err << NAME << ": invalid action '" << command << "'\n";
+            cli::write(cli::message_type::error, "Invalid action '" + command + "'");
             return CP_TOOLS_ERROR_INVALID_COMMAND;
         }
     }
@@ -81,20 +82,20 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "hv", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            out << help() << '\n';
+            cli::write(cli::message_type::none, help());
             return CP_TOOLS_OK;
 
         case 'v':
-            out << version() << '\n';
+            cli::write(cli::message_type::none, version());
             return CP_TOOLS_OK;
 
         default:
-            err << help() << '\n';
+            cli::write(cli::message_type::error, help());
             return CP_TOOLS_ERROR_INVALID_OPTION;
         }
     }
 
-    out << usage() << '\n';
+    cli::write(cli::message_type::none, usage());
     return CP_TOOLS_OK;
 }
 } // namespace cptools::commands

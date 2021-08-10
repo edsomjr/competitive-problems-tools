@@ -3,12 +3,12 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "cli/cli.h"
 #include "commands/init.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
-#include "message.h"
 #include "sh.h"
 
 // Raw strings
@@ -37,28 +37,28 @@ std::string usage() { return "Usage: " NAME " init [-h] [-o output_dir]"; }
 
 std::string help() { return usage() + help_message; }
 
-int copy_template_files(const std::string &dest, std::ostream &out, std::ostream &err) {
-    out << message::info("Initializing directory '" + dest + "' ...") << "\n";
+int copy_template_files(const std::string &dest) {
+    cli::write(cli::message_type::info, "Initializing directory '" + dest + "' ...");
 
     // Copy templates to the directory
     auto res = cptools::fs::copy(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest, true);
     if (not res.ok)
-        err << message::failure(res.error_message) << "\n";
+        cli::write(cli::message_type::error, res.error_message);
     else
-        out << message::success() << "\n";
+        cli::write(cli::message_type::ok);
 
     return res.rc;
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     int option = -1;
     std::string dest{"."};
 
     while ((option = getopt_long(argc, argv, "ho:", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            out << help() << '\n';
+            cli::write(cli::message_type::none, help());
             return 0;
 
         case 'o':
@@ -66,11 +66,11 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         default:
-            err << help() << '\n';
+            cli::write(cli::message_type::error, help());
             return CP_TOOLS_ERROR_INIT_INVALID_OPTION;
         }
     }
 
-    return copy_template_files(dest, out, err);
+    return copy_template_files(dest);
 }
 } // namespace cptools::commands::init

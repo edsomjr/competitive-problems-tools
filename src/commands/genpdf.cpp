@@ -5,13 +5,13 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "cli/cli.h"
 #include "commands/gentex.h"
 #include "commands/init.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
-#include "message.h"
 #include "sh.h"
 #include "task.h"
 #include "util.h"
@@ -73,11 +73,10 @@ std::string usage() {
 std::string help() { return usage() + help_message; }
 
 int generate_pdf(const std::string &doc_class, const std::string &language, int flags,
-                 const std::string &label, const std::string &outfile, bool tutorial,
-                 std::ostream &out, std::ostream &err) {
+                 const std::string &label, const std::string &outfile, bool tutorial) {
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        err << message::failure(fs_res.error_message);
+        cli::write(cli::message_type::error, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -86,22 +85,22 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
                              (tutorial ? "/tutorial.tex" : "/problem.tex")};
     auto removed_result = fs::remove(texfile_path);
     if (not removed_result.ok) {
-        err << message::failure(removed_result.error_message);
+        cli::write(cli::message_type::error, removed_result.error_message);
         return removed_result.rc;
     }
 
     std::ofstream tex_file(texfile_path);
 
     if (not tex_file) {
-        err << message::failure("Error opening file '" + texfile_path) << "'\n";
+        cli::write(cli::message_type::error, "Error opening file '" + texfile_path);
         return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
     }
 
     auto task = tutorial ? gentex::generate_tutorial_latex : gentex::generate_latex;
-    auto rc = task(doc_class, language, flags, label, tex_file, err);
+    auto rc = task(doc_class, language, flags, label, tex_file);
 
     if (rc != CP_TOOLS_OK) {
-        err << message::failure("Error generating the LaTeX file '" + texfile_path) << "'\n";
+        cli::write(cli::message_type::error, "Error generating the LaTeX file '" + texfile_path);
         return rc;
     }
 
@@ -114,25 +113,25 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
     auto res = sh::build(pdf_file, texfile_path);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << message::failure("Error generating the PDF file '" + pdf_file + "'!") << "\n";
-        err << message::trace(res.output) << '\n';
+        cli::write(cli::message_type::error, "Error generating the PDF file '" + pdf_file + "'!");
+        cli::write_trace(res.output);
         return res.rc;
     }
 
     // Copy the generated PDF to the output file
     auto copy_res = fs::copy(pdf_file, outfile, true);
     if (not copy_res.ok) {
-        err << message::failure(copy_res.error_message);
+        cli::write(cli::message_type::error, copy_res.error_message);
         return copy_res.rc;
     }
 
-    out << message::success("File '" + outfile + "' generated.\n");
+    cli::write(cli::message_type::ok, "File '" + outfile + "' generated.");
 
     return CP_TOOLS_OK;
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
     int option = -1;
     bool tutorial = false;
 
@@ -143,7 +142,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            out << help() << '\n';
+            cli::write(cli::message_type::none, help());
             return 0;
 
         case 'b':
@@ -159,13 +158,14 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         case 'l':
-            return gentex::list_document_classes(out, err);
+            return gentex::list_document_classes(out);
 
         case 'g': {
             language = std::string(optarg);
 
             if (not gentex::validate_language(language)) {
-                err << message::failure("Language '" + language + "' not find or supported\n");
+                cli::write(cli::message_type::error,
+                           "Language '" + language + "' not find or supported");
                 return CP_TOOLS_ERROR_GENPDF_INVALID_LANGUAGE;
             }
 
@@ -186,12 +186,12 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         default:
-            err << help() << '\n';
+            cli::write(cli::message_type::error, help());
             return CP_TOOLS_ERROR_GENPDF_INVALID_OPTION;
         }
     }
 
-    return generate_pdf(document_class, language, flags, label, outfile, tutorial, out, err);
+    return generate_pdf(document_class, language, flags, label, outfile, tutorial);
 }
 
 } // namespace cptools::commands::genpdf

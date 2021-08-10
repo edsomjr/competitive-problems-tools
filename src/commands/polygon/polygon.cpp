@@ -3,13 +3,13 @@
 #include <unordered_map>
 
 #include "api/polygon.h"
+#include "cli/cli.h"
 #include "commands/polygon/polygon.h"
 #include "commands/polygon/pull.h"
 #include "defs.h"
 #include "error.h"
 #include "exceptions.h"
 #include "fs.h"
-#include "message.h"
 #include "util.h"
 
 // Raw strings
@@ -84,7 +84,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "hk:s:c:", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            out << help() << '\n';
+            cli::write(cli::message_type::none, help());
             return 0;
 
         case 'k':
@@ -103,15 +103,14 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         default:
-            err << help() << '\n';
+            cli::write(cli::message_type::error, help());
             return CP_TOOLS_ERROR_POLYGON_INVALID_OPTION;
         }
     }
 
     if (creds_from_file and creds_from_cmd) {
-        err << message::failure(
-            "A file for the credentials was specified along credentials in command "
-            "line. Use only one method.\n");
+        cli::write(cli::message_type::error, "A file for the credentials was specified along "
+                                             "credentials in command line. Use only one method");
         return CP_TOOLS_ERROR_POLYGON_MUTUAL_CHOICE_ERROR;
     }
 
@@ -119,7 +118,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         try {
             creds = get_credentials_from_file(creds_file);
         } catch (const exceptions::inexistent_file_error &e) {
-            err << message::failure(std::string(e.what())) << "\n";
+            cli::write(cli::message_type::error, std::string(e.what()));
             return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
         }
     }
@@ -130,11 +129,11 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     bool connected = api::polygon::test_connection(creds);
 
     if (not connected) {
-        err << message::failure("Could not connect with the given credentials.");
+        cli::write(cli::message_type::error, "Could not connect with the given credentials.");
         return CP_TOOLS_ERROR_POLYGON_CANT_CONNECT;
     }
 
-    out << message::success("The given credentials are valid.");
+    cli::write(cli::message_type::ok, "The given credentials are valid.");
 
     return CP_TOOLS_OK;
 }

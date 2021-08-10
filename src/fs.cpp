@@ -5,10 +5,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "cli/cli.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
-#include "message.h"
 #include "util.h"
 
 namespace cptools::fs {

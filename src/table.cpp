@@ -1,5 +1,5 @@
 #include "table.h"
-#include "format.h"
+#include "cli/format.h"
 
 #include <iostream>
 
@@ -16,7 +16,7 @@ std::ostream &operator<<(std::ostream &os, const Table &t) {
     os << hline << '\n';
 
     for (auto h : t.header) {
-        os << "| " << format::apply(h.label, h.format, h.size) << " ";
+        os << "| " << cli::format::apply(h.label, h.format, h.size) << " ";
     }
 
     os << "|\n" << hline << '\n';
@@ -28,7 +28,7 @@ std::ostream &operator<<(std::ostream &os, const Table &t) {
             auto data = i < M ? row[i].first : "";
             auto spec = i < M ? row[i].second : 0;
 
-            os << "| " << format::apply(data, spec, t.header[i].size) << " ";
+            os << "| " << cli::format::apply(data, spec, t.header[i].size) << " ";
         }
 
         os << "|\n" << hline << '\n';

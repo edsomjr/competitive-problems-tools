@@ -3,16 +3,17 @@
 #include <iostream>
 
 #include <dirent.h>
+#include <functional>
 #include <getopt.h>
 #include <unistd.h>
 
+#include "cli/cli.h"
 #include "commands/gentex.h"
 #include "commands/init.h"
 #include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
-#include "message.h"
 #include "task.h"
 #include "util.h"
 
@@ -80,17 +81,17 @@ std::string help() { return usage() + help_message; }
 
 bool validate_language(const std::string &lang) { return languages.find(lang) != languages.end(); }
 
-int list_document_classes(std::ostream &out, std::ostream &err) {
+int list_document_classes(std::ostream &out) {
     std::string classes_dir{CP_TOOLS_CLASSES_DIR};
     DIR *d = opendir(classes_dir.c_str());
 
     if (d == nullptr) {
-        err << message::failure("Directory '" + classes_dir + "' does not exist\n");
+        cli::write(cli::message_type::error, "Directory '" + classes_dir + "' does not exist");
         return CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES;
     }
 
-    out << '\n';
-    out << message::header("    Class           Description\n\n");
+    cli::write(cli::message_type::none, "\n");
+    cli::write(cli::message_type::header, "    Class           Description\n");
 
     while (auto dir = readdir(d)) {
         if (dir == nullptr)
@@ -130,7 +131,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
 
         line = util::strip(line.substr(pos + 1));
 
-        out << message::info("    " + name);
+        cli::write(cli::message_type::info, "    " + name);
         int count = 4 + name.size();
 
         while (count < 20) {
@@ -138,7 +139,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
             ++count;
         }
 
-        out << message::info(line) << '\n';
+        cli::write(cli::message_type::info, line);
     }
 
     out << '\n';
@@ -147,7 +148,7 @@ int list_document_classes(std::ostream &out, std::ostream &err) {
 }
 
 int generate_tutorial_latex(const std::string &doc_class, const std::string &language, int flags,
-                            const std::string &label, std::ostream &out, std::ostream &) {
+                            const std::string &label, std::ostream &out) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
@@ -189,7 +190,7 @@ int generate_tutorial_latex(const std::string &doc_class, const std::string &lan
 }
 
 int generate_latex(const std::string &doc_class, const std::string &language, int flags,
-                   const std::string &label, std::ostream &out, std::ostream &err) {
+                   const std::string &label, std::ostream &out) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
@@ -226,7 +227,7 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 
     out << "\\begin{samples}{" << c1_size << "}{" << c2_size << "}\n";
 
-    auto io_files = task::generate_io_files("samples", out, err);
+    auto io_files = task::generate_io_files("samples");
 
     for (auto [infile, outfile] : io_files)
         out << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" << infile << "}{" << outfile
@@ -260,18 +261,18 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
     int option = -1;
 
     std::string document_class{"cp_modern"}, outfile, language{"pt_BR"}, label{"A"};
     int flags = flag::INCLUDE_AUTHOR | flag::INCLUDE_CONTEST;
 
-    auto f = generate_latex;
+    bool is_tutorial = false;
 
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            out << help() << '\n';
+            cli::write(cli::message_type::none, help());
             return 0;
 
         case 'b':
@@ -287,13 +288,14 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         case 'l':
-            return list_document_classes(out, err);
+            return list_document_classes(out);
 
         case 'g': {
             language = std::string(optarg);
 
             if (not validate_language(language)) {
-                err << message::failure("Language " + language + " not find or supported\n");
+                cli::write(cli::message_type::error,
+                           "Language " + language + " not find or supported");
                 return -1;
             }
 
@@ -301,7 +303,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         }
 
         case 't':
-            f = generate_tutorial_latex;
+            is_tutorial = true;
             break;
 
         case NO_AUTHOR:
@@ -313,7 +315,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         default:
-            err << help() << '\n';
+            cli::write(cli::message_type::error, help());
             return CP_TOOLS_ERROR_GENTEX_INVALID_OPTION;
         }
     }
@@ -324,10 +326,16 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         if (!of)
             return CP_TOOLS_ERROR_GENTEX_INVALID_OUTFILE;
 
-        return f(document_class, language, flags, label, of, err);
+        if (is_tutorial)
+            return generate_tutorial_latex(document_class, language, flags, label, of);
+        else
+            return generate_latex(document_class, language, flags, label, of);
     }
 
-    return f(document_class, language, flags, label, out, err);
+    if (is_tutorial)
+        return generate_tutorial_latex(document_class, language, flags, label, out);
+    else
+        return generate_latex(document_class, language, flags, label, out);
 }
 
 } // namespace cptools::commands::gentex
