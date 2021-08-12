@@ -14,23 +14,32 @@ void set_output_stream(std::ostream &stream) { output_stream = &stream; }
 
 void set_error_stream(std::ostream &stream) { error_stream = &stream; }
 
-void write(const message_type type, const std::string &message, bool is_error) {
+std::string get_prefix(const message_type type) {
     const auto prefix_it = styles::message_type_prefixes.find(type);
     const auto prefix_styles_it = styles::prefix_style.find(type);
+    std::string result = "";
 
-    const auto prefix_styles =
-        prefix_styles_it == styles::prefix_style.end() ? 0 : prefix_styles_it->second;
-
-    std::string prefix = "";
     if (prefix_it != styles::message_type_prefixes.end()) {
-        prefix = format::apply(prefix_it->second, prefix_styles + format::emph::BOLD);
-        prefix += ' ';
+        result = prefix_it->second;
+        result += ' ';
     }
 
-    const auto style = styles::message_type_styles.at(type);
-    const auto formatted = format::apply(message, style);
+    if (prefix_styles_it != styles::prefix_style.end()) {
+        result = format::apply(result, prefix_styles_it->second + format::emph::BOLD);
+    }
 
-    const auto final_message = prefix + formatted;
+    return result;
+}
+
+void write(const message_type type, const std::string &message, bool is_error) {
+    const auto prefix = get_prefix(type);
+    const auto style_it = styles::message_type_styles.find(type);
+    std::string result = message;
+
+    if (style_it != styles::message_type_styles.end() and type != message_type::none)
+        result = format::apply(message, style_it->second);
+
+    const auto final_message = prefix + result;
     const auto target_stream =
         (type >= message_type::trace or is_error) ? error_stream : output_stream;
 
