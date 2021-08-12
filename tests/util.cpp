@@ -112,7 +112,7 @@ SCENARIO("Utilitary functions", "[util]") {
     }
 
     GIVEN("An JSON config file") {
-        auto config = cptools::util::read_json_file("templates/config.json");
+        auto config = cptools::util::read_json_file("templates/problem-template/config.json");
 
         WHEN("There is a string field") {
             std::map<std::string, std::string> fields{
