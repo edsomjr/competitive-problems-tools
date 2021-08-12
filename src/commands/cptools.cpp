@@ -63,6 +63,9 @@ std::string version() { return version_header + version_body; }
 
 // API functions
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+    cli::set_output_stream(out);
+    cli::set_error_stream(err);
+
     if (argc >= 2) {
         std::string command{argv[1]};
         auto it = commands.find(command);
@@ -90,7 +93,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             return CP_TOOLS_OK;
 
         default:
-            cli::write(cli::message_type::error, help());
+            cli::write(cli::message_type::none, help(), true);
             return CP_TOOLS_ERROR_INVALID_OPTION;
         }
     }

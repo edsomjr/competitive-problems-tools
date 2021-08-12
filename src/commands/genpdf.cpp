@@ -186,7 +186,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             break;
 
         default:
-            cli::write(cli::message_type::error, help());
+            cli::write(cli::message_type::none, help(), true);
             return CP_TOOLS_ERROR_GENPDF_INVALID_OPTION;
         }
     }

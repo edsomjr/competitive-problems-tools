@@ -14,7 +14,7 @@ void set_output_stream(std::ostream &stream) { output_stream = &stream; }
 
 void set_error_stream(std::ostream &stream) { error_stream = &stream; }
 
-void write(const message_type type, const std::string &message) {
+void write(const message_type type, const std::string &message, bool is_error) {
     const auto prefix_it = styles::message_type_prefixes.find(type);
     const auto prefix_styles_it = styles::prefix_style.find(type);
 
@@ -31,7 +31,8 @@ void write(const message_type type, const std::string &message) {
     const auto formatted = format::apply(message, style);
 
     const auto final_message = prefix + formatted;
-    const auto target_stream = (type >= message_type::trace) ? error_stream : output_stream;
+    const auto target_stream =
+        (type >= message_type::trace or is_error) ? error_stream : output_stream;
 
     *target_stream << final_message << std::endl;
 }

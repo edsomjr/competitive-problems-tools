@@ -208,13 +208,13 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             return 0;
 
         default:
-            cli::write(cli::message_type::error, help());
+            cli::write(cli::message_type::none, help(), true);
             return CP_TOOLS_ERROR_CLEAN_INVALID_OPTION;
         }
     }
 
     if (argc < 3) {
-        cli::write(cli::message_type::error, usage());
+        cli::write(cli::message_type::none, usage(), true);
         return CP_TOOLS_ERROR_MISSING_ARGUMENT;
     }
 

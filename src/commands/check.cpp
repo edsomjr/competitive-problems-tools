@@ -326,7 +326,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
             return CP_TOOLS_OK;
 
         default:
-            cli::write(cli::message_type::error, help());
+            cli::write(cli::message_type::none, help(), true);
             return CP_TOOLS_ERROR_CLEAN_INVALID_OPTION;
         }
     }
