@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <getopt.h>
-#include <iostream>
 #include <sstream>
 
 #include "catch.hpp"
