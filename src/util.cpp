@@ -181,4 +181,21 @@ std::string get_from_argv(int argc, char *const argv[], std::vector<std::string>
     return default_value;
 }
 
+int gcd(int a, int b)
+{
+    // Euclid's algorithm with bitwise swaps
+    while(b) b ^= a ^= b ^= a %= b;
+    return a;
+}
+
+std::pair<int, int> 
+reduce_fraction(int num, int dem) {
+    int d = gcd(num, dem);
+
+    num /= d;
+    dem /= d;
+
+    return {num, dem};
+}
+
 } // namespace cptools::util
