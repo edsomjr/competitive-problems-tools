@@ -15,6 +15,9 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
 void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id,
                     bool forced);
 
+void pull_statement(const types::polygon::Credentials &creds, const std::string &problem_id,
+                    bool forced);
+
 } // namespace cptools::commands::polygon::pull
 
 #endif

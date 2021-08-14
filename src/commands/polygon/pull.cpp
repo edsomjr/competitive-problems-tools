@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <set>
 #include <string>
+#include <unordered_map>
 
 #include "cli/cli.h"
 #include "commands/polygon/polygon.h"
@@ -47,6 +48,7 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
  */
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
                     const std::string &problem_id, bool forced) {
+    cli::write(cli::message_type::info, "Pulling " + tool_name + "...");
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
     auto polygon_file_content =
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
@@ -66,6 +68,7 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
  */
 void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id,
                     bool forced) {
+    cli::write(cli::message_type::info, "Pulling solutions...");
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
 
     for (const auto &solution : solutions) {
@@ -84,6 +87,37 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
             conflicts::solve_files(remote_file_name, remote_file_name, file_content, forced);
         config::insert_solution_file_name(solution.tag, new_file_path);
     }
+}
+
+/**
+ * @brief Get the statement objects from the Polygon API and writes them to the filesystem.
+ *
+ * @param creds credentials data structure
+ * @param problem_id Polygon's problem ID
+ * @param forced if it should overwrite the existing statement
+ */
+void pull_statement(const types::polygon::Credentials &creds, const std::string &problem_id, const bool forced) {
+    cli::write(cli::message_type::info, "Pulling statement...");
+    auto statements = api::polygon::get_problem_statement(creds, problem_id);
+
+    auto config_json = config::read_config_file();
+    auto titles = util::get_json_value<std::unordered_map<std::string, std::string>>(
+        config_json, "problem|title", {});
+
+    for (const auto &statement : statements) {
+        auto lang = statement.language;
+        auto found = titles.find(lang);
+        if (found == titles.end() or forced)
+            cli::write(cli::message_type::warning, "The local statement will be overwritten");
+        else if (found->second != statement.title){
+            auto new_place = lang + "_old";
+            cli::write(cli::message_type::warning, "Moving local statement to " + new_place);
+            titles.emplace(new_place, found->second);
+        }
+        titles[lang] = statement.title;
+    }
+
+    config::modify_config_file("problem|title", titles);
 }
 
 // API
@@ -126,12 +160,14 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     auto creds = polygon::get_credentials_from_file(config_path);
 
     try {
+        pull_statement(creds, problem_id, forced);
         pull_tool_file("checker", creds, problem_id, forced);
         pull_tool_file("validator", creds, problem_id, forced);
-        pull_tool_file("generator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
     } catch (const exceptions::polygon_api_error &e) {
         cli::write(cli::message_type::error, e.what());
+        cli::write(cli::message_type::warning,
+                   "Pull aborted, some files may not be updated correctly");
         return CP_TOOLS_ERROR_POLYGON_API;
     }
 

@@ -20,8 +20,14 @@ struct Solution {
     std::string tag;
 };
 using SolutionsVector = std::vector<Solution>;
-
 void from_json(const nlohmann::json &j, Solution &s);
+
+struct Statement {
+    std::string language;
+    std::string title;
+};
+using StatementsVector = std::vector<Statement>;
+void from_json(const nlohmann::json &j, Statement &s);
 
 } // namespace cptools::types::polygon
 
