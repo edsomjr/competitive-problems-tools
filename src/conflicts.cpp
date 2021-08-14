@@ -17,8 +17,8 @@ namespace cptools::conflicts {
  * @param forced if it should be forced and overwrite the local file
  * @return std::string name of the new file
  */
-std::string solve_files(std::string local_file_name, std::string remote_file_name,
-                        std::string remote_file_content, bool forced) {
+std::string solve_files(const std::string &local_file_name, const std::string &remote_file_name,
+                        const std::string &remote_file_content, const bool forced) {
     auto local_file_path = std::filesystem::path(local_file_name);
     auto remote_file_path = std::filesystem::path(remote_file_name);
 
