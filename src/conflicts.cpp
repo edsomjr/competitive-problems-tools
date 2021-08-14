@@ -37,7 +37,7 @@ std::string solve_files(std::string local_file_name, std::string remote_file_nam
         fs::remove(local_file_path);
     } else if (different_hashes and equal_paths) {
         std::filesystem::path target(local_file_path);
-        target.replace_extension(".old");
+        target += ".old";
         cli::write(cli::message_type::warning, "The file '" + local_file_path.string() +
                                                    "' will be moved to '" + target.string() + "'");
         fs::copy(local_file_path, target);
