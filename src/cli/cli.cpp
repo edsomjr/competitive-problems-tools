@@ -12,21 +12,21 @@ std::ostream *error_stream = &std::cerr;
 
 /**
  * @brief Set the output stream object to be used for normal output.
- * 
+ *
  * @param stream The stream object to be used
  */
 void set_output_stream(std::ostream &stream) { output_stream = &stream; }
 
 /**
  * @brief Set the error stream object to be used for error output.
- * 
+ *
  * @param stream The stream object to be used
  */
 void set_error_stream(std::ostream &stream) { error_stream = &stream; }
 
 /**
  * @brief Get the prefix string formatted to a given message type.
- * 
+ *
  * @param type The message type to get the prefix for
  * @return std::string The prefix string formatted given the message type
  */
@@ -49,7 +49,7 @@ std::string get_prefix(const message_type type) {
 
 /**
  * @brief Writes the given message to the correct stream.
- * 
+ *
  * @param type The type of the message
  * @param message The message to write
  * @param is_error If it should go to the error stream
@@ -71,7 +71,7 @@ void write(const message_type type, const std::string &message, bool is_error) {
 
 /**
  * @brief Writes a multi lines message formatted to be used in a trace.
- * 
+ *
  * @param message The message to write
  */
 void write_trace(const std::string &message) {
