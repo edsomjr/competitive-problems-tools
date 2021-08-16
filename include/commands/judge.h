@@ -24,7 +24,7 @@ std::string help();
 std::string usage();
 
 // Judge solution
-int judge(const std::string &solution_path, std::ostream &out, std::ostream &err);
+int judge(const std::string &solution_path, std::ostream &out);
 } // namespace cptools::commands::judge
 
 #endif

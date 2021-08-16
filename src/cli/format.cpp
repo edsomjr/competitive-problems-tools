@@ -1,10 +1,10 @@
-#include "format.h"
+#include "cli/format.h"
 
 #include <iomanip>
 #include <map>
 #include <sstream>
 
-namespace cptools::format {
+namespace cptools::cli::format {
 
 static constexpr long long END = 0;
 
@@ -43,4 +43,4 @@ std::string apply(const std::string &text, long long specs, size_t size) {
     return oss.str();
 }
 
-} // namespace cptools::format
+} // namespace cptools::cli::format

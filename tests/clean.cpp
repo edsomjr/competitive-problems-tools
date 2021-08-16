@@ -1,10 +1,10 @@
 #include <cstdlib>
 #include <getopt.h>
-#include <iostream>
 #include <sstream>
 
 #include "catch.hpp"
 #include "commands/clean.h"
+#include "commands/cptools.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
@@ -18,7 +18,7 @@ SCENARIO("Command clean", "[clean]") {
 
             THEN("The the auto-generated files in current directory is deleted") {
                 std::ostringstream out, err;
-                REQUIRE(cptools::commands::clean::run(argc, argv, out, err) == CP_TOOLS_OK);
+                REQUIRE(cptools::commands::run(argc, argv, out, err) == CP_TOOLS_OK);
             }
         }
 
@@ -36,7 +36,7 @@ SCENARIO("Command clean", "[clean]") {
 
             THEN("The subdirectory with the auto-generated files is deleted") {
                 std::ostringstream out, err;
-                REQUIRE(cptools::commands::clean::run(argc, argv, out, err) == CP_TOOLS_OK);
+                REQUIRE(cptools::commands::run(argc, argv, out, err) == CP_TOOLS_OK);
             }
         }
 
@@ -50,7 +50,7 @@ SCENARIO("Command clean", "[clean]") {
             THEN("The output is the help message") {
                 std::ostringstream out, err;
 
-                auto rc = cptools::commands::clean::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
@@ -68,7 +68,7 @@ SCENARIO("Command clean", "[clean]") {
             THEN("The error output is the help message") {
                 std::ostringstream out, err;
 
-                auto rc = cptools::commands::clean::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_ERROR_CLEAN_INVALID_OPTION);
                 REQUIRE(out.str().empty());

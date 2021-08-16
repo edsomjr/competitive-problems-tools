@@ -1,18 +1,18 @@
 #include <algorithm>
 
+#include "cli/cli.h"
 #include "config.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
-#include "message.h"
 #include "sh.h"
 #include "task.h"
 #include "util.h"
 
 namespace cptools::task {
 
-std::vector<std::pair<std::string, std::string>>
-generate_io_files(const std::string &testset, std::ostream &, std::ostream &err, bool gen_output) {
+std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string &testset,
+                                                                   bool gen_output) {
 
     std::vector<std::string> sets{"samples", "manual", "random"};
 
@@ -34,21 +34,21 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
     for (auto &dir : directories) {
         auto fs_res = fs::create_directory(dir);
         if (not fs_res.ok) {
-            err << message::failure(fs_res.error_message);
+            cli::write(cli::message_type::error, fs_res.error_message);
             return {};
         }
     }
 
     if (source == "ERROR") {
-        err << message::failure("Default solution file not found!\n");
+        cli::write(cli::message_type::error, "Default solution file not found!");
         return {};
     }
 
     auto res = cptools::sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        err << message::failure("Can't compile solution '" + source + "'!") << "\n";
-        err << message::trace(res.output) << '\n';
+        cli::write(cli::message_type::error, "Can't compile solution '" + source + "'!");
+        cli::write_trace(res.output);
         return {};
     }
 
@@ -60,7 +60,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             source = cptools::util::get_json_value(config, "tools|generator", std::string("ERROR"));
 
             if (source == "tools/ERROR") {
-                err << message::failure("Generator file not found!\n");
+                cli::write(cli::message_type::error, "Generator file not found!");
                 return {};
             }
 
@@ -69,8 +69,8 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             res = cptools::sh::build(generator, source);
 
             if (res.rc != CP_TOOLS_OK) {
-                err << message::failure("Can't compile generator '" + source + "'!") << "\n";
-                err << message::trace(res.output) << '\n';
+                cli::write(cli::message_type::error, "Can't compile generator '" + source + "'!");
+                cli::write_trace(res.output);
                 return {};
             }
 
@@ -83,10 +83,9 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
                 auto res = sh::execute(generator, parameters, "", dest);
 
                 if (res.rc != CP_TOOLS_OK) {
-                    err << message::failure("Error generating '" + dest + "' with parameters " +
-                                            parameters)
-                        << "\n";
-                    err << message::trace(res.output) << '\n';
+                    cli::write(cli::message_type::error,
+                               "Error generating '" + dest + "' with parameters " + parameters);
+                    cli::write_trace(res.output);
                     return {};
                 }
 
@@ -101,7 +100,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
 
                 auto res = fs::copy(input, dest, true);
                 if (not res.ok) {
-                    err << message::failure(res.error_message);
+                    cli::write(cli::message_type::error, res.error_message);
                     return {};
                 }
 
@@ -118,8 +117,9 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
             auto res = cptools::sh::execute(program, "", input, output);
 
             if (res.rc != CP_TOOLS_OK) {
-                err << message::failure("Can't generate output for input '" + input + "'!") << "\n";
-                err << message::trace(res.output) << '\n';
+                cli::write(cli::message_type::error,
+                           "Can't generate output for input '" + input + "'!");
+                cli::write_trace(res.output);
                 return {};
             }
 
@@ -130,7 +130,7 @@ generate_io_files(const std::string &testset, std::ostream &, std::ostream &err,
     return io_files;
 }
 
-int build_tools(std::string &error, int tools, const std::string &where) {
+int build_tools(int tools, const std::string &where) {
     auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
     auto fs_res = fs::create_directory(dest_dir);
@@ -162,14 +162,16 @@ int build_tools(std::string &error, int tools, const std::string &where) {
             break;
 
         default:
-            error = "Invalid tool required: (" + std::to_string(tools) + ")";
+            cli::write(cli::message_type::error,
+                       "Invalid tool required: (" + std::to_string(tools) + ")");
             return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
         }
 
         auto source = cptools::util::get_json_value(config, "tools|" + program, std::string(""));
 
         if (source.empty()) {
-            error = "Can't find source for '" + program + "' in config file";
+            cli::write(cli::message_type::error,
+                       "Can't find source for '" + program + "' in config file");
             return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
         }
 
@@ -178,8 +180,8 @@ int build_tools(std::string &error, int tools, const std::string &where) {
         auto res = cptools::sh::build(dest, source);
 
         if (res.rc != CP_TOOLS_OK) {
-            error + message::failure("Can't compile '" + source + "'!") + "\n";
-            error + message::trace(res.output) + '\n';
+            cli::write(cli::message_type::error, "Can't compile '" + source + "'!");
+            cli::write_trace(res.output);
             return res.rc;
         }
     }
@@ -187,8 +189,7 @@ int build_tools(std::string &error, int tools, const std::string &where) {
     return CP_TOOLS_OK;
 }
 
-int gen_exe(std::string &error, const std::string &source, const std::string &dest,
-            const std::string &where) {
+int gen_exe(const std::string &source, const std::string &dest, const std::string &where) {
     auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
 
     auto fs_res = fs::create_directory(dest_dir);
@@ -200,15 +201,15 @@ int gen_exe(std::string &error, const std::string &source, const std::string &de
 
     auto removed_result = fs::remove(program);
     if (not removed_result.ok) {
-        error += message::failure(removed_result.error_message);
+        cli::write(cli::message_type::error, removed_result.error_message);
         return removed_result.rc;
     }
 
     auto res = sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        error += message::failure("Can't build solution '" + source + "'!") + "\n";
-        error += message::trace(res.output) + '\n';
+        cli::write(cli::message_type::error, "Can't build solution '" + source + "'!");
+        cli::write_trace(res.output);
         return res.rc;
     }
 

@@ -1,13 +1,13 @@
 #include <getopt.h>
 #include <iostream>
 
+#include "cli/cli.h"
 #include "commands/genpdf.h"
 #include "commands/gentex.h"
 #include "config.h"
 #include "dirs.h"
 #include "error.h"
 #include "fs.h"
-#include "message.h"
 #include "task.h"
 #include "util.h"
 
@@ -78,27 +78,27 @@ std::string help() { return usage() + help_message; }
  * @return int Returns CP_TOOLS_OK if everything goes as expected,
  *             or returns a specific error code if a problem occurs.
  */
-int create_build_dirs(std::ostream &, std::ostream &err) {
+int create_build_dirs(std::ostream &) {
     std::string boca_build_dir{CP_TOOLS_BOCA_BUILD_DIR};
 
     auto res_remove = fs::remove(boca_build_dir);
 
     if (not res_remove.ok) {
-        err << message::failure(res_remove.error_message);
+        cli::write(cli::message_type::error, res_remove.error_message);
         return res_remove.rc;
     }
 
     auto res_create = fs::create_directory(boca_build_dir);
 
     if (not res_create.ok) {
-        err << message::failure(res_create.error_message);
+        cli::write(cli::message_type::error, res_create.error_message);
         return res_create.rc;
     }
 
     auto res_copy = cptools::fs::copy(CP_TOOLS_BOCA_TEMPLATES_DIR, boca_build_dir, true);
 
     if (not res_copy.ok)
-        err << message::failure(res_copy.error_message) << "\n";
+        cli::write(cli::message_type::error, res_copy.error_message);
 
     return res_copy.rc;
 }
@@ -120,7 +120,7 @@ int create_description_dir(int argc, char *const argv[], std::ostream &out, std:
     // Copy the pdf to boca's build directory
     auto res_cpy = fs::copy(pdf_file, boca_desc_dir, true);
     if (not res_cpy.ok) {
-        err << message::failure(res_cpy.error_message) << "\n";
+        cli::write(cli::message_type::error, res_cpy.error_message);
         return res_cpy.rc;
     }
 
@@ -128,7 +128,7 @@ int create_description_dir(int argc, char *const argv[], std::ostream &out, std:
     std::string label = util::get_from_argv(argc, argv, {"--label", "-b"}, "A");
     auto res_rnm = fs::rename(boca_desc_dir + pdf_file, boca_desc_dir + label + ".pdf");
     if (not res_rnm.ok) {
-        err << message::failure(res_rnm.error_message) << "\n";
+        cli::write(cli::message_type::error, res_rnm.error_message);
         return res_rnm.rc;
     }
 
@@ -148,8 +148,8 @@ int create_description_dir(int argc, char *const argv[], std::ostream &out, std:
     return CP_TOOLS_OK;
 }
 
-int create_io_dir(std::ostream &out, std::ostream &err) {
-    auto pairs = task::generate_io_files("all", out, err);
+int create_io_dir() {
+    auto pairs = task::generate_io_files("all");
 
     for (const auto &dir : {std::string("input/"), std::string("output/")}) {
 
@@ -157,7 +157,7 @@ int create_io_dir(std::ostream &out, std::ostream &err) {
             fs::copy(CP_TOOLS_BUILD_DIR + std::string("/") + dir, CP_TOOLS_BOCA_BUILD_DIR + dir);
 
         if (not res_cpy.ok) {
-            err << message::failure(res_cpy.error_message) << "\n";
+            cli::write(cli::message_type::error, res_cpy.error_message);
             return res_cpy.rc;
         }
     }
@@ -166,7 +166,7 @@ int create_io_dir(std::ostream &out, std::ostream &err) {
 }
 
 int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
-    if (create_build_dirs(out, err) != CP_TOOLS_OK) {
+    if (create_build_dirs(out) != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_BUILD_DIRECTORY;
     }
 
@@ -174,7 +174,7 @@ int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err) 
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_DESCRIPTION_DIRECTORY;
     }
 
-    if (create_io_dir(out, err) != CP_TOOLS_OK) {
+    if (create_io_dir() != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_IO_DIRECTORY;
     }
 
@@ -189,7 +189,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            out << help() << '\n';
+            cli::write(cli::message_type::none, help());
             return 0;
         }
     }

@@ -4,14 +4,14 @@
 #include <getopt.h>
 #include <unistd.h>
 
+#include "cli/cli.h"
+#include "cli/format.h"
 #include "commands/clean.h"
 #include "commands/judge.h"
 #include "config.h"
 #include "defs.h"
 #include "dirs.h"
 #include "error.h"
-#include "format.h"
-#include "message.h"
 #include "sh.h"
 #include "table.h"
 #include "task.h"
@@ -60,11 +60,11 @@ std::map<int, std::string> ver_string{
 };
 
 const std::map<int, long long> ver_style{
-    {verdict::AC, format::style::AC},       {verdict::PE, format::style::PE},
-    {verdict::WA, format::style::WA},       {verdict::CE, format::style::CE},
-    {verdict::TLE, format::style::TLE},     {verdict::RTE, format::style::RTE},
-    {verdict::MLE, format::style::MLE},     {verdict::FAIL, format::style::FAIL},
-    {verdict::UNDEF, format::style::UNDEF},
+    {verdict::AC, cli::format::style::AC},       {verdict::PE, cli::format::style::PE},
+    {verdict::WA, cli::format::style::WA},       {verdict::CE, cli::format::style::CE},
+    {verdict::TLE, cli::format::style::TLE},     {verdict::RTE, cli::format::style::RTE},
+    {verdict::MLE, cli::format::style::MLE},     {verdict::FAIL, cli::format::style::FAIL},
+    {verdict::UNDEF, cli::format::style::UNDEF},
 };
 
 // Auxiliary routines
@@ -72,34 +72,25 @@ std::string usage() { return "Usage: " NAME " problem judge solution.[cpp|c|java
 
 std::string help() { return usage() + help_message; }
 
-int judge(const std::string &solution_path, std::ostream &out, std::ostream &err) {
+int judge(const std::string &solution_path, std::ostream &out) {
     table::Table report{{
-        {"#", 4, format::align::RIGHT | format::emph::BOLD},
-        {"Verdict", 32, format::align::LEFT | format::emph::BOLD},
-        {"Time (s)", 12, format::align::RIGHT | format::emph::BOLD},
-        {"Memory (MB)", 12, format::align::RIGHT | format::emph::BOLD},
+        {"#", 4, cli::format::align::RIGHT | cli::format::emph::BOLD},
+        {"Verdict", 32, cli::format::align::LEFT | cli::format::emph::BOLD},
+        {"Time (s)", 12, cli::format::align::RIGHT | cli::format::emph::BOLD},
+        {"Memory (MB)", 12, cli::format::align::RIGHT | cli::format::emph::BOLD},
     }};
 
-    out << message::info("Judging solution '" + solution_path + "'...") << "\n";
+    cli::write(cli::message_type::info, "Judging solution '" + solution_path + "'...");
 
-    // Constrói as ferramentas necessárias
-    std::string error;
-    auto rc = task::build_tools(error, task::tools::VALIDATOR | task::tools::CHECKER);
+    auto rc = task::build_tools(task::tools::VALIDATOR | task::tools::CHECKER);
 
-    if (rc != CP_TOOLS_OK) {
-        err << message::failure("Can't build the required tools") << '\n';
-        err << message::trace(error);
+    if (rc != CP_TOOLS_OK)
         return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
-    }
 
-    // Gera o executável da solução
-    rc = task::gen_exe(error, solution_path, "sol");
+    rc = task::gen_exe(solution_path, "sol");
 
-    if (rc != CP_TOOLS_OK) {
-        err << message::failure("Error on solution '" + solution_path + "' compilation") << '\n';
-        err << message::trace(error) << '\n';
+    if (rc != CP_TOOLS_OK)
         return verdict::CE;
-    }
 
     auto config = cptools::config::read_config_file();
     auto timelimit = cptools::util::get_json_value(config, "problem|timelimit", 1000);
@@ -109,7 +100,7 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
     auto program{std::string(CP_TOOLS_BUILD_DIR) + "/sol"};
     auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
 
-    auto files = task::generate_io_files("all", out, err);
+    auto files = task::generate_io_files("all");
     int ans = verdict::AC, passed = 0;
     double tmax = 0.0, mmax = 0.0;
 
@@ -127,8 +118,8 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         auto res = sh::execute(validator, "", input);
 
         if (res.rc != CP_TOOLS_OK) {
-            err << message::failure("Input file '" + input + "' is invalid") << "\n";
-            err << message::trace(res.output) << '\n';
+            cli::write(cli::message_type::error, "Input file '" + input + "' is invalid");
+            cli::write_trace(res.output);
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
 
@@ -175,55 +166,60 @@ int judge(const std::string &solution_path, std::ostream &out, std::ostream &err
         mmax = std::max(mmax, info.memory);
         passed += ver == verdict::AC ? 1 : 0;
 
-        report.add_row({{number, format::style::COUNTER},
+        report.add_row({{number, cli::format::style::COUNTER},
                         {ver_string[ver], ver_style.at(ver)},
-                        {as_string(info.elapsed, 6), format::style::FLOAT},
-                        {as_string(info.memory, 3), format::style::INT}});
+                        {as_string(info.elapsed, 6), cli::format::style::FLOAT},
+                        {as_string(info.memory, 3), cli::format::style::INT}});
     }
 
     out << report << '\n';
 
     int col_size = 12;
 
-    out << format::apply("Verdict:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(ver_string[ans], ver_style.at(ans) + format::align::LEFT) << '\n';
+    out << cli::format::apply("Verdict:", cli::format::emph::BOLD + cli::format::align::LEFT,
+                              col_size)
+        << cli::format::apply(ver_string[ans], ver_style.at(ans) + cli::format::align::LEFT)
+        << '\n';
 
-    out << format::apply("Passed:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(std::to_string(passed), format::style::INT) << '\n';
+    out << cli::format::apply("Passed:", cli::format::emph::BOLD + cli::format::align::LEFT,
+                              col_size)
+        << cli::format::apply(std::to_string(passed), cli::format::style::INT) << '\n';
 
-    out << format::apply("Max time:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(as_string(tmax, 6), format::style::FLOAT) << '\n';
+    out << cli::format::apply("Max time:", cli::format::emph::BOLD + cli::format::align::LEFT,
+                              col_size)
+        << cli::format::apply(as_string(tmax, 6), cli::format::style::FLOAT) << '\n';
 
-    out << format::apply("Max memory:", format::emph::BOLD + format::align::LEFT, col_size)
-        << format::apply(as_string(mmax, 3), format::style::FLOAT) << '\n';
+    out << cli::format::apply("Max memory:", cli::format::emph::BOLD + cli::format::align::LEFT,
+                              col_size)
+        << cli::format::apply(as_string(mmax, 3), cli::format::style::FLOAT) << '\n';
 
     return ans;
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
     int option = -1;
     std::string target{"."};
 
     while ((option = getopt_long(argc, argv, "h", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            out << help() << '\n';
+            cli::write(cli::message_type::none, help());
             return 0;
 
         default:
-            err << help() << '\n';
+            cli::write(cli::message_type::none, help(), true);
             return CP_TOOLS_ERROR_CLEAN_INVALID_OPTION;
         }
     }
 
     if (argc < 3) {
-        err << usage() << '\n';
+        cli::write(cli::message_type::none, usage(), true);
         return CP_TOOLS_ERROR_MISSING_ARGUMENT;
     }
 
     auto solution_path = argv[2];
 
-    return judge(solution_path, out, err);
+    return judge(solution_path, out);
 }
 } // namespace cptools::commands::judge
