@@ -1,4 +1,5 @@
 #include <getopt.h>
+#include <limits>
 
 #include "cli/cli.h"
 #include "commands/genpdf.h"
@@ -112,14 +113,14 @@ int create_build_dirs(std::ostream &) {
     return res_copy.rc;
 }
 
-int execute_genpdf_command(int argc, char *const argv[], std::ostream &out, std::ostream &err) 
+int execute_genpdf_command(int argc, char *const argv[], std::ostream &out, std::ostream &err)
 {
     std::string document_class  = util::get_from_argv(argc, argv, {"--class", "-c"}, "cp_modern");
     std::string outfile  = util::get_from_argv(argc, argv, {"--output", "-o"}, "problem.pdf");
     std::string language  = util::get_from_argv(argc, argv, {"--lang", "-g"}, "pt_BR");
     std::string label  = util::get_from_argv(argc, argv, {"--label", "-b"}, "A");
     int flags = gentex::flag::INCLUDE_AUTHOR | gentex::flag::INCLUDE_CONTEST;
-    
+
     // ~gentex::flag::INCLUDE_CONTEST
     // Qual é o char correto aqui?
     if( util::get_from_argv(argc, argv, {"--no_author"}, "") == std::string("") ) {
@@ -133,7 +134,7 @@ int execute_genpdf_command(int argc, char *const argv[], std::ostream &out, std:
     bool tutorial = false;
 
     for(int i=0; i<argc; i++) {
-        if(std::string(argv[i]) == std::string("--tutorial") or 
+        if(std::string(argv[i]) == std::string("--tutorial") or
            std::string(argv[i]) == std::string("-t"))
         {
             tutorial = true;
@@ -142,7 +143,7 @@ int execute_genpdf_command(int argc, char *const argv[], std::ostream &out, std:
         }
     }
 
-    return genpdf::generate_pdf(document_class, language, flags, label, 
+    return genpdf::generate_pdf(document_class, language, flags, label,
                                 outfile, tutorial, out, err);
 }
 
@@ -208,14 +209,65 @@ int create_io_dir() {
     return CP_TOOLS_OK;
 }
 
-std::pair<int, int> 
-reduce_fraction(int num, int dem) {
-    int d = util::gcd(num, dem);
+int find_best_divisor(int timelimit_ms, int t) {
 
-    num /= d;
-    dem /= d;
+    int l = 1, r = t;
 
-    return {num, dem};
+    int local_best = -1;
+    int smallest_diff = std::numeric_limits<int>::max();
+
+    while(l <= r) {
+        int mid = l + (r - l) / 2;
+
+        int result = (t/mid);
+        int diff = std::abs( (t/mid) - timelimit_ms );
+
+        if( diff < smallest_diff) {
+            smallest_diff = diff;
+            local_best = mid;
+        }
+
+        if( result == timelimit_ms ) {
+            break;
+        }
+
+        else if(result < timelimit_ms) {
+            r = mid - 1;
+        }
+
+        else if(result > timelimit_ms) {
+            l = mid + 1;
+        }
+    }
+
+    return local_best;
+}
+
+std::pair<int, int> find_optimal_ratio(int timelimit_ms)
+{
+    int global_best_numerator = 1000;
+    int global_best_divisor = 1;
+
+    // t is in ms, and belongs to the range [1000, 5000]
+    for(int t=1000; t<=5000; t+=1000) {
+        int local_best_divisor = find_best_divisor(timelimit_ms, t);
+
+        int global_diff  = std::abs( (global_best_numerator/global_best_divisor) - timelimit_ms );
+        int local_diff  = std::abs( (t/local_best_divisor) - timelimit_ms );
+
+        if( local_diff < global_diff ) {
+            global_best_numerator = t;
+            global_best_divisor = local_best_divisor;
+        }
+    }
+
+    // global_best_numerator is in ms, so divide by 1000 to convert to seconds
+    auto [numerator, divisor] = util::reduce_fraction(
+        global_best_numerator/1000,
+        global_best_divisor
+    );
+
+    return {numerator, divisor};
 }
 
 int create_limits_dir(int argc, char *const argv[]) {
@@ -224,65 +276,63 @@ int create_limits_dir(int argc, char *const argv[]) {
 
     auto config = config::read_config_file();
 
-    int max_file_size = 1024; // KBytes
-    auto max_memory_amount { util::get_json_value(config, 
-                                                  "problem|memory_limit", 
-                                                  std::string("1024"))}; // Mbytes
+    // KBytes
+    auto max_file_size = std::stoi({
+        util::get_from_argv(argc, argv, {"--max-file-size"}, "1024")
+    });
 
-    std::vector<std::pair<std::string, std::string>> lang_time_limits{
-        // lang, default ms time limits
-        {"c",    "100"},
-        {"cpp",  "100"},
-        {"java", "333"},
-        {"kt",   "333"},
-        {"py2",  "500"},
-        {"py3",  "500"},
+    // Mbytes
+    auto max_memory_amount {
+        util::get_json_value(config, "problem|memory_limit", std::string("1024"))
     };
-    
-    for(const auto& [lang, default_timelimit] : lang_time_limits) {
 
-        // --cpp-time-limit, --c-time-limit, --java-time-limit, --kt-time-limit, 
-        auto search_key = std::string("--") + lang + std::string("-time-limit");
-        
-        // ms: milliseconds,   str: type string
-        auto timelimit_ms_str{util::get_from_argv(argc, argv, {search_key}, default_timelimit)};
+    // First try to get the value from the command arguments.
+    auto timelimit_ms_str { util::get_from_argv(argc, argv, {"--cpp-time-limit"}, "") };
+    int timelimit_ms;
 
-        int timelimit_ms = std::stoi(timelimit_ms_str);
-        
-        int nxt_5_mult = timelimit_ms;
+    // If the argument is not passed, the value from config.json is used
+    if( timelimit_ms_str == std::string("") ) {
+        // The value obtained here refers to the timelimit of c and c++
+        timelimit_ms = util::get_json_value(config, "problem|timelimit", 1000);
+    }
+    else {
+        timelimit_ms = std::stoi(timelimit_ms_str);
+    }
 
-        int rounding_factor = 50;
-        if(timelimit_ms % rounding_factor != 0) {
-            nxt_5_mult = timelimit_ms + (rounding_factor - timelimit_ms % rounding_factor);
-        }
+    std::vector<std::pair<std::string, int>> languages {{"c",    1}, {"cpp",  1},
+                                                        {"java", 3}, {"kt",   3},
+                                                        {"py2",  5}, {"py3",  5}};
 
-        // time_limit_str is a value in milliseconds, and the packet from boca expects a 
-        // value in seconds. Thus, it is necessary to find a ratio between time_limit and
-        // repetitions_number that meets the original limit of milliseconds
-        auto [timelimit_s, repetitions_number] = util::reduce_fraction(nxt_5_mult, 
-                                                                      1000);
+
+    for(const auto& [lang, time_ratio] : languages) {
+
+        int lang_timelimit_ms = time_ratio * timelimit_ms;
+
+        // lang_timelimit_ms is in ms, so divide by 1000 to convert to seconds
+        auto [timelimit_s, repetitions_number] = find_optimal_ratio(lang_timelimit_ms);
+
         std::string content{
-            std::string("#!/bin/bash\n") + 
-            
+            std::string("#!/bin/bash\n") +
+
             // time limit
-            std::string("echo ") + std::to_string(timelimit_s) + '\n' + 
+            std::string("echo ") + std::to_string(timelimit_s) + '\n' +
 
             // number of repetitions to be performed within the time limit
-            std::string("echo ") + std::to_string(repetitions_number) + '\n' + 
+            std::string("echo ") + std::to_string(repetitions_number) + '\n' +
 
             // maximum amount of memory per repetition
-            std::string("echo ") + max_memory_amount + '\n' + 
+            std::string("echo ") + max_memory_amount + '\n' +
 
             // maximum file size
-            std::string("echo ") + std::to_string(max_file_size) + '\n' + 
+            std::string("echo ") + std::to_string(max_file_size) + '\n' +
 
             // and shall return zero to indicate no failure
             std::string("exit 0\n")
         };
-        
+
         fs::overwrite_file(limit_path + lang, content);
     }
-    
+
     return CP_TOOLS_OK;
 }
 
