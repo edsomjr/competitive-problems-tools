@@ -243,13 +243,15 @@ int find_best_divisor(int timelimit_ms, int t) {
     return local_best;
 }
 
-std::pair<int, int> find_optimal_ratio(int timelimit_ms)
+std::pair<int, int> find_optimal_ratio(int timelimit_ms, std::pair<int, int> numerator_range)
 {
     int global_best_numerator = 1000;
     int global_best_divisor = 1;
 
+    auto [lower_bound, upper_bound] = numerator_range;
+
     // t is in ms, and belongs to the range [1000, 5000]
-    for(int t=1000; t<=5000; t+=1000) {
+    for(int t=lower_bound; t<=upper_bound; t+=1000) {
         int local_best_divisor = find_best_divisor(timelimit_ms, t);
 
         int global_diff  = std::abs( (global_best_numerator/global_best_divisor) - timelimit_ms );
@@ -287,7 +289,8 @@ int create_limits_dir(int argc, char *const argv[]) {
     };
 
     // First try to get the value from the command arguments.
-    auto timelimit_ms_str { util::get_from_argv(argc, argv, {"--cpp-time-limit"}, "") };
+    auto timelimit_ms_str { util::get_from_argv(argc, argv,
+                                                {"--cpp-time-limit", "--c-time-limit"}, "") };
     int timelimit_ms;
 
     // If the argument is not passed, the value from config.json is used
@@ -308,14 +311,19 @@ int create_limits_dir(int argc, char *const argv[]) {
 
         int lang_timelimit_ms = time_ratio * timelimit_ms;
 
-        // lang_timelimit_ms is in ms, so divide by 1000 to convert to seconds
-        auto [timelimit_s, repetitions_number] = find_optimal_ratio(lang_timelimit_ms);
+        // The find_optimal_ratio function will look for the best ratio within that numerator range.
+        std::pair<int, int> numerator_range{1000*time_ratio, 5000*time_ratio};
+
+        auto [lang_timelimit_s, repetitions_number] = find_optimal_ratio(
+            lang_timelimit_ms,
+            numerator_range
+        );
 
         std::string content{
             std::string("#!/bin/bash\n") +
 
             // time limit
-            std::string("echo ") + std::to_string(timelimit_s) + '\n' +
+            std::string("echo ") + std::to_string(lang_timelimit_s) + '\n' +
 
             // number of repetitions to be performed within the time limit
             std::string("echo ") + std::to_string(repetitions_number) + '\n' +
