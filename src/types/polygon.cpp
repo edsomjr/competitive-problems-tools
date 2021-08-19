@@ -36,4 +36,9 @@ void from_json(const nlohmann::json &j, Statement &s) {
     s.title = j["name"].get<std::string>();
 }
 
+void from_json(const nlohmann::json &j, Information &i) {
+    i.memory_limit = j["memoryLimit"].get<int>();
+    i.time_limit = j["timeLimit"].get<int>();
+}
+
 } // namespace cptools::types::polygon

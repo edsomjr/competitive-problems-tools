@@ -31,6 +31,9 @@ std::string generate_api_sig(const std::string &method_name, const httplib::Para
 types::polygon::StatementsVector get_problem_statement(const types::polygon::Credentials &creds,
                                                        const std::string &problem_id);
 
+types::polygon::Information get_problem_information(const types::polygon::Credentials &creds,
+                                                    const std::string &problem_id);
+
 } // namespace cptools::api::polygon
 
 #endif

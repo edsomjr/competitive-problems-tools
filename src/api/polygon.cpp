@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "api/polygon.h"
-#include "cli/cli.h"
+#include "cli/cli.h" // TODO: remove
 #include "exceptions.h"
 #include "httplib.h"
 #include "json.hpp"
@@ -107,6 +107,18 @@ types::polygon::StatementsVector get_problem_statement(const types::polygon::Cre
     }
 
     return statements;
+}
+
+types::polygon::Information get_problem_information(const types::polygon::Credentials &creds,
+                                                    const std::string &problem_id) {
+    httplib::Params params;
+    params.emplace("problemId", problem_id);
+    auto result = get("problem.info", creds, params);
+
+    auto info_json = nlohmann::json::parse(result->body).at("result");
+    auto info = info_json.get<types::polygon::Information>();
+
+    return info;
 }
 
 std::string generate_api_sig(const std::string &method_name, const httplib::Params &params,

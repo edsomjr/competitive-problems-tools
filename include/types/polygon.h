@@ -29,6 +29,12 @@ struct Statement {
 using StatementsVector = std::vector<Statement>;
 void from_json(const nlohmann::json &j, Statement &s);
 
+struct Information {
+    int time_limit;
+    int memory_limit;
+};
+void from_json(const nlohmann::json &j, Information &i);
+
 } // namespace cptools::types::polygon
 
 #endif
