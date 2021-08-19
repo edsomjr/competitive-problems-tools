@@ -96,28 +96,28 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
  * @param problem_id Polygon's problem ID
  * @param forced if it should overwrite the existing statement
  */
-void pull_statement(const types::polygon::Credentials &creds, const std::string &problem_id, const bool forced) {
-    cli::write(cli::message_type::info, "Pulling statement...");
+void pull_titles(const types::polygon::Credentials &creds, const std::string &problem_id) {
+    auto config_json = config::read_config_file();
+
+    cli::write(cli::message_type::info, "Pulling problem title...");
     auto statements = api::polygon::get_problem_statement(creds, problem_id);
 
-    auto config_json = config::read_config_file();
-    auto titles = util::get_json_value<std::unordered_map<std::string, std::string>>(
-        config_json, "problem|title", {});
+    std::unordered_map<std::string, std::string> titles;
 
     for (const auto &statement : statements) {
         auto lang = statement.language;
-        auto found = titles.find(lang);
-        if (found == titles.end() or forced)
-            cli::write(cli::message_type::warning, "The local statement will be overwritten");
-        else if (found->second != statement.title){
-            auto new_place = lang + "_old";
-            cli::write(cli::message_type::warning, "Moving local statement to " + new_place);
-            titles.emplace(new_place, found->second);
-        }
-        titles[lang] = statement.title;
+        titles.emplace(lang, statement.title);
     }
 
     config::modify_config_file("problem|title", titles);
+}
+
+void pull_infos(const types::polygon::Credentials &creds, const std::string &problem_id) {
+    cli::write(cli::message_type::info, "Pulling problem informations...");
+    auto info = api::polygon::get_problem_information(creds, problem_id);
+
+    config::modify_config_file("problem|memory_limit", info.memory_limit);
+    config::modify_config_file("problem|time_limit", info.time_limit);
 }
 
 // API
@@ -159,15 +159,34 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     auto config_path = fs::get_default_config_path();
     auto creds = polygon::get_credentials_from_file(config_path);
 
+    auto ext = ".old";
+    auto old_config_path = config::config_path_name + ext;
+
+    if (forced)
+        cli::write(cli::message_type::warning, "Forced update: files will be overwritten");
+    else {
+        cli::write(cli::message_type::info,
+                   "Local " + config::config_path_name + " copied to " + old_config_path);
+        fs::copy(config::config_path_name, old_config_path);
+    }
+
     try {
-        pull_statement(creds, problem_id, forced);
         pull_tool_file("checker", creds, problem_id, forced);
         pull_tool_file("validator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
+        pull_titles(creds, problem_id);
+        pull_infos(creds, problem_id);
     } catch (const exceptions::polygon_api_error &e) {
         cli::write(cli::message_type::error, e.what());
         cli::write(cli::message_type::warning,
                    "Pull aborted, some files may not be updated correctly");
+
+        if (not forced) {
+            cli::write(cli::message_type::warning,
+                       "Recovering " + config::config_path_name + " from " + old_config_path);
+            fs::copy(old_config_path, config::config_path_name);
+        }
+
         return CP_TOOLS_ERROR_POLYGON_API;
     }
 

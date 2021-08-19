@@ -32,8 +32,6 @@ std::string solve_files(const std::string &local_file_name, const std::string &r
     bool different_hashes = local_file_hash != remote_file_hash;
 
     if (forced) {
-        cli::write(cli::message_type::warning,
-                   "The file '" + local_file_path.string() + "' will be overwritten.");
         fs::remove(local_file_path);
     } else if (different_hashes and equal_paths) {
         std::filesystem::path target(local_file_path);
