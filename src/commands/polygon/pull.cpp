@@ -48,7 +48,7 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
  */
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
                     const std::string &problem_id, bool forced) {
-    cli::write(cli::message_type::info, "Pulling " + tool_name + "...");
+    cli::write(cli::fmt::info, "Pulling " + tool_name + "...");
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
     auto polygon_file_content =
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
@@ -68,7 +68,7 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
  */
 void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id,
                     bool forced) {
-    cli::write(cli::message_type::info, "Pulling solutions...");
+    cli::write(cli::fmt::info, "Pulling solutions...");
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
 
     for (const auto &solution : solutions) {
@@ -99,7 +99,7 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
 void pull_titles(const types::polygon::Credentials &creds, const std::string &problem_id) {
     auto config_json = config::read_config_file();
 
-    cli::write(cli::message_type::info, "Pulling problem title...");
+    cli::write(cli::fmt::info, "Pulling problem title...");
     auto statements = api::polygon::get_problem_statement(creds, problem_id);
 
     std::unordered_map<std::string, std::string> titles;
@@ -113,7 +113,7 @@ void pull_titles(const types::polygon::Credentials &creds, const std::string &pr
 }
 
 void pull_infos(const types::polygon::Credentials &creds, const std::string &problem_id) {
-    cli::write(cli::message_type::info, "Pulling problem informations...");
+    cli::write(cli::fmt::info, "Pulling problem informations...");
     auto info = api::polygon::get_problem_information(creds, problem_id);
 
     config::modify_config_file("problem|memory_limit", info.memory_limit);
@@ -128,7 +128,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     while ((option = getopt_long(argc, argv, "hf", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help_message);
+            cli::write(cli::fmt::none, help_message);
             return CP_TOOLS_OK;
 
         case 'f':
@@ -136,7 +136,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
             break;
 
         default:
-            cli::write(cli::message_type::error, help_message);
+            cli::write(cli::fmt::error, help_message);
             return CP_TOOLS_ERROR_POLYGON_INVALID_OPTION;
         }
     }
@@ -146,13 +146,12 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     try {
         problem_id = config::get_polygon_problem_id();
     } catch (const exceptions::inexistent_file_error &e) {
-        cli::write(cli::message_type::error, e.what());
+        cli::write(cli::fmt::error, e.what());
         return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
     }
 
     if (problem_id == "") {
-        cli::write(cli::message_type::error,
-                   "Couldn't find the problem id in the configuration file.");
+        cli::write(cli::fmt::error, "Couldn't find the problem id in the configuration file.");
         return CP_TOOLS_ERROR_POLYGON_NO_PROBLEM_ID;
     }
 
@@ -163,9 +162,9 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     auto old_config_path = config::config_path_name + ext;
 
     if (forced)
-        cli::write(cli::message_type::warning, "Forced update: files will be overwritten");
+        cli::write(cli::fmt::warning, "Forced update: files will be overwritten");
     else {
-        cli::write(cli::message_type::info,
+        cli::write(cli::fmt::info,
                    "Local " + config::config_path_name + " copied to " + old_config_path);
         fs::copy(config::config_path_name, old_config_path);
     }
@@ -177,12 +176,11 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
         pull_titles(creds, problem_id);
         pull_infos(creds, problem_id);
     } catch (const exceptions::polygon_api_error &e) {
-        cli::write(cli::message_type::error, e.what());
-        cli::write(cli::message_type::warning,
-                   "Pull aborted, some files may not be updated correctly");
+        cli::write(cli::fmt::error, e.what());
+        cli::write(cli::fmt::warning, "Pull aborted, some files may not be updated correctly");
 
         if (not forced) {
-            cli::write(cli::message_type::warning,
+            cli::write(cli::fmt::warning,
                        "Recovering " + config::config_path_name + " from " + old_config_path);
             fs::copy(old_config_path, config::config_path_name);
         }
@@ -190,7 +188,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
         return CP_TOOLS_ERROR_POLYGON_API;
     }
 
-    cli::write(cli::message_type::ok, "Pull completed");
+    cli::write(cli::fmt::ok, "Pull completed");
 
     return CP_TOOLS_OK;
 }

@@ -36,13 +36,12 @@ std::string solve_files(const std::string &local_file_name, const std::string &r
     } else if (different_hashes and equal_paths) {
         std::filesystem::path target(local_file_path);
         target += ".old";
-        cli::write(cli::message_type::warning, "The file '" + local_file_path.string() +
-                                                   "' will be moved to '" + target.string() + "'");
+        cli::write(cli::fmt::warning, "The file '" + local_file_path.string() +
+                                          "' will be moved to '" + target.string() + "'");
         fs::copy(local_file_path, target);
     } else if (not equal_paths and not different_hashes) {
-        cli::write(cli::message_type::info, "The file '" + local_file_path.string() +
-                                                "' will be moved to '" + new_file_path.string() +
-                                                "'");
+        cli::write(cli::fmt::info, "The file '" + local_file_path.string() +
+                                       "' will be moved to '" + new_file_path.string() + "'");
         fs::remove(local_file_path);
     }
     fs::overwrite_file(new_file_path, remote_file_content);

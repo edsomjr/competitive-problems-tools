@@ -8,26 +8,22 @@
 
 namespace cptools::cli::styles {
 
-const std::unordered_map<message_type, long long> message_type_styles = {
-    {message_type::none, 0},
-    {message_type::header, format::emph::BOLD},
-    {message_type::info, format::color::GRAY},
-    {message_type::ok, format::emph::ITALIC + format::color::GREEN},
-    {message_type::warning, format::emph::ITALIC + format::color::YELLOW},
-    {message_type::trace, format::emph::ITALIC + format::color::VIOLET},
-    {message_type::error, format::emph::ITALIC + format::color::RED}};
+const std::unordered_map<fmt, long long> message_type_styles = {
+    {fmt::none, 0},
+    {fmt::header, format::emph::BOLD},
+    {fmt::info, format::color::GRAY},
+    {fmt::ok, format::emph::ITALIC + format::color::GREEN},
+    {fmt::warning, format::emph::ITALIC + format::color::YELLOW},
+    {fmt::trace, format::emph::ITALIC + format::color::VIOLET},
+    {fmt::error, format::emph::ITALIC + format::color::RED}};
 
-const std::unordered_map<message_type, std::string> message_type_prefixes = {
-    {message_type::ok, "Ok!"},
-    {message_type::warning, "Warning!"},
-    {message_type::trace, "Trace:"},
-    {message_type::error, "Failed!"}};
+const std::unordered_map<fmt, std::string> message_type_prefixes = {
+    {fmt::ok, "Ok!"}, {fmt::warning, "Warning!"}, {fmt::trace, "Trace:"}, {fmt::error, "Failed!"}};
 
-const std::unordered_map<message_type, long long> prefix_style = {
-    {message_type::ok, format::color::GREEN},
-    {message_type::warning, format::color::YELLOW},
-    {message_type::trace, format::color::VIOLET},
-    {message_type::error, format::color::RED}};
+const std::unordered_map<fmt, long long> prefix_style = {{fmt::ok, format::color::GREEN},
+                                                         {fmt::warning, format::color::YELLOW},
+                                                         {fmt::trace, format::color::VIOLET},
+                                                         {fmt::error, format::color::RED}};
 
 } // namespace cptools::cli::styles
 

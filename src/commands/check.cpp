@@ -69,10 +69,10 @@ std::string usage() { return "Usage: " NAME " check [-h] [-a] [-c] [-s] [-t] [-v
 std::string help() { return usage() + help_message; }
 
 int validate_checker() {
-    cli::write(cli::message_type::info, "Creating directory " CP_TOOLS_BUILD_DIR);
+    cli::write(cli::fmt::info, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        cli::write(cli::message_type::error, fs_res.error_message);
+        cli::write(cli::fmt::error, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -81,14 +81,14 @@ int validate_checker() {
     auto source = cptools::util::get_json_value(config, "tools|validator", std::string("ERROR"));
 
     if (source == "ERROR") {
-        cli::write(cli::message_type::error, "[validate_validator] Validator file not found!\n");
+        cli::write(cli::fmt::error, "[validate_validator] Validator file not found!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
     auto res = cptools::sh::build(validator, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Can't compile validator '" + source + "'!");
+        cli::write(cli::fmt::error, "Can't compile validator '" + source + "'!");
         cli::write_trace(res.output);
         return res.rc;
     }
@@ -96,7 +96,7 @@ int validate_checker() {
     source = cptools::util::get_json_value(config, "tools|checker", std::string("ERROR"));
 
     if (source == "ERROR") {
-        cli::write(cli::message_type::error, "[validate_checker] Checker file not found!\n");
+        cli::write(cli::fmt::error, "[validate_checker] Checker file not found!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_CHECKER;
     }
 
@@ -105,7 +105,7 @@ int validate_checker() {
     res = cptools::sh::build(checker, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Can't compile checker '" + source + "'!");
+        cli::write(cli::fmt::error, "Can't compile checker '" + source + "'!");
         cli::write_trace(res.output);
         return res.rc;
     }
@@ -113,8 +113,7 @@ int validate_checker() {
     source = cptools::util::get_json_value(config, "solutions|default", std::string("ERROR"));
 
     if (source == "ERROR") {
-        cli::write(cli::message_type::error,
-                   "[validate_checker] Default solution file not found!\n");
+        cli::write(cli::fmt::error, "[validate_checker] Default solution file not found!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
@@ -123,7 +122,7 @@ int validate_checker() {
     res = cptools::sh::build(solution, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Can't compile solution '" + source + "'!");
+        cli::write(cli::fmt::error, "Can't compile solution '" + source + "'!");
         cli::write_trace(res.output);
         return res.rc;
     }
@@ -132,27 +131,25 @@ int validate_checker() {
         config, "tests|checker", std::map<std::string, std::pair<std::string, std::string>>{});
 
     if (tests.empty()) {
-        cli::write(cli::message_type::error,
-                   "[validate_checker] There are no tests for the validator\n");
+        cli::write(cli::fmt::error, "[validate_checker] There are no tests for the validator\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
-    cli::write(cli::message_type::info,
+    cli::write(cli::fmt::info,
                "Testing the checker (" + std::to_string(tests.size()) + " tests) ...");
 
     for (auto [input, data] : tests) {
         auto [output, verdict] = data;
 
         if (rcodes.find(verdict) == rcodes.end()) {
-            cli::write(cli::message_type::error,
-                       "[validate_checker] Invalid verdict: '" + verdict + "'\n");
+            cli::write(cli::fmt::error, "[validate_checker] Invalid verdict: '" + verdict + "'\n");
             return CP_TOOLS_ERROR_CHECK_INVALID_VEREDICT;
         }
 
         auto result = sh::execute(validator, "", input, "");
 
         if (result.rc != CP_TOOLS_OK) {
-            cli::write(cli::message_type::error, "Input file '" + input + "' is invalid!");
+            cli::write(cli::fmt::error, "Input file '" + input + "' is invalid!");
             cli::write_trace(result.output);
             return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
         }
@@ -162,8 +159,7 @@ int validate_checker() {
         result = sh::execute(solution, "", input, res);
 
         if (result.rc != CP_TOOLS_OK) {
-            cli::write(cli::message_type::error,
-                       "Can't generatate output for input '" + input + "'!");
+            cli::write(cli::fmt::error, "Can't generatate output for input '" + input + "'!");
             cli::write_trace(result.output);
             return result.rc;
         }
@@ -178,23 +174,23 @@ int validate_checker() {
             oss << got.output;
             oss << "Got: " << mcodes[got.rc] << ", expected: " << mcodes[expected] << '\n';
 
-            cli::write(cli::message_type::error, "Test '" + input + "' failed!");
+            cli::write(cli::fmt::error, "Test '" + input + "' failed!");
             cli::write_trace(oss.str());
 
             return CP_TOOLS_ERROR_CHECK_TEST_FAILED;
         }
     }
 
-    cli::write(cli::message_type::ok);
+    cli::write(cli::fmt::ok);
 
     return CP_TOOLS_OK;
 }
 
 int validate_validator() {
-    cli::write(cli::message_type::info, "Creating directory " CP_TOOLS_BUILD_DIR);
+    cli::write(cli::fmt::info, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        cli::write(cli::message_type::error, fs_res.error_message);
+        cli::write(cli::fmt::error, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -203,15 +199,14 @@ int validate_validator() {
     auto source = cptools::util::get_json_value(config, "tools|validator", std::string("ERROR"));
 
     if (source == "ERROR") {
-        cli::write(cli::message_type::error,
-                   "[validate_validator] Default solution file not found!\n");
+        cli::write(cli::fmt::error, "[validate_validator] Default solution file not found!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
     auto res = cptools::sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Can't compile validator '" + source + "'!");
+        cli::write(cli::fmt::error, "Can't compile validator '" + source + "'!");
         cli::write_trace(res.output);
         return res.rc;
     }
@@ -220,12 +215,11 @@ int validate_validator() {
                                                std::map<std::string, std::string>{});
 
     if (tests.empty()) {
-        cli::write(cli::message_type::error,
-                   "[validate_validator] There are no tests for the validator\n");
+        cli::write(cli::fmt::error, "[validate_validator] There are no tests for the validator\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_TESTS;
     }
 
-    cli::write(cli::message_type::info,
+    cli::write(cli::fmt::info,
                "Testing the validator (" + std::to_string(tests.size()) + " tests) ...");
 
     for (auto [input, verdict] : tests) {
@@ -234,23 +228,23 @@ int validate_validator() {
         std::string res = (result.output.find("FAIL") == std::string::npos ? "OK" : "INVALID");
 
         if (verdict != res) {
-            cli::write(cli::message_type::error, "Input '" + input + " is invalid: expected = '" +
-                                                     verdict + "', got = '" + res + "'");
+            cli::write(cli::fmt::error, "Input '" + input + " is invalid: expected = '" + verdict +
+                                            "', got = '" + res + "'");
             cli::write_trace(result.output.empty() ? "Test valid!" : result.output);
             return result.rc;
         }
     }
 
-    cli::write(cli::message_type::ok);
+    cli::write(cli::fmt::ok);
 
     return CP_TOOLS_OK;
 }
 
 int validate_tests() {
-    cli::write(cli::message_type::info, "Creating directory " CP_TOOLS_BUILD_DIR);
+    cli::write(cli::fmt::info, "Creating directory " CP_TOOLS_BUILD_DIR);
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        cli::write(cli::message_type::error, fs_res.error_message);
+        cli::write(cli::fmt::error, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -259,14 +253,14 @@ int validate_tests() {
     auto source = cptools::util::get_json_value(config, "tools|validator", std::string("ERROR"));
 
     if (source == "ERROR") {
-        cli::write(cli::message_type::error, "Default solution file not found!");
+        cli::write(cli::fmt::error, "Default solution file not found!");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
 
     auto res = cptools::sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Can't compile validator '" + source + "'!");
+        cli::write(cli::fmt::error, "Can't compile validator '" + source + "'!");
         cli::write_trace(res.output);
         return res.rc;
     }
@@ -274,24 +268,24 @@ int validate_tests() {
     auto io_files = task::generate_io_files("all", false);
 
     if (io_files.empty()) {
-        cli::write(cli::message_type::error, "There are no io files to validate!");
+        cli::write(cli::fmt::error, "There are no io files to validate!");
         return CP_TOOLS_ERROR_CHECK_MISSING_IO_FILES;
     }
 
-    cli::write(cli::message_type::info,
+    cli::write(cli::fmt::info,
                "Validating the input files (" + std::to_string(io_files.size()) + " tests) ...");
 
     for (auto [input, _] : io_files) {
         auto result = sh::execute(program, "", input, "");
 
         if (result.rc != CP_TOOLS_OK) {
-            cli::write(cli::message_type::error, "Input file '" + input + "' is invalid!");
+            cli::write(cli::fmt::error, "Input file '" + input + "' is invalid!");
             cli::write_trace(result.output);
             return CP_TOOLS_ERROR_CHECK_INVALID_INPUT_FILE;
         }
     }
 
-    cli::write(cli::message_type::ok);
+    cli::write(cli::fmt::ok);
 
     return CP_TOOLS_OK;
 }
@@ -306,7 +300,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
             return validate_checker();
 
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return 0;
 
         case 't':
@@ -326,7 +320,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
             return CP_TOOLS_OK;
 
         default:
-            cli::write(cli::message_type::none, help(), true);
+            cli::write(cli::fmt::none, help(), true);
             return CP_TOOLS_ERROR_CLEAN_INVALID_OPTION;
         }
     }
