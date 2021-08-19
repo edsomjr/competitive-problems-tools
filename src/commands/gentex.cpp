@@ -196,7 +196,7 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
     auto event{util::get_json_value(config, "problem|contest", std::string())};
     auto author{util::get_json_value(config, "author|name", std::string())};
     auto title{util::get_json_value(config, "problem|title|" + language, std::string("Título"))};
-    auto timelimit{util::get_json_value(config, "problem|timelimit", 1)};
+    auto time_limit{util::get_json_value(config, "problem|time_limit", 1)};
     auto memorylimit = round(util::get_json_value(config, "problem|memory_limit", 256));
 
     auto c1_size = util::get_json_value(config, "PDF|first_column_size", std::string("6cm"));
@@ -217,7 +217,7 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 
     out.precision(1);
     out << "\\begin{problem}{" << label << "}{" << title << "}{" << std::fixed
-        << (timelimit / 1000.0) << "}{" << memorylimit << "}\n\n";
+        << (time_limit / 1000.0) << "}{" << memorylimit << "}\n\n";
     out << "\\input{tex/" << language << "/statement}\n\n";
     out << "\\begin{probleminput}{tex/" << language << "/input}\n";
     out << "\\end{probleminput}\n\n";

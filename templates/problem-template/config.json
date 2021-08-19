@@ -12,7 +12,7 @@
             "en_US": "Title"
         },
 
-        "timelimit": 1000,
+        "time_limit": 1000,
         "memory_limit": 256,
         "tags": [ "greedy", "sorting", "ad-hoc" ],
         "contest": "Evento onde o problema foi aplicado pela primeira vez",

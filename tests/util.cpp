@@ -149,7 +149,7 @@ SCENARIO("Utilitary functions", "[util]") {
 
         WHEN("There is a numeric field") {
             std::map<std::string, double> fields{
-                {"problem|timelimit", 1000},
+                {"problem|time_limit", 1000},
                 {"problem|memory_limit", 256},
             };
 
