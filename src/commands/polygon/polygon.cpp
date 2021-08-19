@@ -84,7 +84,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "hk:s:c:", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return 0;
 
         case 'k':
@@ -103,14 +103,14 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
             break;
 
         default:
-            cli::write(cli::message_type::none, help(), true);
+            cli::write(cli::fmt::none, help(), true);
             return CP_TOOLS_ERROR_POLYGON_INVALID_OPTION;
         }
     }
 
     if (creds_from_file and creds_from_cmd) {
-        cli::write(cli::message_type::error, "A file for the credentials was specified along "
-                                             "credentials in command line. Use only one method");
+        cli::write(cli::fmt::error, "A file for the credentials was specified along "
+                                    "credentials in command line. Use only one method");
         return CP_TOOLS_ERROR_POLYGON_MUTUAL_CHOICE_ERROR;
     }
 
@@ -118,7 +118,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         try {
             creds = get_credentials_from_file(creds_file);
         } catch (const exceptions::inexistent_file_error &e) {
-            cli::write(cli::message_type::error, std::string(e.what()));
+            cli::write(cli::fmt::error, std::string(e.what()));
             return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
         }
     }
@@ -129,11 +129,11 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     bool connected = api::polygon::test_connection(creds);
 
     if (not connected) {
-        cli::write(cli::message_type::error, "Could not connect with the given credentials.");
+        cli::write(cli::fmt::error, "Could not connect with the given credentials.");
         return CP_TOOLS_ERROR_POLYGON_CANT_CONNECT;
     }
 
-    cli::write(cli::message_type::ok, "The given credentials are valid.");
+    cli::write(cli::fmt::ok, "The given credentials are valid.");
 
     return CP_TOOLS_OK;
 }

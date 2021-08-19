@@ -34,20 +34,20 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
     for (auto &dir : directories) {
         auto fs_res = fs::create_directory(dir);
         if (not fs_res.ok) {
-            cli::write(cli::message_type::error, fs_res.error_message);
+            cli::write(cli::fmt::error, fs_res.error_message);
             return {};
         }
     }
 
     if (source == "ERROR") {
-        cli::write(cli::message_type::error, "Default solution file not found!");
+        cli::write(cli::fmt::error, "Default solution file not found!");
         return {};
     }
 
     auto res = cptools::sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Can't compile solution '" + source + "'!");
+        cli::write(cli::fmt::error, "Can't compile solution '" + source + "'!");
         cli::write_trace(res.output);
         return {};
     }
@@ -60,7 +60,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
             source = cptools::util::get_json_value(config, "tools|generator", std::string("ERROR"));
 
             if (source == "tools/ERROR") {
-                cli::write(cli::message_type::error, "Generator file not found!");
+                cli::write(cli::fmt::error, "Generator file not found!");
                 return {};
             }
 
@@ -69,7 +69,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
             res = cptools::sh::build(generator, source);
 
             if (res.rc != CP_TOOLS_OK) {
-                cli::write(cli::message_type::error, "Can't compile generator '" + source + "'!");
+                cli::write(cli::fmt::error, "Can't compile generator '" + source + "'!");
                 cli::write_trace(res.output);
                 return {};
             }
@@ -83,7 +83,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
                 auto res = sh::execute(generator, parameters, "", dest);
 
                 if (res.rc != CP_TOOLS_OK) {
-                    cli::write(cli::message_type::error,
+                    cli::write(cli::fmt::error,
                                "Error generating '" + dest + "' with parameters " + parameters);
                     cli::write_trace(res.output);
                     return {};
@@ -100,7 +100,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
 
                 auto res = fs::copy(input, dest, true);
                 if (not res.ok) {
-                    cli::write(cli::message_type::error, res.error_message);
+                    cli::write(cli::fmt::error, res.error_message);
                     return {};
                 }
 
@@ -117,8 +117,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
             auto res = cptools::sh::execute(program, "", input, output);
 
             if (res.rc != CP_TOOLS_OK) {
-                cli::write(cli::message_type::error,
-                           "Can't generate output for input '" + input + "'!");
+                cli::write(cli::fmt::error, "Can't generate output for input '" + input + "'!");
                 cli::write_trace(res.output);
                 return {};
             }
@@ -162,16 +161,14 @@ int build_tools(int tools, const std::string &where) {
             break;
 
         default:
-            cli::write(cli::message_type::error,
-                       "Invalid tool required: (" + std::to_string(tools) + ")");
+            cli::write(cli::fmt::error, "Invalid tool required: (" + std::to_string(tools) + ")");
             return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
         }
 
         auto source = cptools::util::get_json_value(config, "tools|" + program, std::string(""));
 
         if (source.empty()) {
-            cli::write(cli::message_type::error,
-                       "Can't find source for '" + program + "' in config file");
+            cli::write(cli::fmt::error, "Can't find source for '" + program + "' in config file");
             return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
         }
 
@@ -180,7 +177,7 @@ int build_tools(int tools, const std::string &where) {
         auto res = cptools::sh::build(dest, source);
 
         if (res.rc != CP_TOOLS_OK) {
-            cli::write(cli::message_type::error, "Can't compile '" + source + "'!");
+            cli::write(cli::fmt::error, "Can't compile '" + source + "'!");
             cli::write_trace(res.output);
             return res.rc;
         }
@@ -201,14 +198,14 @@ int gen_exe(const std::string &source, const std::string &dest, const std::strin
 
     auto removed_result = fs::remove(program);
     if (not removed_result.ok) {
-        cli::write(cli::message_type::error, removed_result.error_message);
+        cli::write(cli::fmt::error, removed_result.error_message);
         return removed_result.rc;
     }
 
     auto res = sh::build(program, source);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Can't build solution '" + source + "'!");
+        cli::write(cli::fmt::error, "Can't build solution '" + source + "'!");
         cli::write_trace(res.output);
         return res.rc;
     }

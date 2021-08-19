@@ -80,7 +80,7 @@ int judge(const std::string &solution_path, std::ostream &out) {
         {"Memory (MB)", 12, cli::format::align::RIGHT | cli::format::emph::BOLD},
     }};
 
-    cli::write(cli::message_type::info, "Judging solution '" + solution_path + "'...");
+    cli::write(cli::fmt::info, "Judging solution '" + solution_path + "'...");
 
     auto rc = task::build_tools(task::tools::VALIDATOR | task::tools::CHECKER);
 
@@ -118,7 +118,7 @@ int judge(const std::string &solution_path, std::ostream &out) {
         auto res = sh::execute(validator, "", input);
 
         if (res.rc != CP_TOOLS_OK) {
-            cli::write(cli::message_type::error, "Input file '" + input + "' is invalid");
+            cli::write(cli::fmt::error, "Input file '" + input + "' is invalid");
             cli::write_trace(res.output);
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
@@ -204,17 +204,17 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
     while ((option = getopt_long(argc, argv, "h", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return 0;
 
         default:
-            cli::write(cli::message_type::none, help(), true);
+            cli::write(cli::fmt::none, help(), true);
             return CP_TOOLS_ERROR_CLEAN_INVALID_OPTION;
         }
     }
 
     if (argc < 3) {
-        cli::write(cli::message_type::none, usage(), true);
+        cli::write(cli::fmt::none, usage(), true);
         return CP_TOOLS_ERROR_MISSING_ARGUMENT;
     }
 

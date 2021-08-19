@@ -38,14 +38,14 @@ std::string usage() { return "Usage: " NAME " init [-h] [-o output_dir]"; }
 std::string help() { return usage() + help_message; }
 
 int copy_template_files(const std::string &dest) {
-    cli::write(cli::message_type::info, "Initializing directory '" + dest + "' ...");
+    cli::write(cli::fmt::info, "Initializing directory '" + dest + "' ...");
 
     // Copy templates to the directory
     auto res = cptools::fs::copy(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest, true);
     if (not res.ok)
-        cli::write(cli::message_type::error, res.error_message);
+        cli::write(cli::fmt::error, res.error_message);
     else
-        cli::write(cli::message_type::ok);
+        cli::write(cli::fmt::ok);
 
     return res.rc;
 }
@@ -58,7 +58,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     while ((option = getopt_long(argc, argv, "ho:", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return 0;
 
         case 'o':
@@ -66,7 +66,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
             break;
 
         default:
-            cli::write(cli::message_type::none, help(), true);
+            cli::write(cli::fmt::none, help(), true);
             return CP_TOOLS_ERROR_INIT_INVALID_OPTION;
         }
     }

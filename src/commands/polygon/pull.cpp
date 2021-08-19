@@ -94,7 +94,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     while ((option = getopt_long(argc, argv, "hf", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help_message);
+            cli::write(cli::fmt::none, help_message);
             return CP_TOOLS_OK;
 
         case 'f':
@@ -102,7 +102,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
             break;
 
         default:
-            cli::write(cli::message_type::error, help_message);
+            cli::write(cli::fmt::error, help_message);
             return CP_TOOLS_ERROR_POLYGON_INVALID_OPTION;
         }
     }
@@ -112,13 +112,12 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     try {
         problem_id = config::get_polygon_problem_id();
     } catch (const exceptions::inexistent_file_error &e) {
-        cli::write(cli::message_type::error, e.what());
+        cli::write(cli::fmt::error, e.what());
         return CP_TOOLS_EXCEPTION_INEXISTENT_FILE;
     }
 
     if (problem_id == "") {
-        cli::write(cli::message_type::error,
-                   "Couldn't find the problem id in the configuration file.");
+        cli::write(cli::fmt::error, "Couldn't find the problem id in the configuration file.");
         return CP_TOOLS_ERROR_POLYGON_NO_PROBLEM_ID;
     }
 
@@ -131,11 +130,11 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
         pull_tool_file("generator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
     } catch (const exceptions::polygon_api_error &e) {
-        cli::write(cli::message_type::error, e.what());
+        cli::write(cli::fmt::error, e.what());
         return CP_TOOLS_ERROR_POLYGON_API;
     }
 
-    cli::write(cli::message_type::ok, "Pull completed");
+    cli::write(cli::fmt::ok, "Pull completed");
 
     return CP_TOOLS_OK;
 }

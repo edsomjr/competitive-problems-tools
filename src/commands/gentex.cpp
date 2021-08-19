@@ -85,12 +85,12 @@ int list_document_classes(std::ostream &out) {
     DIR *d = opendir(classes_dir.c_str());
 
     if (d == nullptr) {
-        cli::write(cli::message_type::error, "Directory '" + classes_dir + "' does not exist");
+        cli::write(cli::fmt::error, "Directory '" + classes_dir + "' does not exist");
         return CP_TOOLS_ERROR_GENTEX_LIST_DOCUMENT_CLASSES;
     }
 
-    cli::write(cli::message_type::none, "\n");
-    cli::write(cli::message_type::header, "    Class           Description\n");
+    cli::write(cli::fmt::none, "\n");
+    cli::write(cli::fmt::header, "    Class           Description\n");
 
     while (auto dir = readdir(d)) {
         if (dir == nullptr)
@@ -130,7 +130,7 @@ int list_document_classes(std::ostream &out) {
 
         line = util::strip(line.substr(pos + 1));
 
-        cli::write(cli::message_type::info, "    " + name);
+        cli::write(cli::fmt::info, "    " + name);
         int count = 4 + name.size();
 
         while (count < 20) {
@@ -138,7 +138,7 @@ int list_document_classes(std::ostream &out) {
             ++count;
         }
 
-        cli::write(cli::message_type::info, line);
+        cli::write(cli::fmt::info, line);
     }
 
     out << '\n';
@@ -271,7 +271,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return 0;
 
         case 'b':
@@ -293,8 +293,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             language = std::string(optarg);
 
             if (not validate_language(language)) {
-                cli::write(cli::message_type::error,
-                           "Language " + language + " not find or supported");
+                cli::write(cli::fmt::error, "Language " + language + " not find or supported");
                 return -1;
             }
 
@@ -314,7 +313,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             break;
 
         default:
-            cli::write(cli::message_type::none, help(), true);
+            cli::write(cli::fmt::none, help(), true);
             return CP_TOOLS_ERROR_GENTEX_INVALID_OPTION;
         }
     }

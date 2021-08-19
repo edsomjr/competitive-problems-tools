@@ -75,7 +75,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         }
 
         if (command.front() != '-') {
-            cli::write(cli::message_type::error, "Invalid action '" + command + "'");
+            cli::write(cli::fmt::error, "Invalid action '" + command + "'");
             return CP_TOOLS_ERROR_INVALID_COMMAND;
         }
     }
@@ -85,20 +85,20 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "hv", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return CP_TOOLS_OK;
 
         case 'v':
-            cli::write(cli::message_type::none, version());
+            cli::write(cli::fmt::none, version());
             return CP_TOOLS_OK;
 
         default:
-            cli::write(cli::message_type::none, help(), true);
+            cli::write(cli::fmt::none, help(), true);
             return CP_TOOLS_ERROR_INVALID_OPTION;
         }
     }
 
-    cli::write(cli::message_type::none, usage());
+    cli::write(cli::fmt::none, usage());
     return CP_TOOLS_OK;
 }
 } // namespace cptools::commands

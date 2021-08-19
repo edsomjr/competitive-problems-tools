@@ -84,21 +84,21 @@ int create_build_dirs(std::ostream &) {
     auto res_remove = fs::remove(boca_build_dir);
 
     if (not res_remove.ok) {
-        cli::write(cli::message_type::error, res_remove.error_message);
+        cli::write(cli::fmt::error, res_remove.error_message);
         return res_remove.rc;
     }
 
     auto res_create = fs::create_directory(boca_build_dir);
 
     if (not res_create.ok) {
-        cli::write(cli::message_type::error, res_create.error_message);
+        cli::write(cli::fmt::error, res_create.error_message);
         return res_create.rc;
     }
 
     auto res_copy = cptools::fs::copy(CP_TOOLS_BOCA_TEMPLATES_DIR, boca_build_dir, true);
 
     if (not res_copy.ok)
-        cli::write(cli::message_type::error, res_copy.error_message);
+        cli::write(cli::fmt::error, res_copy.error_message);
 
     return res_copy.rc;
 }
@@ -120,7 +120,7 @@ int create_description_dir(int argc, char *const argv[], std::ostream &out, std:
     // Copy the pdf to boca's build directory
     auto res_cpy = fs::copy(pdf_file, boca_desc_dir, true);
     if (not res_cpy.ok) {
-        cli::write(cli::message_type::error, res_cpy.error_message);
+        cli::write(cli::fmt::error, res_cpy.error_message);
         return res_cpy.rc;
     }
 
@@ -128,7 +128,7 @@ int create_description_dir(int argc, char *const argv[], std::ostream &out, std:
     std::string label = util::get_from_argv(argc, argv, {"--label", "-b"}, "A");
     auto res_rnm = fs::rename(boca_desc_dir + pdf_file, boca_desc_dir + label + ".pdf");
     if (not res_rnm.ok) {
-        cli::write(cli::message_type::error, res_rnm.error_message);
+        cli::write(cli::fmt::error, res_rnm.error_message);
         return res_rnm.rc;
     }
 
@@ -157,7 +157,7 @@ int create_io_dir() {
             fs::copy(CP_TOOLS_BUILD_DIR + std::string("/") + dir, CP_TOOLS_BOCA_BUILD_DIR + dir);
 
         if (not res_cpy.ok) {
-            cli::write(cli::message_type::error, res_cpy.error_message);
+            cli::write(cli::fmt::error, res_cpy.error_message);
             return res_cpy.rc;
         }
     }
@@ -189,7 +189,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return 0;
         }
     }

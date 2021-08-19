@@ -76,7 +76,7 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
                  const std::string &label, const std::string &outfile, bool tutorial) {
     auto fs_res = fs::create_directory(CP_TOOLS_BUILD_DIR);
     if (not fs_res.ok) {
-        cli::write(cli::message_type::error, fs_res.error_message);
+        cli::write(cli::fmt::error, fs_res.error_message);
         return fs_res.rc;
     }
 
@@ -85,14 +85,14 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
                              (tutorial ? "/tutorial.tex" : "/problem.tex")};
     auto removed_result = fs::remove(texfile_path);
     if (not removed_result.ok) {
-        cli::write(cli::message_type::error, removed_result.error_message);
+        cli::write(cli::fmt::error, removed_result.error_message);
         return removed_result.rc;
     }
 
     std::ofstream tex_file(texfile_path);
 
     if (not tex_file) {
-        cli::write(cli::message_type::error, "Error opening file '" + texfile_path);
+        cli::write(cli::fmt::error, "Error opening file '" + texfile_path);
         return CP_TOOLS_ERROR_GENPDF_INVALID_OUTFILE;
     }
 
@@ -100,7 +100,7 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
     auto rc = task(doc_class, language, flags, label, tex_file);
 
     if (rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Error generating the LaTeX file '" + texfile_path);
+        cli::write(cli::fmt::error, "Error generating the LaTeX file '" + texfile_path);
         return rc;
     }
 
@@ -113,7 +113,7 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
     auto res = sh::build(pdf_file, texfile_path);
 
     if (res.rc != CP_TOOLS_OK) {
-        cli::write(cli::message_type::error, "Error generating the PDF file '" + pdf_file + "'!");
+        cli::write(cli::fmt::error, "Error generating the PDF file '" + pdf_file + "'!");
         cli::write_trace(res.output);
         return res.rc;
     }
@@ -121,11 +121,11 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
     // Copy the generated PDF to the output file
     auto copy_res = fs::copy(pdf_file, outfile, true);
     if (not copy_res.ok) {
-        cli::write(cli::message_type::error, copy_res.error_message);
+        cli::write(cli::fmt::error, copy_res.error_message);
         return copy_res.rc;
     }
 
-    cli::write(cli::message_type::ok, "File '" + outfile + "' generated.");
+    cli::write(cli::fmt::ok, "File '" + outfile + "' generated.");
 
     return CP_TOOLS_OK;
 }
@@ -142,7 +142,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
     while ((option = getopt_long(argc, argv, "ho:c:lg:b:t", longopts, NULL)) != -1) {
         switch (option) {
         case 'h':
-            cli::write(cli::message_type::none, help());
+            cli::write(cli::fmt::none, help());
             return 0;
 
         case 'b':
@@ -164,8 +164,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             language = std::string(optarg);
 
             if (not gentex::validate_language(language)) {
-                cli::write(cli::message_type::error,
-                           "Language '" + language + "' not find or supported");
+                cli::write(cli::fmt::error, "Language '" + language + "' not find or supported");
                 return CP_TOOLS_ERROR_GENPDF_INVALID_LANGUAGE;
             }
 
@@ -186,7 +185,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             break;
 
         default:
-            cli::write(cli::message_type::none, help(), true);
+            cli::write(cli::fmt::none, help(), true);
             return CP_TOOLS_ERROR_GENPDF_INVALID_OPTION;
         }
     }
