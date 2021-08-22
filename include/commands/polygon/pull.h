@@ -19,6 +19,8 @@ void pull_titles(const types::polygon::Credentials &creds, const std::string &pr
 
 void pull_infos(const types::polygon::Credentials &creds, const std::string &problem_id);
 
+void pull_tags(const types::polygon::Credentials &creds, const std::string &problem_id);
+
 } // namespace cptools::commands::polygon::pull
 
 #endif

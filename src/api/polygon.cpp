@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "api/polygon.h"
-#include "cli/cli.h" // TODO: remove
 #include "exceptions.h"
 #include "httplib.h"
 #include "json.hpp"
@@ -142,6 +141,15 @@ std::string generate_api_sig(const std::string &method_name, const httplib::Para
     std::string hashed = util::sha_512(to_hash);
 
     return zero_padding + hashed;
+}
+
+std::vector<std::string> get_problem_tags(const types::polygon::Credentials &creds,
+                                          const std::string &problem_id) {
+    httplib::Params params;
+    params.emplace("problemId", problem_id);
+    auto result = get("problem.viewTags", creds, params);
+    auto tags_json = nlohmann::json::parse(result->body).at("result");
+    return tags_json.get<std::vector<std::string>>();
 }
 
 } // namespace cptools::api::polygon

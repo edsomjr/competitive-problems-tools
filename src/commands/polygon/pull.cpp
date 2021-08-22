@@ -120,6 +120,12 @@ void pull_infos(const types::polygon::Credentials &creds, const std::string &pro
     config::modify_config_file("problem|time_limit", info.time_limit);
 }
 
+void pull_tags(const types::polygon::Credentials &creds, const std::string &problem_id) {
+    cli::write(cli::fmt::info, "Pulling problem tags...");
+    auto tags = api::polygon::get_problem_tags(creds, problem_id);
+    config::modify_config_file("problem|tags", tags);
+}
+
 // API
 int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     int option = -1;
@@ -175,6 +181,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
         pull_solutions(creds, problem_id, forced);
         pull_titles(creds, problem_id);
         pull_infos(creds, problem_id);
+        pull_tags(creds, problem_id);
     } catch (const exceptions::polygon_api_error &e) {
         cli::write(cli::fmt::error, e.what());
         cli::write(cli::fmt::warning, "Pull aborted, some files may not be updated correctly");
