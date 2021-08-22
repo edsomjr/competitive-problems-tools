@@ -12,6 +12,14 @@
 
 namespace cptools::api::polygon {
 
+/**
+ * @brief Makes a GET HTTP request to Polygon's API.
+ * 
+ * @param method Polygon's API method to call
+ * @param creds Credentials to use for the request
+ * @param params Parameters to send with the request
+ * @return httplib::Result 
+ */
 httplib::Result get(std::string method, const types::polygon::Credentials &creds,
                     httplib::Params &params) {
     std::time_t now{std::time(nullptr)};
@@ -31,6 +39,12 @@ httplib::Result get(std::string method, const types::polygon::Credentials &creds
     return result;
 }
 
+/**
+ * @brief Tests whether a Polygon connection is valid.
+ * 
+ * @param creds Credentials to use for the request
+ * @return true if the connection is valid, false otherwise
+ */
 bool test_connection(const types::polygon::Credentials &creds) {
     httplib::Params params{};
 
@@ -43,6 +57,14 @@ bool test_connection(const types::polygon::Credentials &creds) {
     return true;
 }
 
+/**
+ * @brief Get the problem file name object
+ * 
+ * @param tool_type Which tools should be pulled the information
+ * @param creds Credentials to use for the request
+ * @param problem_id The problem ID
+ * @return std::string with the problem file name
+ */
 std::string get_problem_file_name(const std::string &tool_type,
                                   const types::polygon::Credentials &creds,
                                   const std::string &problem_id) {
@@ -61,6 +83,15 @@ std::string get_problem_file_name(const std::string &tool_type,
     return file_name;
 }
 
+/**
+ * @brief Get the problem file content
+ * 
+ * @param file_name The problem file name
+ * @param tool_type Which tool should be pulled the information
+ * @param creds Credentials to use for the request
+ * @param problem_id The problem ID
+ * @return std::string with the problem file content
+ */
 std::string get_problem_file(const std::string &file_name, const std::string &tool_type,
                              const types::polygon::Credentials &creds,
                              const std::string &problem_id) {
@@ -80,6 +111,13 @@ std::string get_problem_file(const std::string &file_name, const std::string &to
     return result->body;
 }
 
+/**
+ * @brief Get the problem solutions objects
+ * 
+ * @param creds Credentials to use for the request
+ * @param problem_id The problem ID
+ * @return std::vector<types::polygon::Solution> with all Solutions found
+ */
 std::vector<types::polygon::Solution>
 get_problem_solutions(const types::polygon::Credentials &creds, const std::string problem_id) {
     httplib::Params params;
@@ -92,6 +130,13 @@ get_problem_solutions(const types::polygon::Credentials &creds, const std::strin
     return solutions;
 }
 
+/**
+ * @brief Get the problem statement object
+ * 
+ * @param creds Credentials to use for the request
+ * @param problem_id The problem ID
+ * @return types::polygon::StatementsVector with all Statements found
+ */
 types::polygon::StatementsVector get_problem_statement(const types::polygon::Credentials &creds,
                                                        const std::string &problem_id) {
     httplib::Params params;
@@ -108,6 +153,13 @@ types::polygon::StatementsVector get_problem_statement(const types::polygon::Cre
     return statements;
 }
 
+/**
+ * @brief Get the problem information object
+ * 
+ * @param creds Credentials to use for the request
+ * @param problem_id The problem ID
+ * @return types::polygon::Information with all Information found
+ */
 types::polygon::Information get_problem_information(const types::polygon::Credentials &creds,
                                                     const std::string &problem_id) {
     httplib::Params params;
@@ -120,6 +172,14 @@ types::polygon::Information get_problem_information(const types::polygon::Creden
     return info;
 }
 
+/**
+ * @brief Generates the parameters for authorization in a Polygon request
+ * 
+ * @param method_name The name of the method to be called
+ * @param params The parameters to be passed to the method
+ * @param creds Credentials to use for the request
+ * @return std::string with the API signature
+ */
 std::string generate_api_sig(const std::string &method_name, const httplib::Params &params,
                              const types::polygon::Credentials &creds) {
     std::string params_str;
@@ -143,6 +203,13 @@ std::string generate_api_sig(const std::string &method_name, const httplib::Para
     return zero_padding + hashed;
 }
 
+/**
+ * @brief Get the problem tags
+ * 
+ * @param creds Credentials to use for the request
+ * @param problem_id The problem ID
+ * @return std::vector<std::string> with all tags found 
+ */
 std::vector<std::string> get_problem_tags(const types::polygon::Credentials &creds,
                                           const std::string &problem_id) {
     httplib::Params params;
