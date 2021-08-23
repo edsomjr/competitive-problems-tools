@@ -14,11 +14,11 @@ namespace cptools::api::polygon {
 
 /**
  * @brief Makes a GET HTTP request to Polygon's API.
- * 
+ *
  * @param method Polygon's API method to call
  * @param creds Credentials to use for the request
  * @param params Parameters to send with the request
- * @return httplib::Result 
+ * @return httplib::Result
  */
 httplib::Result get(std::string method, const types::polygon::Credentials &creds,
                     httplib::Params &params) {
@@ -41,7 +41,7 @@ httplib::Result get(std::string method, const types::polygon::Credentials &creds
 
 /**
  * @brief Tests whether a Polygon connection is valid.
- * 
+ *
  * @param creds Credentials to use for the request
  * @return true if the connection is valid, false otherwise
  */
@@ -59,7 +59,7 @@ bool test_connection(const types::polygon::Credentials &creds) {
 
 /**
  * @brief Get the problem file name object
- * 
+ *
  * @param tool_type Which tools should be pulled the information
  * @param creds Credentials to use for the request
  * @param problem_id The problem ID
@@ -85,7 +85,7 @@ std::string get_problem_file_name(const std::string &tool_type,
 
 /**
  * @brief Get the problem file content
- * 
+ *
  * @param file_name The problem file name
  * @param tool_type Which tool should be pulled the information
  * @param creds Credentials to use for the request
@@ -113,7 +113,7 @@ std::string get_problem_file(const std::string &file_name, const std::string &to
 
 /**
  * @brief Get the problem solutions objects
- * 
+ *
  * @param creds Credentials to use for the request
  * @param problem_id The problem ID
  * @return std::vector<types::polygon::Solution> with all Solutions found
@@ -132,7 +132,7 @@ get_problem_solutions(const types::polygon::Credentials &creds, const std::strin
 
 /**
  * @brief Get the problem statement object
- * 
+ *
  * @param creds Credentials to use for the request
  * @param problem_id The problem ID
  * @return types::polygon::StatementsVector with all Statements found
@@ -155,7 +155,7 @@ types::polygon::StatementsVector get_problem_statement(const types::polygon::Cre
 
 /**
  * @brief Get the problem information object
- * 
+ *
  * @param creds Credentials to use for the request
  * @param problem_id The problem ID
  * @return types::polygon::Information with all Information found
@@ -174,7 +174,7 @@ types::polygon::Information get_problem_information(const types::polygon::Creden
 
 /**
  * @brief Generates the parameters for authorization in a Polygon request
- * 
+ *
  * @param method_name The name of the method to be called
  * @param params The parameters to be passed to the method
  * @param creds Credentials to use for the request
@@ -205,10 +205,10 @@ std::string generate_api_sig(const std::string &method_name, const httplib::Para
 
 /**
  * @brief Get the problem tags
- * 
+ *
  * @param creds Credentials to use for the request
  * @param problem_id The problem ID
- * @return std::vector<std::string> with all tags found 
+ * @return std::vector<std::string> with all tags found
  */
 std::vector<std::string> get_problem_tags(const types::polygon::Credentials &creds,
                                           const std::string &problem_id) {
