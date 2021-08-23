@@ -28,6 +28,15 @@ get_problem_solutions(const types::polygon::Credentials &creds, const std::strin
 std::string generate_api_sig(const std::string &method_name, const httplib::Params &params,
                              const types::polygon::Credentials &creds);
 
+types::polygon::StatementsVector get_problem_statement(const types::polygon::Credentials &creds,
+                                                       const std::string &problem_id);
+
+types::polygon::Information get_problem_information(const types::polygon::Credentials &creds,
+                                                    const std::string &problem_id);
+
+std::vector<std::string> get_problem_tags(const types::polygon::Credentials &creds,
+                                          const std::string &problem_id);
+
 } // namespace cptools::api::polygon
 
 #endif

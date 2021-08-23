@@ -93,7 +93,7 @@ int judge(const std::string &solution_path, std::ostream &out) {
         return verdict::CE;
 
     auto config = cptools::config::read_config_file();
-    auto timelimit = cptools::util::get_json_value(config, "problem|timelimit", 1000);
+    auto time_limit = cptools::util::get_json_value(config, "problem|time_limit", 1000);
     auto memory_limit = cptools::util::get_json_value(config, "problem|memory_limit", 1000);
 
     auto checker{std::string(CP_TOOLS_BUILD_DIR) + "/checker"};
@@ -123,14 +123,14 @@ int judge(const std::string &solution_path, std::ostream &out) {
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
 
-        auto info = sh::profile(program, "", 2 * timelimit / 1000.0, input, output);
+        auto info = sh::profile(program, "", 2 * time_limit / 1000.0, input, output);
 
         int ver = verdict::AC;
 
         if (info.rc != CP_TOOLS_OK)
             ver = verdict::RTE;
 
-        if (info.elapsed > timelimit / 1000.0) {
+        if (info.elapsed > time_limit / 1000.0) {
             ver = verdict::TLE;
         }
 
@@ -140,7 +140,7 @@ int judge(const std::string &solution_path, std::ostream &out) {
         if (ver == verdict::AC) {
             auto args{input + " " + output + " " + answer};
 
-            res = sh::execute(checker, args, "", "/dev/null", 2 * timelimit / 1000.0);
+            res = sh::execute(checker, args, "", "/dev/null", 2 * time_limit / 1000.0);
 
             switch (res.rc) {
             case 6:

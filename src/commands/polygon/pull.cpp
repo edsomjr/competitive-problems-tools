@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <set>
 #include <string>
+#include <unordered_map>
 
 #include "cli/cli.h"
 #include "commands/polygon/polygon.h"
@@ -47,6 +48,7 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
  */
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
                     const std::string &problem_id, bool forced) {
+    cli::write(cli::fmt::info, "Pulling " + tool_name + "...");
     auto polygon_file_name = api::polygon::get_problem_file_name(tool_name, creds, problem_id);
     auto polygon_file_content =
         api::polygon::get_problem_file(polygon_file_name, tool_name, creds, problem_id);
@@ -66,6 +68,7 @@ void pull_tool_file(const std::string tool_name, const types::polygon::Credentia
  */
 void pull_solutions(const types::polygon::Credentials &creds, const std::string &problem_id,
                     bool forced) {
+    cli::write(cli::fmt::info, "Pulling solutions...");
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
 
     for (const auto &solution : solutions) {
@@ -84,6 +87,43 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
             conflicts::solve_files(remote_file_name, remote_file_name, file_content, forced);
         config::insert_solution_file_name(solution.tag, new_file_path);
     }
+}
+
+/**
+ * @brief Get the statement objects from the Polygon API and writes them to the filesystem.
+ *
+ * @param creds credentials data structure
+ * @param problem_id Polygon's problem ID
+ * @param forced if it should overwrite the existing statement
+ */
+void pull_titles(const types::polygon::Credentials &creds, const std::string &problem_id) {
+    auto config_json = config::read_config_file();
+
+    cli::write(cli::fmt::info, "Pulling problem title...");
+    auto statements = api::polygon::get_problem_statement(creds, problem_id);
+
+    std::unordered_map<std::string, std::string> titles;
+
+    for (const auto &statement : statements) {
+        auto lang = statement.language;
+        titles.emplace(lang, statement.title);
+    }
+
+    config::modify_config_file("problem|title", titles);
+}
+
+void pull_infos(const types::polygon::Credentials &creds, const std::string &problem_id) {
+    cli::write(cli::fmt::info, "Pulling problem informations...");
+    auto info = api::polygon::get_problem_information(creds, problem_id);
+
+    config::modify_config_file("problem|memory_limit", info.memory_limit);
+    config::modify_config_file("problem|time_limit", info.time_limit);
+}
+
+void pull_tags(const types::polygon::Credentials &creds, const std::string &problem_id) {
+    cli::write(cli::fmt::info, "Pulling problem tags...");
+    auto tags = api::polygon::get_problem_tags(creds, problem_id);
+    config::modify_config_file("problem|tags", tags);
 }
 
 // API
@@ -124,13 +164,34 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     auto config_path = fs::get_default_config_path();
     auto creds = polygon::get_credentials_from_file(config_path);
 
+    auto ext = ".old";
+    auto old_config_path = config::config_path_name + ext;
+
+    if (forced)
+        cli::write(cli::fmt::warning, "Forced update: files will be overwritten");
+    else {
+        cli::write(cli::fmt::info,
+                   "Local " + config::config_path_name + " copied to " + old_config_path);
+        fs::copy(config::config_path_name, old_config_path);
+    }
+
     try {
         pull_tool_file("checker", creds, problem_id, forced);
         pull_tool_file("validator", creds, problem_id, forced);
-        pull_tool_file("generator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
+        pull_titles(creds, problem_id);
+        pull_infos(creds, problem_id);
+        pull_tags(creds, problem_id);
     } catch (const exceptions::polygon_api_error &e) {
         cli::write(cli::fmt::error, e.what());
+        cli::write(cli::fmt::warning, "Pull aborted, some files may not be updated correctly");
+
+        if (not forced) {
+            cli::write(cli::fmt::warning,
+                       "Recovering " + config::config_path_name + " from " + old_config_path);
+            fs::copy(old_config_path, config::config_path_name);
+        }
+
         return CP_TOOLS_ERROR_POLYGON_API;
     }
 

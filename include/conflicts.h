@@ -5,8 +5,8 @@
 
 namespace cptools::conflicts {
 
-std::string solve_files(std::string local_file_name, std::string remote_file_name,
-                        std::string remote_file_content, bool forced);
+std::string solve_files(const std::string &local_file_name, const std::string &remote_file_name,
+                        const std::string &remote_file_content, const bool forced);
 
 } // namespace cptools::conflicts
 

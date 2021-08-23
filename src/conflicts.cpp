@@ -17,8 +17,8 @@ namespace cptools::conflicts {
  * @param forced if it should be forced and overwrite the local file
  * @return std::string name of the new file
  */
-std::string solve_files(std::string local_file_name, std::string remote_file_name,
-                        std::string remote_file_content, bool forced) {
+std::string solve_files(const std::string &local_file_name, const std::string &remote_file_name,
+                        const std::string &remote_file_content, const bool forced) {
     auto local_file_path = std::filesystem::path(local_file_name);
     auto remote_file_path = std::filesystem::path(remote_file_name);
 
@@ -32,12 +32,10 @@ std::string solve_files(std::string local_file_name, std::string remote_file_nam
     bool different_hashes = local_file_hash != remote_file_hash;
 
     if (forced) {
-        cli::write(cli::fmt::warning,
-                   "The file '" + local_file_path.string() + "' will be overwritten.");
         fs::remove(local_file_path);
     } else if (different_hashes and equal_paths) {
         std::filesystem::path target(local_file_path);
-        target.replace_extension(".old");
+        target += ".old";
         cli::write(cli::fmt::warning, "The file '" + local_file_path.string() +
                                           "' will be moved to '" + target.string() + "'");
         fs::copy(local_file_path, target);

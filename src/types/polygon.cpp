@@ -22,4 +22,23 @@ void from_json(const nlohmann::json &j, Solution &s) {
     j.at("modificationTimeSeconds").get_to(s.modification_time);
 }
 
+void from_json(const nlohmann::json &j, Statement &s) {
+    auto language = j["language"].get<std::string>();
+    language = util::lower_string(language);
+
+    if (language == "portuguese")
+        s.language = "pt_BR";
+    else if (language == "english")
+        s.language = "en_US";
+    else
+        s.language = language;
+
+    s.title = j["name"].get<std::string>();
+}
+
+void from_json(const nlohmann::json &j, Information &i) {
+    i.memory_limit = j["memoryLimit"].get<int>();
+    i.time_limit = j["timeLimit"].get<int>();
+}
+
 } // namespace cptools::types::polygon
