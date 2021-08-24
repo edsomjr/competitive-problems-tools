@@ -19,6 +19,8 @@ std::vector<std::string> get_solutions_file_names(const std::string &tag);
 
 void insert_solution_file_name(const std::string &tag, const std::string &file_name);
 
+std::string generate_old_config_filename();
+
 template <typename T>
 void modify_config_file(const std::string &path, T new_value, const std::string &op = "replace") {
     auto pointer = util::to_json_pointer(path);

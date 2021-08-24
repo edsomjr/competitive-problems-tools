@@ -21,6 +21,21 @@ std::string get_tool_file_name(const std::string &tool) {
 }
 
 /**
+ * @brief Generates a file path to be used as the backup for the actual config file.
+ *
+ * @return std::string with the file path.
+ */
+std::string generate_old_config_filename() {
+    auto config_path = std::filesystem::path(config_path_name);
+    auto ext = config_path.extension().string();
+    auto filename_no_ext = config_path.replace_extension("").string() + "_";
+    auto current_timestamp = util::get_timestamp();
+    auto new_name = filename_no_ext + current_timestamp + ext + ".old";
+    auto old_config_path = config_path.replace_filename(new_name);
+    return old_config_path.string();
+}
+
+/**
  * @brief Inserts a solution file name in the config file.
  *
  * @param tag solution's tag
