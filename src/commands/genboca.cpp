@@ -243,12 +243,38 @@ int find_best_divisor(int timelimit_ms, int t) {
     return local_best;
 }
 
+/**
+ * @brief Function that will find the best Ratio for the number of milliseconds divided
+ * by the number of repetitions that generate a value close to the timelimit_ms
+ * parameter. The second parameter is the search range for the numerator.
+ *
+ * @param timelimit_ms
+ * @param numerator_range
+ * @return std::pair<int, int> Returns a pair of integers, the first being the numerator
+ * and the second being the denominator of the ratio found.
+ */
 std::pair<int, int> find_optimal_ratio(int timelimit_ms, std::pair<int, int> numerator_range)
 {
+    // Smallest num, div possible
     int global_best_numerator = 1000;
     int global_best_divisor = 1;
 
     auto [lower_bound, upper_bound] = numerator_range;
+
+    // The proportion that results in the closest to timelimit_ms is not always the best.
+    // Proportion that have a very large numerator require the judge to have more
+    // execution time. This way we penalize the large numerators to find the best ratio,
+    // with the smallest possible numerator that the result approaches the timelimit_ms
+    std::map<int, int> seconds_penality;
+
+    int mid_point = lower_bound + (upper_bound - lower_bound) / 2;
+
+    for(int i=lower_bound; i<=upper_bound; i += 1000) {
+        if(i < mid_point) seconds_penality[i] = 0;
+        else {
+            seconds_penality[i] = 500;
+        }
+    }
 
     // t is in ms, and belongs to the range [1000, 5000]
     for(int t=lower_bound; t<=upper_bound; t+=1000) {
@@ -257,7 +283,12 @@ std::pair<int, int> find_optimal_ratio(int timelimit_ms, std::pair<int, int> num
         int global_diff  = std::abs( (global_best_numerator/global_best_divisor) - timelimit_ms );
         int local_diff  = std::abs( (t/local_best_divisor) - timelimit_ms );
 
-        if( local_diff < global_diff ) {
+        int approx_timelimit_ms = (t/local_best_divisor);
+
+        // approx_timelimit_ms has to be greater than or equal to timelimit_ms
+        if( (approx_timelimit_ms >= timelimit_ms) &&
+            (seconds_penality[t] + local_diff < global_diff ) )
+        {
             global_best_numerator = t;
             global_best_divisor = local_best_divisor;
         }
@@ -272,8 +303,8 @@ std::pair<int, int> find_optimal_ratio(int timelimit_ms, std::pair<int, int> num
     return {numerator, divisor};
 }
 
-int create_limits_dir(int argc, char *const argv[]) {
-
+int create_limits_dir(int argc, char *const argv[])
+{
     auto limit_path{CP_TOOLS_BOCA_BUILD_DIR + std::string("limits/")};
 
     auto config = config::read_config_file();
@@ -289,8 +320,10 @@ int create_limits_dir(int argc, char *const argv[]) {
     };
 
     // First try to get the value from the command arguments.
-    auto timelimit_ms_str { util::get_from_argv(argc, argv,
-                                                {"--cpp-time-limit", "--c-time-limit"}, "") };
+    auto timelimit_ms_str {
+        util::get_from_argv(argc, argv, {"--cpp-time-limit", "--c-time-limit"}, "")
+    };
+
     int timelimit_ms;
 
     // If the argument is not passed, the value from config.json is used
