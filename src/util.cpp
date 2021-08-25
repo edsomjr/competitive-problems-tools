@@ -18,10 +18,10 @@ namespace cptools::util {
  * @return std::string with the timestamp formatted as described above.
  */
 std::string get_timestamp() {
-    std::time_t t = std::time(nullptr);
-    std::tm tm = *std::localtime(&t);
+    auto t = std::time(nullptr);
+    auto tm = std::localtime(&t);
     std::stringstream ss;
-    ss << std::put_time(&tm, "%Y-%m-%d_%H:%M:%S");
+    ss << std::put_time(tm, "%Y-%m-%d_%H:%M:%S");
     return ss.str();
 }
 
