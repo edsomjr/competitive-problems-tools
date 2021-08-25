@@ -8,6 +8,8 @@
 
 namespace cptools::util {
 
+std::string get_timestamp();
+
 std::vector<std::string> split(const std::string &s, char delim = ' ');
 
 std::string strip(const std::string &s);

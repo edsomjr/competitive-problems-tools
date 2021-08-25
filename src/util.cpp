@@ -12,6 +12,19 @@
 
 namespace cptools::util {
 
+/**
+ * @brief Get the timestamp of the current time using the format "%Y-%m-%d_%H:%M:%S".
+ *
+ * @return std::string with the timestamp formatted as described above.
+ */
+std::string get_timestamp() {
+    auto t = std::time(nullptr);
+    auto tm = std::localtime(&t);
+    std::stringstream ss;
+    ss << std::put_time(tm, "%Y-%m-%d_%H:%M:%S");
+    return ss.str();
+}
+
 std::vector<std::string> split(const std::string &s, char delim) {
     enum State { NONE, ESCAPED, TOKEN };
     enum State state = NONE;

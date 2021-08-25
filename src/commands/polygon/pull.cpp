@@ -164,8 +164,7 @@ int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     auto config_path = fs::get_default_config_path();
     auto creds = polygon::get_credentials_from_file(config_path);
 
-    auto ext = ".old";
-    auto old_config_path = config::config_path_name + ext;
+    auto old_config_path = config::generate_old_config_filename();
 
     if (forced)
         cli::write(cli::fmt::warning, "Forced update: files will be overwritten");
