@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <numeric>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -192,6 +193,16 @@ std::string get_from_argv(int argc, char *const argv[], std::vector<std::string>
     }
 
     return default_value;
+}
+
+std::pair<int, int>
+reduce_fraction(int num, int dem) {
+    int d = std::gcd(num, dem);
+
+    num /= d;
+    dem /= d;
+
+    return {num, dem};
 }
 
 } // namespace cptools::util

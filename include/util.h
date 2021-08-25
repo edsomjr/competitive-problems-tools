@@ -21,6 +21,9 @@ nlohmann::json read_json_file(const std::string &config_file_path);
 
 std::string sha_512(const std::string &s);
 
+std::pair<int, int>
+reduce_fraction(int num, int dem);
+
 std::string to_json_pointer(const std::string &s);
 
 template <typename T>
