@@ -88,7 +88,7 @@ std::string help() { return usage() + help_message; }
  * @return int Returns CP_TOOLS_OK if everything goes as expected,
  *             or returns a specific error code if a problem occurs.
  */
-int create_build_dirs(std::ostream &) {
+int create_build_dirs() {
     std::string boca_build_dir{CP_TOOLS_BOCA_BUILD_DIR};
 
     auto res_remove = fs::remove(boca_build_dir);
@@ -113,7 +113,7 @@ int create_build_dirs(std::ostream &) {
     return res_copy.rc;
 }
 
-int execute_genpdf_command(int argc, char *const argv[], std::ostream &out, std::ostream &err)
+int execute_genpdf_command(int argc, char *const argv[])
 {
     std::string document_class  = util::get_from_argv(argc, argv, {"--class", "-c"}, "cp_modern");
     std::string outfile  = util::get_from_argv(argc, argv, {"--output", "-o"}, "problem.pdf");
@@ -144,14 +144,14 @@ int execute_genpdf_command(int argc, char *const argv[], std::ostream &out, std:
     }
 
     return genpdf::generate_pdf(document_class, language, flags, label,
-                                outfile, tutorial, out, err);
+                                outfile, tutorial);
 }
 
-int create_description_dir(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+int create_description_dir(int argc, char *const argv[]) {
     // optind is a built-in global variable.
     // It is used to control the current position of argv.
 
-    int res_pdf = execute_genpdf_command(argc, argv, out, err);
+    int res_pdf = execute_genpdf_command(argc, argv);
     if (res_pdf != CP_TOOLS_OK) {
         return res_pdf;
     }
@@ -377,13 +377,13 @@ int create_limits_dir(int argc, char *const argv[])
     return CP_TOOLS_OK;
 }
 
-int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
-    auto rnt = create_build_dirs(out);
+int genboca(int argc, char *const argv[]) {
+    auto rnt = create_build_dirs();
     if (rnt != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_BUILD_DIRECTORY;
     }
 
-    rnt = create_description_dir(argc, argv, out, err);
+    rnt = create_description_dir(argc, argv);
     if (rnt != CP_TOOLS_OK) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_DESCRIPTION_DIRECTORY;
     }
@@ -395,7 +395,7 @@ int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err) 
 
     rnt = create_limits_dir(argc, argv);
     if (rnt != CP_TOOLS_OK) {
-        err << rnt << '\n';
+        cli::write(cli::fmt::error, std::to_string(rnt));
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_IO_DIRECTORY;
     }
 
@@ -403,7 +403,7 @@ int genboca(int argc, char *const argv[], std::ostream &out, std::ostream &err) 
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
     int option = -1;
 
     // This command has many options, but only the `help` option is dealt with here.
@@ -415,7 +415,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
         }
     }
 
-    return genboca(argc, argv, out, err);
+    return genboca(argc, argv);
 }
 
 } // namespace cptools::commands::genboca
