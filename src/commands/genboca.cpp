@@ -40,6 +40,10 @@ Pack the marathon problem for the online judge BOCA (https://github.com/cassiopc
     --tutorial
 
     --no_author     Omits problem's author.
+    
+    --c-time-limit  Defines the maximum timelimit of the problem in the C language. 
+                    This time is used as a basis for calculating the time of other 
+                    programming languages.
 
     --no_contest    problem's contest.
 
