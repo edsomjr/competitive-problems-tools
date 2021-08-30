@@ -134,19 +134,3 @@ If you are using Travis on your own fork you must add the environment variables 
 * C++20
 * GCC v.10.3.0
 * LaTeX
-
-## Troubleshooting
-
-### Outdated GCC
-
-`g++: error: unrecognized command line option ‘-std=c++20’; did you mean ‘-std=c++2a’?`
-
-If you get this error when running `make`, it's because you are using an outdated version of GCC.
-
-The solution is installing `gcc-10` and `g++-10` packages and updating its alternatives:
-
-```
-$ apt -y install gcc-10 g++-10
-$ update-alternatives remove-all g++
-$ update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 30
-```
