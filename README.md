@@ -50,7 +50,7 @@ $ make uninstall
 ## Dependencies
 
 - pdflatex
-- GCC 9
+- GCC 10
 - Python 3
 - libssl-dev
 - clang-format (optional)
@@ -131,6 +131,6 @@ If you are using Travis on your own fork you must add the environment variables 
 
 ## Technologies
 
-* C++17
-* GCC v.10.2.0
+* C++20
+* GCC v.10.3.0
 * LaTeX
