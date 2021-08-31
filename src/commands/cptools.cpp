@@ -63,7 +63,7 @@ std::string version() { return version_header + version_body; }
 
 // API functions
 int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
-    cli::set_output_stream(out);
+    cli::set_output_stream(err);
     cli::set_error_stream(err);
 
     if (argc >= 2) {
