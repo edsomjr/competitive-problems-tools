@@ -291,7 +291,7 @@ int validate_tests() {
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
 
     while ((option = getopt_long(argc, argv, "achstv", longopts, NULL)) != -1) {

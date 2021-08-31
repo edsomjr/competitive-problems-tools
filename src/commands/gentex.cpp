@@ -260,7 +260,7 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
 
     std::string document_class{"cp_modern"}, outfile, language{"pt_BR"}, label{"A"};

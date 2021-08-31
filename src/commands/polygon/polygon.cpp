@@ -38,8 +38,7 @@ The options are:
 namespace cptools::commands::polygon {
 
 // Global variables
-std::unordered_map<std::string, int (*)(int, char *const[], std::ostream &, std::ostream &)>
-    commands{{"pull", pull::run}};
+std::unordered_map<std::string, int (*)(int, char *const[])> cmds{{"pull", pull::run}};
 
 static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
                                    {"key", required_argument, NULL, 'k'},
@@ -67,7 +66,7 @@ types::polygon::Credentials get_credentials_from_file(const std::string &filepat
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
+int run(int argc, char *const argv[]) {
     int option = -1;
     types::polygon::Credentials creds;
     std::string creds_file{fs::get_default_config_path()};
@@ -76,9 +75,9 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
 
     if (argc >= 3) {
         std::string command{argv[2]};
-        auto it = commands.find(command);
-        if (it != commands.end())
-            return commands[command](argc, argv, out, err);
+        auto it = cmds.find(command);
+        if (it != cmds.end())
+            return cmds[command](argc, argv);
     }
 
     while ((option = getopt_long(argc, argv, "hk:s:c:", longopts, NULL)) != -1) {

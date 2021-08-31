@@ -200,7 +200,7 @@ int judge(const std::string &solution_path) {
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
     std::string target{"."};
 

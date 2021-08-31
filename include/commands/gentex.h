@@ -22,7 +22,7 @@ int generate_tutorial_latex(const std::string &doc_class, const std::string &lan
                             const std::string &label, std::ostream &out_stream);
 
 // Main routine
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
+int run(int argc, char *const argv[]);
 } // namespace cptools::commands::gentex
 
 #endif

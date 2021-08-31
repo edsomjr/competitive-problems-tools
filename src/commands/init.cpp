@@ -51,7 +51,7 @@ int copy_template_files(const std::string &dest) {
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
     std::string dest{"."};
 
