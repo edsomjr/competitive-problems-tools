@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <getopt.h>
+#include <ranges>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -126,6 +127,24 @@ void pull_tags(const types::polygon::Credentials &creds, const std::string &prob
     config::modify_config_file("problem|tags", tags);
 }
 
+void pull_tests(const types::polygon::Credentials &creds, const std::string &problem_id,
+                bool forced) {
+    cli::write(cli::fmt::info, "Pulling tests...");
+
+    auto remote_tests = api::polygon::get_problem_tests(creds, problem_id);
+
+    auto is_manual = [](const types::polygon::Test &t) { return t.manual; };
+    auto local_sample_tests = config::get_tests_file_names(config::test_type::sample);
+    auto l_manual_tests = config::get_tests_file_names(config::test_type::manual);
+    l_manual_tests.insert(l_manual_tests.end(), local_sample_tests.begin(), local_sample_tests.end());
+
+    for (const auto &rt : remote_tests | std::views::filter(is_manual)) {
+        auto found = std::find(l_manual_tests.begin(), l_manual_tests.end(), rt.file_name);
+        if (found != l_manual_tests.end())
+            conflicts::solve_files(*found, rt.file_name, rt.input, forced);
+    }
+}
+
 // API
 int run(int argc, char *const argv[]) {
     int option = -1;
@@ -178,6 +197,7 @@ int run(int argc, char *const argv[]) {
         pull_tool_file("checker", creds, problem_id, forced);
         pull_tool_file("validator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
+        pull_tests(creds, problem_id, forced);
         pull_titles(creds, problem_id);
         pull_infos(creds, problem_id);
         pull_tags(creds, problem_id);
