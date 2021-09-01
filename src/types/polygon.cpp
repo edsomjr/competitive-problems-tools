@@ -41,4 +41,19 @@ void from_json(const nlohmann::json &j, Information &i) {
     i.time_limit = j["timeLimit"].get<int>();
 }
 
+void from_json(const nlohmann::json &j, Test &t) {
+    t.index = j["index"].get<int>();
+    t.manual = j["manual"].get<bool>();
+
+    if (t.manual) {
+        t.use_in_statements = j["useInStatements"].get<bool>();
+        t.input = j["input"].get<std::string>();
+        t.script_line = "";
+    } else {
+        t.script_line = j["scriptLine"].get<std::string>();
+        t.use_in_statements = false;
+        t.input = "";
+    }
+}
+
 } // namespace cptools::types::polygon

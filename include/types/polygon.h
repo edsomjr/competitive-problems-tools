@@ -35,6 +35,16 @@ struct Information {
 };
 void from_json(const nlohmann::json &j, Information &i);
 
+struct Test {
+    int index;
+    std::string input;
+    bool manual;
+    bool use_in_statements;
+    std::string script_line;
+};
+using TestsVector = std::vector<Test>;
+void from_json(const nlohmann::json &j, Test &t);
+
 } // namespace cptools::types::polygon
 
 #endif
