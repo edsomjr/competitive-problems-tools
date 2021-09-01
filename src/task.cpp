@@ -59,7 +59,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
         if (s == "random") {
             source = cptools::util::get_json_value(config, "tools|generator", std::string("ERROR"));
 
-            if (source == "tools/ERROR") {
+            if (source == "ERROR") {
                 cli::write(cli::fmt::error, "Generator file not found!");
                 return {};
             }
