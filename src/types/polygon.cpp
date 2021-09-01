@@ -43,6 +43,8 @@ void from_json(const nlohmann::json &j, Information &i) {
 
 void from_json(const nlohmann::json &j, Test &t) {
     t.index = j["index"].get<int>();
+    std::string tests_prefix = "tests/";
+    t.file_name = tests_prefix + std::to_string(t.index);
     t.manual = j["manual"].get<bool>();
 
     if (t.manual) {

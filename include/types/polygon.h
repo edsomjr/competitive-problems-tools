@@ -37,6 +37,7 @@ void from_json(const nlohmann::json &j, Information &i);
 
 struct Test {
     int index;
+    std::string file_name;
     std::string input;
     bool manual;
     bool use_in_statements;
