@@ -11,11 +11,17 @@ namespace cptools::config {
 
 const std::string config_path_name = "config.json";
 
+enum test_type { sample, manual };
+const std::unordered_map<test_type, std::string> test_type_tag{{sample, "samples"},
+                                                               {manual, "manual"}};
+
 nlohmann::json read_config_file();
 std::string get_polygon_problem_id();
 std::string get_tool_file_name(const std::string &tool);
 
 std::vector<std::string> get_solutions_file_names(const std::string &tag);
+
+std::vector<std::string> get_tests_file_names(const test_type type);
 
 void insert_solution_file_name(const std::string &tag, const std::string &file_name);
 

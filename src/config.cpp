@@ -82,4 +82,17 @@ std::vector<std::string> get_solutions_file_names(const std::string &tag) {
     return file_names;
 }
 
+std::vector<std::string> get_tests_file_names(const test_type type) {
+    const auto config_json = read_config_file();
+    auto path = "tests|" + test_type_tag.at(type);
+    auto tests =
+        util::get_json_value<std::unordered_map<std::string, std::string>>(config_json, path, {});
+
+    std::vector<std::string> file_names;
+    std::ranges::transform(tests, std::back_inserter(file_names),
+                           [](const auto &pair) { return pair.first; });
+
+    return file_names;
+}
+
 } // namespace cptools::config
