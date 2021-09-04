@@ -40,9 +40,9 @@ Pack the marathon problem for the online judge BOCA (https://github.com/cassiopc
     --tutorial
 
     --no_author     Omits problem's author.
-    
-    --c-time-limit  Defines the maximum timelimit of the problem in the C language. 
-                    This time is used as a basis for calculating the time of other 
+
+    --c-time-limit  Defines the maximum timelimit of the problem in the C language.
+                    This time is used as a basis for calculating the time of other
                     programming languages.
 
     --no_contest    problem's contest.
@@ -363,6 +363,42 @@ int create_limits_dir(int argc, char *const argv[]) {
     return CP_TOOLS_OK;
 }
 
+int modify_checker()
+{
+    auto config = config::read_config_file();
+
+    auto checker_file = util::get_json_value(
+        config,
+        "tools|checker",
+        std::string("tools/checker.cpp")
+    );
+
+    // auto checker_path{ CP_TOOLS_BOCA_BUILD_DIR + checker_file };
+
+    std::string sed_cmd = R"sed_cmd(
+sed -i \
+'s/'\
+'int main(int argc'\
+'/'\
+'void convert_code(int rc, void*) {\n'\
+'    exit(rc + 4);\n'\
+'}\n\n'\
+'int main(int argc, char* argv[]) {\n'\
+'    std::swap(argv[1], argv[2]);\n'\
+'    std::swap(argv[2], argv[3]);\n'\
+'    on_exit(convert_code, NULL);\n'\
+'    main2(argc, argv);\n'\
+'}\n\n'\
+'int main2(int argc'\
+'/g' )sed_cmd";
+
+    sed_cmd += checker_file;
+
+    system(sed_cmd.c_str());
+
+    return CP_TOOLS_OK;
+}
+
 int genboca(int argc, char *const argv[]) {
     auto rnt = create_build_dirs();
     if (rnt != CP_TOOLS_OK) {
@@ -383,6 +419,12 @@ int genboca(int argc, char *const argv[]) {
     if (rnt != CP_TOOLS_OK) {
         cli::write(cli::fmt::error, std::to_string(rnt));
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_IO_DIRECTORY;
+    }
+
+    rnt = modify_checker();
+    if (rnt != CP_TOOLS_OK) {
+        cli::write(cli::fmt::error, std::to_string(rnt));
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_MODIFY_CHECKER_FILE;
     }
 
     return CP_TOOLS_OK;
