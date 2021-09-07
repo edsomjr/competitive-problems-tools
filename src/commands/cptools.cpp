@@ -46,10 +46,10 @@ Written by Edson Alves.)body"};
 namespace cptools::commands {
 
 // Global variables
-std::unordered_map<std::string, int (*)(int, char *const[], std::ostream &, std::ostream &)>
-    commands{{"init", init::run},       {"check", check::run},    {"clean", clean::run},
-             {"gentex", gentex::run},   {"genpdf", genpdf::run},  {"judge", judge::run},
-             {"polygon", polygon::run}, {"genboca", genboca::run}};
+std::unordered_map<std::string, int (*)(int, char *const[])> cmds{
+    {"init", init::run},       {"check", check::run},    {"clean", clean::run},
+    {"gentex", gentex::run},   {"genpdf", genpdf::run},  {"judge", judge::run},
+    {"polygon", polygon::run}, {"genboca", genboca::run}};
 
 static struct option longopts[] = {
     {"help", no_argument, NULL, 'h'}, {"version", no_argument, NULL, 'v'}, {0, 0, 0, 0}};
@@ -68,10 +68,10 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &err) {
 
     if (argc >= 2) {
         std::string command{argv[1]};
-        auto it = commands.find(command);
+        auto it = cmds.find(command);
 
-        if (it != commands.end()) {
-            return commands[command](argc, argv, out, err);
+        if (it != cmds.end()) {
+            return cmds[command](argc, argv);
         }
 
         if (command.front() != '-') {

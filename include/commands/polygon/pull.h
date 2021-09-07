@@ -7,7 +7,7 @@
 
 namespace cptools::commands::polygon::pull {
 
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
+int run(int argc, char *const argv[]);
 
 void pull_tool_file(const std::string tool_name, const types::polygon::Credentials &creds,
                     const std::string &problem_id, bool forced);

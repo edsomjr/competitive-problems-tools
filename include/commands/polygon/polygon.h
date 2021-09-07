@@ -8,7 +8,7 @@
 
 namespace cptools::commands::polygon {
 
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
+int run(int argc, char *const argv[]);
 
 types::polygon::Credentials get_credentials_from_file(const std::string &filepath);
 

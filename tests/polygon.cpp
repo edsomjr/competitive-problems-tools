@@ -3,12 +3,10 @@
 #include <string>
 
 #include "catch.hpp"
-#include "commands/polygon/polygon.h"
+#include "commands/cptools.h"
 #include "error.h"
 #include "fs.h"
 #include "util.h"
-
-using cptools::commands::polygon::run;
 
 const std::string default_json_invalid{"{\"polygon\":{\"key\": \"\", \"secret\": \"\"}}"};
 const std::string user_config_path = cptools::fs::get_default_config_path();
@@ -29,7 +27,7 @@ SCENARIO("Command polygon", "[polygon]") {
                 optind = 1;
                 THEN("The output must be an error for inexistent file") {
                     std::ostringstream out, err;
-                    auto rc = run(argc, argv, out, err);
+                    auto rc = cptools::commands::run(argc, argv, out, err);
 
                     REQUIRE(rc == CP_TOOLS_EXCEPTION_INEXISTENT_FILE);
                 }
@@ -44,7 +42,7 @@ SCENARIO("Command polygon", "[polygon]") {
 
                 THEN("The output must be an error because it wasn't able to connect") {
                     std::ostringstream out, err;
-                    auto rc = run(argc, argv, out, err);
+                    auto rc = cptools::commands::run(argc, argv, out, err);
 
                     REQUIRE(rc == CP_TOOLS_ERROR_POLYGON_CANT_CONNECT);
                 }
@@ -59,7 +57,7 @@ SCENARIO("Command polygon", "[polygon]") {
 
             THEN("The output must be an error because of the mutual choice") {
                 std::ostringstream out, err;
-                auto rc = run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_ERROR_POLYGON_MUTUAL_CHOICE_ERROR);
             }
@@ -73,7 +71,7 @@ SCENARIO("Command polygon", "[polygon]") {
 
             THEN("The output must be an error saying it wasn't able to connect") {
                 std::ostringstream out, err;
-                auto rc = run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_ERROR_POLYGON_CANT_CONNECT);
             }
@@ -101,7 +99,7 @@ SCENARIO("Command polygon", "[polygon]") {
                     optind = 1;
 
                     std::ostringstream out, err;
-                    auto rc = run(argc, argv, out, err);
+                    auto rc = cptools::commands::run(argc, argv, out, err);
 
                     REQUIRE(rc == CP_TOOLS_OK);
                 }
@@ -116,7 +114,7 @@ SCENARIO("Command polygon", "[polygon]") {
                     optind = 1;
 
                     std::ostringstream out, err;
-                    auto rc = run(argc, argv, out, err);
+                    auto rc = cptools::commands::run(argc, argv, out, err);
 
                     REQUIRE(rc == CP_TOOLS_OK);
                 }

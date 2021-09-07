@@ -5,7 +5,7 @@
 
 namespace cptools::commands::init {
 
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
+int run(int argc, char *const argv[]);
 
 std::string help();
 std::string usage();

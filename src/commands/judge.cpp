@@ -72,7 +72,7 @@ std::string usage() { return "Usage: " NAME " problem judge solution.[cpp|c|java
 
 std::string help() { return usage() + help_message; }
 
-int judge(const std::string &solution_path, std::ostream &out) {
+int judge(const std::string &solution_path) {
     table::Table report{{
         {"#", 4, cli::format::align::RIGHT | cli::format::emph::BOLD},
         {"Verdict", 32, cli::format::align::LEFT | cli::format::emph::BOLD},
@@ -172,32 +172,35 @@ int judge(const std::string &solution_path, std::ostream &out) {
                         {as_string(info.memory, 3), cli::format::style::INT}});
     }
 
-    out << report << '\n';
-
+    std::ostringstream oss;
     int col_size = 12;
 
-    out << cli::format::apply("Verdict:", cli::format::emph::BOLD + cli::format::align::LEFT,
+    oss << report << std::endl;
+
+    oss << cli::format::apply("Verdict:", cli::format::emph::BOLD + cli::format::align::LEFT,
                               col_size)
         << cli::format::apply(ver_string[ans], ver_style.at(ans) + cli::format::align::LEFT)
-        << '\n';
+        << std::endl;
 
-    out << cli::format::apply("Passed:", cli::format::emph::BOLD + cli::format::align::LEFT,
+    oss << cli::format::apply("Passed:", cli::format::emph::BOLD + cli::format::align::LEFT,
                               col_size)
-        << cli::format::apply(std::to_string(passed), cli::format::style::INT) << '\n';
+        << cli::format::apply(std::to_string(passed), cli::format::style::INT) << std::endl;
 
-    out << cli::format::apply("Max time:", cli::format::emph::BOLD + cli::format::align::LEFT,
+    oss << cli::format::apply("Max time:", cli::format::emph::BOLD + cli::format::align::LEFT,
                               col_size)
-        << cli::format::apply(as_string(tmax, 6), cli::format::style::FLOAT) << '\n';
+        << cli::format::apply(as_string(tmax, 6), cli::format::style::FLOAT) << std::endl;
 
-    out << cli::format::apply("Max memory:", cli::format::emph::BOLD + cli::format::align::LEFT,
+    oss << cli::format::apply("Max memory:", cli::format::emph::BOLD + cli::format::align::LEFT,
                               col_size)
-        << cli::format::apply(as_string(mmax, 3), cli::format::style::FLOAT) << '\n';
+        << cli::format::apply(as_string(mmax, 3), cli::format::style::FLOAT) << std::endl;
+
+    cli::write(cli::fmt::none, oss.str());
 
     return ans;
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
     std::string target{"."};
 
@@ -220,6 +223,6 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
 
     auto solution_path = argv[2];
 
-    return judge(solution_path, out);
+    return judge(solution_path);
 }
 } // namespace cptools::commands::judge

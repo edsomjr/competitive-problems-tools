@@ -389,7 +389,7 @@ int genboca(int argc, char *const argv[]) {
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
 
     // This command has many options, but only the `help` option is dealt with here.

@@ -127,7 +127,7 @@ void pull_tags(const types::polygon::Credentials &creds, const std::string &prob
 }
 
 // API
-int run(int argc, char *const argv[], std::ostream &, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
     auto forced = false;
 

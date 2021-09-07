@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "catch.hpp"
+#include "commands/cptools.h"
 #include "commands/init.h"
 #include "dirs.h"
 #include "error.h"
@@ -21,7 +22,7 @@ SCENARIO("Command init", "[init]") {
                 REQUIRE(res.rc == CP_TOOLS_OK);
 
                 std::ostringstream out, err;
-                REQUIRE(cptools::commands::init::run(argc, argv, out, err) == CP_TOOLS_OK);
+                REQUIRE(cptools::commands::run(argc, argv, out, err) == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
 
                 auto res_same =
@@ -41,7 +42,7 @@ SCENARIO("Command init", "[init]") {
             THEN("The output is the help message") {
                 std::ostringstream out, err;
 
-                auto rc = cptools::commands::init::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
@@ -60,7 +61,7 @@ SCENARIO("Command init", "[init]") {
             THEN("The error output is the help message") {
                 std::ostringstream out, err;
 
-                auto rc = cptools::commands::init::run(argc, argv, out, err);
+                auto rc = cptools::commands::run(argc, argv, out, err);
 
                 REQUIRE(rc == CP_TOOLS_ERROR_INIT_INVALID_OPTION);
                 REQUIRE(out.str().empty());

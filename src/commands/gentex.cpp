@@ -80,7 +80,7 @@ std::string help() { return usage() + help_message; }
 
 bool validate_language(const std::string &lang) { return languages.find(lang) != languages.end(); }
 
-int list_document_classes(std::ostream &out) {
+int list_document_classes() {
     std::string classes_dir{CP_TOOLS_CLASSES_DIR};
     DIR *d = opendir(classes_dir.c_str());
 
@@ -134,20 +134,20 @@ int list_document_classes(std::ostream &out) {
         int count = 4 + name.size();
 
         while (count < 20) {
-            out << ' ';
+            std::cout << ' ';
             ++count;
         }
 
         cli::write(cli::fmt::info, line);
     }
 
-    out << '\n';
+    std::cout << '\n';
 
     return CP_TOOLS_OK;
 }
 
 int generate_tutorial_latex(const std::string &doc_class, const std::string &language, int flags,
-                            const std::string &label, std::ostream &out) {
+                            const std::string &label, std::ostream &out_stream) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
@@ -163,33 +163,33 @@ int generate_tutorial_latex(const std::string &doc_class, const std::string &lan
         (not util::get_json_value(config, "PDF|include_author", false)))
         author = "";
 
-    out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
-    out << "\\usepackage{amsmath}\n";
-    out << "\\usepackage{tikz}\n\n";
+    out_stream << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
+    out_stream << "\\usepackage{amsmath}\n";
+    out_stream << "\\usepackage{tikz}\n\n";
 
-    out << "\\newcommand{\\Mod}[1]{\\ (\\mathrm{mod}\\ #1)}\n\n";
+    out_stream << "\\newcommand{\\Mod}[1]{\\ (\\mathrm{mod}\\ #1)}\n\n";
 
-    out << "\\begin{document}\n\n";
+    out_stream << "\\begin{document}\n\n";
 
-    out << "\\header{" << event << "}{" << author << "}\n\n";
+    out_stream << "\\header{" << event << "}{" << author << "}\n\n";
 
-    out << "\\begin{flushleft}\n";
-    out << "\\textbf{\\Large{" << label << ". " << title << "}}\n";
-    out << "\\end{flushleft}\n";
+    out_stream << "\\begin{flushleft}\n";
+    out_stream << "\\textbf{\\Large{" << label << ". " << title << "}}\n";
+    out_stream << "\\end{flushleft}\n";
 
-    out << "\\vspace{0.2in}\n";
+    out_stream << "\\vspace{0.2in}\n";
 
-    out << "\\input{tex/" << language << "/tutorial}\n\n";
+    out_stream << "\\input{tex/" << language << "/tutorial}\n\n";
 
-    out << "\\trailer{" << event << "}{" << author << "}\n\n";
+    out_stream << "\\trailer{" << event << "}{" << author << "}\n\n";
 
-    out << "\\end{document}\n";
+    out_stream << "\\end{document}\n";
 
     return CP_TOOLS_OK;
 }
 
 int generate_latex(const std::string &doc_class, const std::string &language, int flags,
-                   const std::string &label, std::ostream &out) {
+                   const std::string &label, std::ostream &out_stream) {
     auto config = config::read_config_file();
 
     auto lang{languages.at(language)};
@@ -210,57 +210,57 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
         (not util::get_json_value(config, "PDF|include_author", false)))
         author = "";
 
-    out << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
-    out << "\\begin{document}\n\n";
+    out_stream << "\\documentclass[" << lang << "]{" << doc_class << "}\n\n";
+    out_stream << "\\begin{document}\n\n";
 
-    out << "\\header{" << event << "}{" << author << "}\n\n";
+    out_stream << "\\header{" << event << "}{" << author << "}\n\n";
 
-    out.precision(1);
-    out << "\\begin{problem}{" << label << "}{" << title << "}{" << std::fixed
-        << (time_limit / 1000.0) << "}{" << memorylimit << "}\n\n";
-    out << "\\input{tex/" << language << "/statement}\n\n";
-    out << "\\begin{probleminput}{tex/" << language << "/input}\n";
-    out << "\\end{probleminput}\n\n";
-    out << "\\begin{problemoutput}{tex/" << language << "/output}\n";
-    out << "\\end{problemoutput}\n\n";
+    out_stream.precision(1);
+    out_stream << "\\begin{problem}{" << label << "}{" << title << "}{" << std::fixed
+               << (time_limit / 1000.0) << "}{" << memorylimit << "}\n\n";
+    out_stream << "\\input{tex/" << language << "/statement}\n\n";
+    out_stream << "\\begin{probleminput}{tex/" << language << "/input}\n";
+    out_stream << "\\end{probleminput}\n\n";
+    out_stream << "\\begin{problemoutput}{tex/" << language << "/output}\n";
+    out_stream << "\\end{problemoutput}\n\n";
 
-    out << "\\begin{samples}{" << c1_size << "}{" << c2_size << "}\n";
+    out_stream << "\\begin{samples}{" << c1_size << "}{" << c2_size << "}\n";
 
     auto io_files = task::generate_io_files("samples");
 
     for (auto [infile, outfile] : io_files)
-        out << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" << infile << "}{" << outfile
-            << "}\n";
+        out_stream << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" << infile << "}{"
+                   << outfile << "}\n";
 
-    out << "\\end{samples}\n\n";
+    out_stream << "\\end{samples}\n\n";
 
     auto notes{
         util::get_json_value(config, "problem|notes", std::vector<std::string>{"Notas", "Notes"})};
 
-    out << "\% notes: ";
+    out_stream << "\% notes: ";
     for (auto x : notes)
-        out << x << " ";
-    out << '\n';
+        out_stream << x << " ";
+    out_stream << '\n';
 
     if (notes.front() == "Notas") {
-        out << "\\begin{problemnotes}{tex/" << language << "/notes}\n";
-        out << "\\end{problemnotes}\n\n";
+        out_stream << "\\begin{problemnotes}{tex/" << language << "/notes}\n";
+        out_stream << "\\end{problemnotes}\n\n";
     } else {
-        out << "\\begin{customnotes}{" << notes.front() << "}{" << notes.back() << "}{tex/"
-            << language << "/notes}\n";
-        out << "\\end{customnotes}\n\n";
+        out_stream << "\\begin{customnotes}{" << notes.front() << "}{" << notes.back() << "}{tex/"
+                   << language << "/notes}\n";
+        out_stream << "\\end{customnotes}\n\n";
     }
 
-    out << "\\trailer{" << event << "}{" << author << "}\n\n";
+    out_stream << "\\trailer{" << event << "}{" << author << "}\n\n";
 
-    out << "\\end{problem}\n";
-    out << "\\end{document}\n";
+    out_stream << "\\end{problem}\n";
+    out_stream << "\\end{document}\n";
 
     return CP_TOOLS_OK;
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
 
     std::string document_class{"cp_modern"}, outfile, language{"pt_BR"}, label{"A"};
@@ -287,7 +287,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             break;
 
         case 'l':
-            return list_document_classes(out);
+            return list_document_classes();
 
         case 'g': {
             language = std::string(optarg);
@@ -331,9 +331,9 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
     }
 
     if (is_tutorial)
-        return generate_tutorial_latex(document_class, language, flags, label, out);
+        return generate_tutorial_latex(document_class, language, flags, label, std::cout);
     else
-        return generate_latex(document_class, language, flags, label, out);
+        return generate_latex(document_class, language, flags, label, std::cout);
 }
 
 } // namespace cptools::commands::gentex

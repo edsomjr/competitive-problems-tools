@@ -131,7 +131,7 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
 }
 
 // API functions
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
+int run(int argc, char *const argv[]) {
     int option = -1;
     bool tutorial = false;
 
@@ -158,7 +158,7 @@ int run(int argc, char *const argv[], std::ostream &out, std::ostream &) {
             break;
 
         case 'l':
-            return gentex::list_document_classes(out);
+            return gentex::list_document_classes();
 
         case 'g': {
             language = std::string(optarg);

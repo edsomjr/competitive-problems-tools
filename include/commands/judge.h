@@ -17,14 +17,14 @@ extern const int UNDEF;
 } // namespace verdict
 
 // Main routine
-int run(int argc, char *const argv[], std::ostream &out, std::ostream &err);
+int run(int argc, char *const argv[]);
 
 // Auxiliary routines
 std::string help();
 std::string usage();
 
 // Judge solution
-int judge(const std::string &solution_path, std::ostream &out);
+int judge(const std::string &solution_path);
 } // namespace cptools::commands::judge
 
 #endif
