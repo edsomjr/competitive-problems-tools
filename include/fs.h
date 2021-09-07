@@ -9,10 +9,7 @@
 namespace cptools::fs {
 
 using Result = types::common::Result;
-
-const Result make_result(bool res);
-const Result make_result(bool res, int rc, const std::filesystem::filesystem_error &e);
-const Result make_result(bool res, int rc, const std::string err_msg);
+using types::common::make_result;
 
 const Result create_directory(const std::string &path);
 const Result exists(const std::string &path);

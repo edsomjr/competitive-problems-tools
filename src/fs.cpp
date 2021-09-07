@@ -13,18 +13,6 @@
 
 namespace cptools::fs {
 
-const Result make_result(bool res) { return Result{res, CP_TOOLS_OK, ""}; }
-
-const Result make_result(bool res, int rc, const std::filesystem::filesystem_error &e) {
-    Result result{res, rc, ""};
-    result.error_message = e.what();
-    return result;
-}
-
-const Result make_result(bool res, int rc, const std::string err_msg) {
-    return Result{res, rc, err_msg};
-}
-
 const Result create_directory(const std::string &path) {
     if (exists(path).ok)
         return make_result(true);
@@ -33,13 +21,13 @@ const Result create_directory(const std::string &path) {
     try {
         created = std::filesystem::create_directories(path);
     } catch (const std::filesystem::filesystem_error &err) {
-        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY, err);
+        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY, "", err.what());
     }
 
     if (created)
         return make_result(created);
     else
-        return make_result(created, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY,
+        return make_result(created, CP_TOOLS_ERROR_CPP_FILESYSTEM_CREATE_DIRECTORY, "",
                            "Failed to create directory " + path);
 }
 
@@ -48,7 +36,7 @@ const Result exists(const std::string &path) {
     try {
         ok = std::filesystem::exists(path);
     } catch (const std::filesystem::filesystem_error &err) {
-        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_EXISTS, err);
+        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_EXISTS, "", err.what());
     }
 
     return make_result(ok);
@@ -62,7 +50,7 @@ const Result copy(const std::string &src, const std::string &dst, bool overwrite
     try {
         std::filesystem::copy(src, dst, options);
     } catch (const std::filesystem::filesystem_error &err) {
-        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY, err);
+        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_COPY, "", err.what());
     }
 
     return make_result(true);
@@ -76,13 +64,13 @@ const Result remove(const std::string &path) {
     try {
         removed = std::filesystem::remove_all(path);
     } catch (const std::filesystem::filesystem_error &err) {
-        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE, err);
+        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE, "", err.what());
     }
 
     if (removed)
         return make_result(removed);
     else
-        return make_result(removed, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE,
+        return make_result(removed, CP_TOOLS_ERROR_CPP_FILESYSTEM_REMOVE, "",
                            "Impossible to remove " + path);
 }
 
@@ -91,13 +79,13 @@ const Result equivalent(const std::string &p1, const std::string &p2) {
     try {
         same = std::filesystem::equivalent(p1, p2);
     } catch (const std::filesystem::filesystem_error &err) {
-        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_EQUIVALENT, err);
+        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_EQUIVALENT, "", err.what());
     }
 
     if (same)
         return make_result(same);
     else
-        return make_result(same, CP_TOOLS_ERROR_CPP_FILESYSTEM_EQUIVALENT,
+        return make_result(same, CP_TOOLS_ERROR_CPP_FILESYSTEM_EQUIVALENT, "",
                            "Impossible to compare " + p1 + " and " + p2);
 }
 
@@ -106,7 +94,7 @@ const Result is_directory(const std::string &path) {
     try {
         is_dir = std::filesystem::is_directory(path);
     } catch (const std::filesystem::filesystem_error &err) {
-        make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_IS_DIRECTORY, err);
+        make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_IS_DIRECTORY, "", err.what());
     }
 
     return make_result(is_dir);
@@ -117,7 +105,7 @@ const Result is_file(const std::string &path) {
     try {
         is_file = std::filesystem::is_regular_file(path);
     } catch (const std::filesystem::filesystem_error &err) {
-        make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_IS_FILE, err);
+        make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_IS_FILE, "", err.what());
     }
 
     return make_result(is_file);
@@ -127,7 +115,7 @@ const Result rename(const std::string old_path, const std::string new_path) {
     try {
         std::filesystem::rename(old_path, new_path);
     } catch (const std::filesystem::filesystem_error &err) {
-        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_RENAME, err);
+        return make_result(false, CP_TOOLS_ERROR_CPP_FILESYSTEM_RENAME, "", err.what());
     }
     return make_result(true);
 }
