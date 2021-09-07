@@ -82,12 +82,19 @@ int judge(const std::string &solution_path) {
 
     cli::write(cli::fmt::info, "Judging solution '" + solution_path + "'...");
 
-    auto rc = task::build_tools(task::tools::VALIDATOR | task::tools::CHECKER);
-
-    if (rc != CP_TOOLS_OK)
+    auto res = task::build_tool(config::tool_type::checker);
+    if (not res.ok) {
+        cli::write(cli::fmt::error, "Could not build checker: " + res.error_message);
         return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
+    }
 
-    rc = task::gen_exe(solution_path, "sol");
+    res = task::build_tool(config::tool_type::validator);
+    if (not res.ok) {
+        cli::write(cli::fmt::error, "Could not build validator: " + res.error_message);
+        return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
+    }
+
+    auto rc = task::gen_exe(solution_path, "sol");
 
     if (rc != CP_TOOLS_OK)
         return verdict::CE;

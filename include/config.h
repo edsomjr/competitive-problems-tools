@@ -18,9 +18,9 @@ const std::unordered_map<test_type, std::string> test_type_tag{{sample, "samples
 
 enum tool_type { checker, validator, generator, interactor };
 const std::unordered_map<tool_type, std::string> tool_type_tag{{checker, "checker"},
-                                                                {validator, "validator"},
-                                                                {generator, "generator"},
-                                                                {interactor, "interactor"}};
+                                                               {validator, "validator"},
+                                                               {generator, "generator"},
+                                                               {interactor, "interactor"}};
 
 nlohmann::json read_config_file();
 std::string get_polygon_problem_id();
