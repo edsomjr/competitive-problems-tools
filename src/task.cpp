@@ -74,8 +74,7 @@ std::vector<std::pair<std::string, std::string>> generate_io_files(const std::st
                 return {};
             }
 
-            auto inputs =
-                cptools::util::get_json_value(config, "tests|random", std::vector<std::string>{});
+            auto inputs = config::get_random_tests_inputs();
 
             for (auto parameters : inputs) {
                 std::string dest{input_dir + std::to_string(next++)};

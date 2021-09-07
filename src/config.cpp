@@ -95,4 +95,11 @@ std::vector<std::string> get_tests_file_names(const test_type type) {
     return file_names;
 }
 
+std::vector<std::string> get_random_tests_inputs() {
+    const auto config_json = read_config_file();
+    auto path = "tests|random";
+    auto tests = util::get_json_value<std::vector<std::string>>(config_json, path, {});
+    return tests;
+}
+
 } // namespace cptools::config

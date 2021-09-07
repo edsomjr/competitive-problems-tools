@@ -23,6 +23,8 @@ std::vector<std::string> get_solutions_file_names(const std::string &tag);
 
 std::vector<std::string> get_tests_file_names(const test_type type);
 
+std::vector<std::string> get_random_tests_inputs();
+
 void insert_solution_file_name(const std::string &tag, const std::string &file_name);
 
 std::string generate_old_config_filename();
