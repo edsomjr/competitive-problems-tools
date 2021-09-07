@@ -10,6 +10,8 @@
 #include "fs.h"
 #include "task.h"
 #include "util.h"
+#include "sh.h"
+
 
 // Raw strings
 static const std::string help_message{
@@ -340,22 +342,24 @@ int create_limits_dir(int argc, char *const argv[]) {
         auto [lang_timelimit_s, repetitions_number] =
             find_optimal_ratio(lang_timelimit_ms, numerator_range);
 
-        std::string content{std::string("#!/bin/bash\n") +
+        std::string content{
+            std::string("#!/bin/bash\n") +
 
-                            // time limit
-                            std::string("echo ") + std::to_string(lang_timelimit_s) + '\n' +
+            // time limit
+            std::string("echo ") + std::to_string(lang_timelimit_s) + '\n' +
 
-                            // number of repetitions to be performed within the time limit
-                            std::string("echo ") + std::to_string(repetitions_number) + '\n' +
+            // number of repetitions to be performed within the time limit
+            std::string("echo ") + std::to_string(repetitions_number) + '\n' +
 
-                            // maximum amount of memory per repetition
-                            std::string("echo ") + max_memory_amount + '\n' +
+            // maximum amount of memory per repetition
+            std::string("echo ") + max_memory_amount + '\n' +
 
-                            // maximum file size
-                            std::string("echo ") + std::to_string(max_file_size) + '\n' +
+            // maximum file size
+            std::string("echo ") + std::to_string(max_file_size) + '\n' +
 
-                            // and shall return zero to indicate no failure
-                            std::string("exit 0\n")};
+            // and shall return zero to indicate no failure
+            std::string("exit 0\n")
+        };
 
         fs::overwrite_file(limit_path + lang, content);
     }
@@ -363,26 +367,28 @@ int create_limits_dir(int argc, char *const argv[]) {
     return CP_TOOLS_OK;
 }
 
-int modify_checker()
+/**
+ * @brief Modify a file that contains a checker.
+ *
+ *        The modification consists of overwriting the file's main function, in order to
+ *        change the order of the parameters passed in argv. In addition to this
+ *        modification, a function is added to the `on_exit` routine to change the
+ *        returned code.
+ *
+ * @param checker_file
+ * @return int
+ */
+int modify_checker_file(std::string checker_file)
 {
-    auto config = config::read_config_file();
-
-    auto checker_file = util::get_json_value(
-        config,
-        "tools|checker",
-        std::string("tools/checker.cpp")
-    );
-
-    // auto checker_path{ CP_TOOLS_BOCA_BUILD_DIR + checker_file };
-
-    std::string sed_cmd = R"sed_cmd(
-sed -i \
+    std::string sed_args = R"sed_cmd(\
+-i \
 's/'\
 'int main(int argc'\
 '/'\
 'void convert_code(int rc, void*) {\n'\
 '    exit(rc + 4);\n'\
 '}\n\n'\
+'int main2(int argc, char* argv[]);\n\n'\
 'int main(int argc, char* argv[]) {\n'\
 '    std::swap(argv[1], argv[2]);\n'\
 '    std::swap(argv[2], argv[3]);\n'\
@@ -392,9 +398,113 @@ sed -i \
 'int main2(int argc'\
 '/g' )sed_cmd";
 
-    sed_cmd += checker_file;
+    sed_args += checker_file;
 
-    system(sed_cmd.c_str());
+    std::string error;
+
+    auto result = sh::execute("sed", sed_args, "", "");
+
+    if (result.rc != CP_TOOLS_OK) {
+        cli::write_trace(result.output);
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_RUN_SED_ON_CHECKER_FILE;
+    }
+
+    return CP_TOOLS_OK;
+}
+
+
+/**
+ * @brief Function that performs the necessary modifications to adapt the cp-tools
+ *        checker with the format expected by BOCA compare scripts.
+ *
+ * @return int
+ */
+int create_compare_dir()
+{
+    auto config = config::read_config_file();
+
+    auto checker_file = util::get_json_value(
+        config,
+        "tools|checker",
+        std::string("tools/checker.cpp")
+    );
+
+    std::string checker_cpy("tools/.checker.cpp");
+
+    auto cpy_retn = fs::copy(checker_file, checker_cpy, true);
+
+    if (not cpy_retn.ok) {
+        cli::write(cli::fmt::error, cpy_retn.error_message);
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_COPY_OF_CHECKER_FILE_FILE;
+    }
+
+    auto mdy_retn = modify_checker_file(checker_cpy);
+
+    if (mdy_retn != CP_TOOLS_OK) {
+        return mdy_retn;
+    }
+
+    auto binary_name = std::string(".base_binary");
+    auto binary_path = std::string("tools/") + binary_name;
+
+    auto bld_retn = sh::build(binary_path, checker_cpy);
+
+    if (bld_retn.rc != CP_TOOLS_OK) {
+        cli::write(cli::fmt::error, "Can't compile '" + checker_cpy + "'!");
+        cli::write_trace(bld_retn.output);
+        return bld_retn.rc;
+    }
+
+    auto rme_retn = fs::remove(checker_cpy);
+
+    if (not rme_retn.ok) {
+        cli::write(cli::fmt::error, rme_retn.error_message);
+        return rme_retn.rc;
+    }
+
+    auto compare_path{ CP_TOOLS_BOCA_BUILD_DIR + std::string("compare/") };
+
+    auto rnm_retn = fs::rename(binary_path, compare_path + binary_name);
+
+    if (not rnm_retn.ok) {
+        cli::write(cli::fmt::error, rnm_retn.error_message);
+        return rnm_retn.rc;
+    }
+
+    std::vector<std::string> supported_languages{"c", "cpp", "java", "kt", "py2", "py3"};
+
+    for(auto lang : supported_languages) {
+
+        std::string lang_exec_file = compare_path + lang;
+
+        auto bny_cpy_retn = fs::copy(
+            compare_path + binary_name,
+            lang_exec_file,
+            true
+        );
+
+        if (not bny_cpy_retn.ok) {
+            cli::write(cli::fmt::error, bny_cpy_retn.error_message);
+            return {};
+        }
+
+        std::string error;
+        std::string chmod_args = std::string("755 ") + lang_exec_file;
+
+        auto chmod_retn = sh::execute("chmod", chmod_args, "", "");
+
+        if (chmod_retn.rc != CP_TOOLS_OK) {
+            cli::write_trace(chmod_retn.output);
+            return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_ADD_EXECUTION_PERMISSION;
+        }
+    }
+
+    auto rmv_retn = fs::remove(compare_path + binary_name);
+
+    if (not rmv_retn.ok) {
+        cli::write(cli::fmt::error, rmv_retn.error_message);
+        return rmv_retn.rc;
+    }
 
     return CP_TOOLS_OK;
 }
@@ -421,7 +531,7 @@ int genboca(int argc, char *const argv[]) {
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_CREATE_IO_DIRECTORY;
     }
 
-    rnt = modify_checker();
+    rnt = create_compare_dir();
     if (rnt != CP_TOOLS_OK) {
         cli::write(cli::fmt::error, std::to_string(rnt));
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_MODIFY_CHECKER_FILE;
