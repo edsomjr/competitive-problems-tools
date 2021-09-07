@@ -13,9 +13,17 @@ std::string get_polygon_problem_id() {
     return problem_id;
 }
 
-std::string get_tool_file_name(const std::string &tool) {
+std::string get_tool_file_name(const std::string &type) {
+    for (const auto [key, value] : tool_type_tag) {
+        if (value == type)
+            return get_tool_file_name(key);
+    }
+    return "";
+}
+
+std::string get_tool_file_name(const tool_type type) {
     const auto json_object = read_config_file();
-    const std::string path = "tools|" + tool;
+    const std::string path = "tools|" + tool_type_tag.at(type);
     const auto file_name = util::get_json_value<std::string>(json_object, path, "");
     return file_name;
 }

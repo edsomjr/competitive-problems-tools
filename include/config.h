@@ -2,6 +2,7 @@
 #define CP_TOOLS_CONFIG_H
 
 #include <string>
+#include <unordered_map>
 
 #include "fs.h"
 #include "json.hpp"
@@ -15,9 +16,16 @@ enum test_type { sample, manual };
 const std::unordered_map<test_type, std::string> test_type_tag{{sample, "samples"},
                                                                {manual, "manual"}};
 
+enum tool_type { checker, validator, generator, interactor };
+const std::unordered_map<tool_type, std::string> tool_type_tag{{checker, "checker"},
+                                                                {validator, "validator"},
+                                                                {generator, "generator"},
+                                                                {interactor, "interactor"}};
+
 nlohmann::json read_config_file();
 std::string get_polygon_problem_id();
-std::string get_tool_file_name(const std::string &tool);
+std::string get_tool_file_name(const tool_type type);
+std::string get_tool_file_name(const std::string &type);
 
 std::vector<std::string> get_solutions_file_names(const std::string &tag);
 
