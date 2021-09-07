@@ -115,11 +115,11 @@ int judge(const std::string &solution_path) {
         auto number = util::split(input, '/').back();
         auto output{std::string(CP_TOOLS_BUILD_DIR) + "/out"};
 
-        auto res = sh::execute(validator, "", input);
+        auto res = sh::execute_program(validator, "", input);
 
-        if (res.rc != CP_TOOLS_OK) {
+        if (!res.ok) {
             cli::write(cli::fmt::error, "Input file '" + input + "' is invalid");
-            cli::write_trace(res.output);
+            cli::write_trace(res.error_message);
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
 
@@ -140,7 +140,7 @@ int judge(const std::string &solution_path) {
         if (ver == verdict::AC) {
             auto args{input + " " + output + " " + answer};
 
-            res = sh::execute(checker, args, "", "/dev/null", 2 * time_limit / 1000.0);
+            res = sh::execute_program(checker, args, "", "/dev/null", 2 * time_limit / 1000.0);
 
             switch (res.rc) {
             case 6:

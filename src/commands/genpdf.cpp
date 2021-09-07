@@ -112,9 +112,9 @@ int generate_pdf(const std::string &doc_class, const std::string &language, int 
 
     auto res = sh::build(pdf_file, texfile_path);
 
-    if (res.rc != CP_TOOLS_OK) {
+    if (not res.ok) {
         cli::write(cli::fmt::error, "Error generating the PDF file '" + pdf_file + "'!");
-        cli::write_trace(res.output);
+        cli::write_trace(res.error_message);
         return res.rc;
     }
 

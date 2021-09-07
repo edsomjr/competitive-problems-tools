@@ -136,7 +136,8 @@ void pull_tests(const types::polygon::Credentials &creds, const std::string &pro
     auto is_manual = [](const types::polygon::Test &t) { return t.manual; };
     auto local_sample_tests = config::get_tests_file_names(config::test_type::sample);
     auto l_manual_tests = config::get_tests_file_names(config::test_type::manual);
-    l_manual_tests.insert(l_manual_tests.end(), local_sample_tests.begin(), local_sample_tests.end());
+    l_manual_tests.insert(l_manual_tests.end(), local_sample_tests.begin(),
+                          local_sample_tests.end());
 
     for (const auto &rt : remote_tests | std::views::filter(is_manual)) {
         auto found = std::find(l_manual_tests.begin(), l_manual_tests.end(), rt.file_name);
