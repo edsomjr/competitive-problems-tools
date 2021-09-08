@@ -12,9 +12,10 @@ namespace cptools::config {
 
 const std::string config_path_name = "config.json";
 
-enum test_type { sample, manual };
+enum test_type { sample, manual, random };
 const std::unordered_map<test_type, std::string> test_type_tag{{sample, "samples"},
-                                                               {manual, "manual"}};
+                                                               {manual, "manual"},
+                                                               {random, "random"}};
 
 enum tool_type { checker, validator, generator, interactor };
 const std::unordered_map<tool_type, std::string> tool_type_tag{{checker, "checker"},
