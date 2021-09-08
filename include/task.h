@@ -19,7 +19,7 @@ const Result build_tool(config::tool_type tool_type);
 std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string &testset,
                                                                    bool gen_output = true);
 
-int gen_exe(const std::string &source, const std::string &dest, const std::string &where = ".");
+const Result gen_exe(const std::string &source, const std::string &dest);
 
 } // namespace cptools::task
 

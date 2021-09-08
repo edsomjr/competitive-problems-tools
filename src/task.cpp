@@ -148,30 +148,27 @@ const Result build_tool(config::tool_type tool_type) {
     return res;
 }
 
-int gen_exe(const std::string &source, const std::string &dest, const std::string &where) {
-    auto dest_dir{where + "/" + CP_TOOLS_BUILD_DIR + "/"};
+const Result gen_exe(const std::string &source, const std::string &dest) {
+    auto dest_dir = std::filesystem::path(CP_TOOLS_BUILD_DIR);
 
     auto fs_res = fs::create_directory(dest_dir);
-    if (not fs_res.ok) {
-        return fs_res.rc;
-    }
+    if (not fs_res.ok)
+        return fs_res;
 
-    auto program{dest_dir + dest};
+    auto program = dest_dir / dest;
 
     auto removed_result = fs::remove(program);
-    if (not removed_result.ok) {
-        cli::write(cli::fmt::error, removed_result.error_message);
-        return removed_result.rc;
-    }
+    if (not removed_result.ok)
+        return removed_result;
 
     auto res = sh::build(program, source);
 
     if (!res.ok) {
         cli::write(cli::fmt::error, "Can't build solution '" + source + "'!");
         cli::write_trace(res.error_message);
-        return res.rc;
+        return res;
     }
 
-    return CP_TOOLS_OK;
+    return res;
 }
 } // namespace cptools::task

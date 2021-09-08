@@ -94,10 +94,12 @@ int judge(const std::string &solution_path) {
         return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
     }
 
-    auto rc = task::gen_exe(solution_path, "sol");
+    res = task::gen_exe(solution_path, "sol");
 
-    if (rc != CP_TOOLS_OK)
+    if (not res.ok) {
+        cli::write(cli::fmt::error, "Could not generate executable: " + res.error_message);
         return verdict::CE;
+    }
 
     auto config = cptools::config::read_config_file();
     auto time_limit = cptools::util::get_json_value(config, "problem|time_limit", 1000);
