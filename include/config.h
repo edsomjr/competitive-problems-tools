@@ -28,7 +28,8 @@ std::string get_polygon_problem_id();
 std::string get_tool_file_name(const tool_type type);
 std::string get_tool_file_name(const std::string &type);
 
-std::vector<std::string> get_solutions_file_names(const std::string &tag);
+std::vector<std::string> get_solutions_file_paths(const std::string &tag,
+                                                  const bool filename_only = false);
 
 std::vector<std::string> get_tests_file_names(const test_type type);
 std::vector<std::string> get_all_tests_file_names();

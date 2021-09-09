@@ -110,9 +110,9 @@ int validate_checker() {
         return res.rc;
     }
 
-    source = cptools::util::get_json_value(config, "solutions|default", std::string("ERROR"));
+    source = config::get_solutions_file_paths("default")[0];
 
-    if (source == "ERROR") {
+    if (source == "") {
         cli::write(cli::fmt::error, "[validate_checker] Default solution file not found!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }

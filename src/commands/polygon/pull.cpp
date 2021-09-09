@@ -73,20 +73,22 @@ void pull_solutions(const types::polygon::Credentials &creds, const std::string 
     auto solutions = api::polygon::get_problem_solutions(creds, problem_id);
 
     for (const auto &solution : solutions) {
-        auto files_with_same_tag = config::get_solutions_file_names(solution.tag);
+        auto files_with_same_tag = config::get_solutions_file_paths(solution.tag);
+
         auto file_content =
             api::polygon::get_problem_file(solution.name, "solution", creds, problem_id);
-        auto remote_file_name = std::filesystem::path(solution.name).filename().string();
+
+        const auto remote_file_name = std::filesystem::path(solution.name).filename().string();
+        const auto remote_file_path = "solutions/" + remote_file_name;
 
         auto file_exists = std::find(files_with_same_tag.begin(), files_with_same_tag.end(),
                                      remote_file_name) != files_with_same_tag.end();
 
-        if (!file_exists) {
-            fs::overwrite_file(remote_file_name, "");
-        }
-        auto new_file_path =
-            conflicts::solve_files(remote_file_name, remote_file_name, file_content, forced);
-        config::insert_solution_file_name(solution.tag, new_file_path);
+        if (!file_exists)
+            fs::overwrite_file(remote_file_path, file_content);
+        else
+            conflicts::solve_files(remote_file_path, remote_file_name, file_content, forced);
+        config::insert_solution_file_name(solution.tag, remote_file_name);
     }
 }
 
@@ -195,13 +197,13 @@ int run(int argc, char *const argv[]) {
     }
 
     try {
-        pull_tool_file("checker", creds, problem_id, forced);
-        pull_tool_file("validator", creds, problem_id, forced);
+        // pull_tool_file("checker", creds, problem_id, forced);
+        // pull_tool_file("validator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
-        pull_tests(creds, problem_id, forced);
-        pull_titles(creds, problem_id);
-        pull_infos(creds, problem_id);
-        pull_tags(creds, problem_id);
+        // pull_tests(creds, problem_id, forced);
+        // pull_titles(creds, problem_id);
+        // pull_infos(creds, problem_id);
+        // pull_tags(creds, problem_id);
     } catch (const exceptions::polygon_api_error &e) {
         cli::write(cli::fmt::error, e.what());
         cli::write(cli::fmt::warning, "Pull aborted, some files may not be updated correctly");

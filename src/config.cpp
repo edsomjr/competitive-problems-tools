@@ -53,7 +53,7 @@ void insert_solution_file_name(const std::string &tag, const std::string &file_n
     const auto json_object = read_config_file();
     const std::string path = "solutions|" + tag;
 
-    auto files_with_tag = get_solutions_file_names(tag);
+    auto files_with_tag = get_solutions_file_paths(tag, true);
     auto found = std::find(files_with_tag.begin(), files_with_tag.end(), file_name);
 
     if (tag == "default") {
@@ -77,17 +77,28 @@ void insert_solution_file_name(const std::string &tag, const std::string &file_n
  * @return std::vector<std::string> Returns a vector with the strings found on the
  *                                  config.json using the tag strings.
  */
-std::vector<std::string> get_solutions_file_names(const std::string &tag) {
+std::vector<std::string> get_solutions_file_paths(const std::string &tag,
+                                                  const bool filename_only) {
     const auto config_json = read_config_file();
     const std::string path = "solutions|" + tag;
 
+    std::vector<std::string> results;
     if (tag == "default") {
-        auto file_name = util::get_json_value<std::string>(config_json, path, "");
-        return std::vector<std::string>{file_name};
+        const auto file_name = util::get_json_value<std::string>(config_json, path, "");
+        results.push_back(file_name);
+    } else {
+        const auto file_names =
+            util::get_json_value<std::vector<std::string>>(config_json, path, {});
+        results = file_names;
     }
 
-    auto file_names = util::get_json_value<std::vector<std::string>>(config_json, path, {});
-    return file_names;
+    if (filename_only)
+        return results;
+
+    for (auto &file_name : results)
+        file_name = "solutions/" + file_name;
+
+    return results;
 }
 
 std::vector<std::string> get_tests_file_names(const test_type type) {

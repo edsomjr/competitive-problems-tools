@@ -12,7 +12,7 @@
 namespace cptools::task {
 
 const Result build_default_solution() {
-    const auto solution_src = config::get_solutions_file_names("default")[0];
+    const auto solution_src = config::get_solutions_file_paths("default")[0];
     const auto dest_file = std::string(CP_TOOLS_BUILD_DIR) + "/solution";
     const auto build_res = sh::build(dest_file, solution_src);
     return build_res;
