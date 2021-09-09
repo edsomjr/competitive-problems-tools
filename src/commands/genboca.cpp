@@ -194,7 +194,7 @@ int create_description_dir(int argc, char *const argv[]) {
 }
 
 int create_io_dir() {
-    auto pairs = task::generate_io_files("all");
+    auto pairs = task::generate_all_io_files();
 
     for (const auto &dir : {std::string("input/"), std::string("output/")}) {
 

@@ -109,7 +109,7 @@ int judge(const std::string &solution_path) {
     auto program{std::string(CP_TOOLS_BUILD_DIR) + "/sol"};
     auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
 
-    auto files = task::generate_io_files("all");
+    auto files = task::generate_all_io_files();
     int ans = verdict::AC, passed = 0;
     double tmax = 0.0, mmax = 0.0;
 

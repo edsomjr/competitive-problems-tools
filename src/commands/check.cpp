@@ -265,7 +265,7 @@ int validate_tests() {
         return res.rc;
     }
 
-    auto io_files = task::generate_io_files("all", false);
+    auto io_files = task::generate_all_io_files(false);
 
     if (io_files.empty()) {
         cli::write(cli::fmt::error, "There are no io files to validate!");
