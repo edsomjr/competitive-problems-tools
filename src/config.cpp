@@ -110,4 +110,13 @@ std::vector<std::string> get_random_tests_inputs() {
     return tests;
 }
 
+std::vector<std::string> get_all_tests_file_names() {
+    std::vector<std::string> results;
+    for (const auto &type : all_test_types) {
+        const auto file_names = get_tests_file_names(type);
+        results.insert(results.end(), file_names.begin(), file_names.end());
+    }
+    return results;
+}
+
 } // namespace cptools::config
