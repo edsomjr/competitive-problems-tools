@@ -488,7 +488,6 @@ int create_compare_dir()
             return {};
         }
 
-        std::string error;
         std::string chmod_args = std::string("755 ") + lang_exec_file;
 
         auto chmod_retn = sh::execute("chmod", chmod_args, "", "");
@@ -504,6 +503,56 @@ int create_compare_dir()
     if (not rmv_retn.ok) {
         cli::write(cli::fmt::error, rmv_retn.error_message);
         return rmv_retn.rc;
+    }
+
+    return CP_TOOLS_OK;
+}
+
+int zip_boca_package(int argc, char *const argv[]){
+
+    std::string default_zip_name = util::get_from_argv(
+        argc,
+        argv,
+        {"--label", "-b"},
+    "A");
+
+    std::string zip_name = util::get_from_argv(
+        argc,
+        argv,
+        {"--zip-name", "-z"},
+        default_zip_name
+    );
+
+    std::string boca_package_name = std::string("./") + zip_name;
+
+    auto rnm_retn = fs::rename(CP_TOOLS_BOCA_BUILD_DIR, boca_package_name);
+
+    if (not rnm_retn.ok) {
+        cli::write(cli::fmt::error, rnm_retn.error_message);
+        return rnm_retn.rc;
+    }
+
+    zip_name += std::string(".zip");
+
+    std::string zip_args = (
+        std::string("-r ") +
+        zip_name +
+        std::string(" ") +
+        boca_package_name
+    );
+
+    auto zip_retn = sh::execute("zip", zip_args, "", "");
+
+    if (zip_retn.rc != CP_TOOLS_OK) {
+        cli::write_trace(zip_retn.output);
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_ADD_EXECUTION_PERMISSION;
+    }
+
+    auto removed_result = fs::remove(boca_package_name);
+
+    if (not removed_result.ok) {
+        cli::write(cli::fmt::error, removed_result.error_message);
+        return removed_result.rc;
     }
 
     return CP_TOOLS_OK;
@@ -532,6 +581,13 @@ int genboca(int argc, char *const argv[]) {
     }
 
     rnt = create_compare_dir();
+    if (rnt != CP_TOOLS_OK) {
+        cli::write(cli::fmt::error, std::to_string(rnt));
+        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_MODIFY_CHECKER_FILE;
+    }
+
+    rnt = zip_boca_package(argc, argv);
+
     if (rnt != CP_TOOLS_OK) {
         cli::write(cli::fmt::error, std::to_string(rnt));
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_MODIFY_CHECKER_FILE;
