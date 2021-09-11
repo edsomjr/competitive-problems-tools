@@ -1,5 +1,6 @@
 #include <getopt.h>
 #include <limits>
+#include <sstream>
 
 #include "cli/cli.h"
 #include "commands/genpdf.h"
@@ -510,11 +511,8 @@ int create_compare_dir()
 
 int zip_boca_package(int argc, char *const argv[]){
 
-    std::string default_zip_name = util::get_from_argv(
-        argc,
-        argv,
-        {"--label", "-b"},
-    "A");
+    std::string label_name = util::get_from_argv(argc, argv, {"--label", "-b"}, "A");
+    std::string default_zip_name = label_name + ".zip";
 
     std::string zip_name = util::get_from_argv(
         argc,
@@ -523,37 +521,21 @@ int zip_boca_package(int argc, char *const argv[]){
         default_zip_name
     );
 
-    std::string boca_package_name = std::string("./") + zip_name;
+    std::ostringstream oss;
+    oss << "cd " << CP_TOOLS_BOCA_BUILD_DIR << " && zip -r " << zip_name << " * "
+        << "&& cd ../../ && mv " << CP_TOOLS_BOCA_BUILD_DIR << zip_name << " .";
 
-    auto rnm_retn = fs::rename(CP_TOOLS_BOCA_BUILD_DIR, boca_package_name);
+    std::string cmd = oss.str();
 
-    if (not rnm_retn.ok) {
-        cli::write(cli::fmt::error, rnm_retn.error_message);
-        return rnm_retn.rc;
-    }
+    // Not working
+    // auto zip_retn = sh::execute(cmd, "", "", "");
 
-    zip_name += std::string(".zip");
+    // if (zip_retn.rc != CP_TOOLS_OK) {
+    //     cli::write_trace(zip_retn.output);
+    //     return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_ADD_EXECUTION_PERMISSION;
+    // }
 
-    std::string zip_args = (
-        std::string("-r ") +
-        zip_name +
-        std::string(" ") +
-        boca_package_name
-    );
-
-    auto zip_retn = sh::execute("zip", zip_args, "", "");
-
-    if (zip_retn.rc != CP_TOOLS_OK) {
-        cli::write_trace(zip_retn.output);
-        return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_ADD_EXECUTION_PERMISSION;
-    }
-
-    auto removed_result = fs::remove(boca_package_name);
-
-    if (not removed_result.ok) {
-        cli::write(cli::fmt::error, removed_result.error_message);
-        return removed_result.rc;
-    }
+    std::system(cmd.c_str());
 
     return CP_TOOLS_OK;
 }
