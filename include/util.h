@@ -15,6 +15,8 @@ std::vector<std::string> split(const std::string &s, char delim = ' ');
 std::string strip(const std::string &s);
 std::string strip(const std::string &s, char c);
 
+std::string join(const std::vector<std::string> &v, char delim = ' ');
+
 std::string lower_string(const std::string &s);
 
 nlohmann::json read_json_file(const std::string &config_file_path);

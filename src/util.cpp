@@ -106,6 +106,16 @@ std::string strip(const std::string &s) { return strip(s, " \t\n\r\b"); }
 
 std::string strip(const std::string &s, char c) { return strip(s, std::string(1, c)); }
 
+std::string join(const std::vector<std::string> &v, const char delim) {
+    std::stringstream ss;
+    const auto delim_str = std::string(1, delim);
+    for (size_t i = 0; i < v.size(); ++i) {
+        const auto local_delim = i ? delim_str : "";
+        ss << local_delim << v[i];
+    }
+    return ss.str();
+}
+
 std::string lower_string(const std::string &s) {
     auto s_copy = std::string(s);
     std::transform(s.begin(), s.end(), s_copy.begin(),
