@@ -12,7 +12,11 @@ namespace cptools::config {
 
 const std::string config_path_name = "config.json";
 
-enum test_type { sample, manual, random };
+enum test_type {
+    sample,
+    manual,
+    random
+}; // random must be the last one in the enum because of generate_all_io_files
 static const std::vector<test_type> all_test_types = {sample, manual, random};
 const std::unordered_map<test_type, std::string> test_type_tag{
     {sample, "samples"}, {manual, "manual"}, {random, "random"}};
