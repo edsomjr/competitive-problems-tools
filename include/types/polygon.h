@@ -41,7 +41,6 @@ struct Test {
     std::string input;
     bool manual;
     bool use_in_statements;
-    std::string script_line;
 };
 using TestsVector = std::vector<Test>;
 void from_json(const nlohmann::json &j, Test &t);

@@ -1,9 +1,9 @@
 #include <filesystem>
 #include <getopt.h>
 #include <ranges>
-#include <set>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "cli/cli.h"
 #include "commands/polygon/polygon.h"
@@ -13,6 +13,7 @@
 #include "error.h"
 #include "exceptions.h"
 #include "fs.h"
+#include "task.h"
 #include "types/polygon.h"
 #include "util.h"
 
@@ -146,6 +147,22 @@ void pull_tests(const types::polygon::Credentials &creds, const std::string &pro
         if (found != l_manual_tests.end())
             conflicts::solve_files(*found, rt.file_name, rt.input, forced);
     }
+
+    auto is_random = [](const types::polygon::Test &t) { return !t.manual; };
+    std::unordered_set<std::string> unique_inputs;
+    auto l_random_inputs = config::get_random_tests_inputs();
+    for (const auto &rt : remote_tests | std::views::filter(is_random)) {
+        const auto cmd = util::split(rt.input);
+        std::vector<std::string> args(cmd.begin() + 1, cmd.end());
+        const auto args_str = util::join(args);
+        unique_inputs.insert(args_str);
+    }
+
+    if (not forced)
+        unique_inputs.insert(l_random_inputs.begin(), l_random_inputs.end());
+
+    const std::vector<std::string> inputs_result(unique_inputs.begin(), unique_inputs.end());
+    config::modify_config_file("tests|random", inputs_result);
 }
 
 // API
@@ -197,13 +214,13 @@ int run(int argc, char *const argv[]) {
     }
 
     try {
-        // pull_tool_file("checker", creds, problem_id, forced);
-        // pull_tool_file("validator", creds, problem_id, forced);
+        pull_tool_file("checker", creds, problem_id, forced);
+        pull_tool_file("validator", creds, problem_id, forced);
         pull_solutions(creds, problem_id, forced);
-        // pull_tests(creds, problem_id, forced);
-        // pull_titles(creds, problem_id);
-        // pull_infos(creds, problem_id);
-        // pull_tags(creds, problem_id);
+        pull_tests(creds, problem_id, forced);
+        pull_titles(creds, problem_id);
+        pull_infos(creds, problem_id);
+        pull_tags(creds, problem_id);
     } catch (const exceptions::polygon_api_error &e) {
         cli::write(cli::fmt::error, e.what());
         cli::write(cli::fmt::warning, "Pull aborted, some files may not be updated correctly");

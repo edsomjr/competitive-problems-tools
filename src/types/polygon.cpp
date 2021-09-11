@@ -49,12 +49,10 @@ void from_json(const nlohmann::json &j, Test &t) {
 
     if (t.manual) {
         t.use_in_statements = j["useInStatements"].get<bool>();
-        t.input = j["input"].get<std::string>();
-        t.script_line = "";
+        t.input = util::strip(j["input"].get<std::string>());
     } else {
-        t.script_line = j["scriptLine"].get<std::string>();
+        t.input = util::strip(j["scriptLine"].get<std::string>());
         t.use_in_statements = false;
-        t.input = "";
     }
 }
 
