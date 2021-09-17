@@ -524,7 +524,7 @@ int zip_boca_package(int argc, char *const argv[]){
     );
 
     std::ostringstream oss;
-    oss << "cd " << CP_TOOLS_BOCA_BUILD_DIR << " && zip -r " << zip_name << " * "
+    oss << "cd " << CP_TOOLS_BOCA_BUILD_DIR << " && zip -r -q " << zip_name << " * "
         << "&& cd ../../ && mv " << CP_TOOLS_BOCA_BUILD_DIR << zip_name << " .";
 
     std::string cmd = oss.str();
