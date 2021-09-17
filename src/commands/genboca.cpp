@@ -387,15 +387,10 @@ int modify_checker_file(std::string checker_file)
 'int main(int argc'\
 '/'\
 '#include <algorithm>\n\n'\
-'void convert_code(int rc, void*) {\n'\
-'    if(rc == 4) exit(1);\n'\
-'    exit(rc);\n'\
-'}\n\n'\
 'int main2(int argc, char* argv[]);\n\n'\
 'int main(int argc, char* argv[]) {\n'\
 '    std::swap(argv[1], argv[3]);\n'\
 '    std::swap(argv[2], argv[3]);\n'\
-'    on_exit(convert_code, NULL);\n'\
 '    main2(argc, argv);\n'\
 '}\n\n'\
 'int main2(int argc'\
@@ -458,12 +453,12 @@ int create_compare_dir()
         return bld_retn.rc;
     }
 
-    auto rme_retn = fs::remove(checker_cpy);
+    // auto rme_retn = fs::remove(checker_cpy);
 
-    if (not rme_retn.ok) {
-        cli::write(cli::fmt::error, rme_retn.error_message);
-        return rme_retn.rc;
-    }
+    // if (not rme_retn.ok) {
+    //     cli::write(cli::fmt::error, rme_retn.error_message);
+    //     return rme_retn.rc;
+    // }
 
     auto compare_path{ CP_TOOLS_BOCA_BUILD_DIR + std::string("compare/") };
 
