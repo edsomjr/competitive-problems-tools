@@ -387,12 +387,13 @@ int modify_checker_file(std::string checker_file)
 'int main(int argc'\
 '/'\
 'void convert_code(int rc, void*) {\n'\
-'    exit(rc + 4);\n'\
+'    if(rc == 4) exit(1);\n'\
+'    exit(rc);\n'\
 '}\n\n'\
 'int main2(int argc, char* argv[]);\n\n'\
 'int main(int argc, char* argv[]) {\n'\
+'    std::swap(argv[1], argv[3]);\n'\
 '    std::swap(argv[1], argv[2]);\n'\
-'    std::swap(argv[2], argv[3]);\n'\
 '    on_exit(convert_code, NULL);\n'\
 '    main2(argc, argv);\n'\
 '}\n\n'\
