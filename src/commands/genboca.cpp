@@ -386,14 +386,11 @@ int modify_checker_file(std::string checker_file)
 's/'\
 'int main(int argc'\
 '/'\
-'void convert_code(int rc, void*) {\n'\
-'    exit(rc + 4);\n'\
-'}\n\n'\
+'#include <algorithm>\n\n'\
 'int main2(int argc, char* argv[]);\n\n'\
 'int main(int argc, char* argv[]) {\n'\
-'    std::swap(argv[1], argv[2]);\n'\
+'    std::swap(argv[1], argv[3]);\n'\
 '    std::swap(argv[2], argv[3]);\n'\
-'    on_exit(convert_code, NULL);\n'\
 '    main2(argc, argv);\n'\
 '}\n\n'\
 'int main2(int argc'\
@@ -456,12 +453,12 @@ int create_compare_dir()
         return bld_retn.rc;
     }
 
-    auto rme_retn = fs::remove(checker_cpy);
+    // auto rme_retn = fs::remove(checker_cpy);
 
-    if (not rme_retn.ok) {
-        cli::write(cli::fmt::error, rme_retn.error_message);
-        return rme_retn.rc;
-    }
+    // if (not rme_retn.ok) {
+    //     cli::write(cli::fmt::error, rme_retn.error_message);
+    //     return rme_retn.rc;
+    // }
 
     auto compare_path{ CP_TOOLS_BOCA_BUILD_DIR + std::string("compare/") };
 
@@ -522,7 +519,7 @@ int zip_boca_package(int argc, char *const argv[]){
     );
 
     std::ostringstream oss;
-    oss << "cd " << CP_TOOLS_BOCA_BUILD_DIR << " && zip -r " << zip_name << " * "
+    oss << "cd " << CP_TOOLS_BOCA_BUILD_DIR << " && zip -r -q " << zip_name << " * "
         << "&& cd ../../ && mv " << CP_TOOLS_BOCA_BUILD_DIR << zip_name << " .";
 
     std::string cmd = oss.str();
