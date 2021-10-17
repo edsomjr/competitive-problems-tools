@@ -96,6 +96,7 @@ std::string help() { return usage() + help_message; }
  *             or returns a specific error code if a problem occurs.
  */
 int create_build_dirs() {
+    cli::write(cli::fmt::ok, "Creating BOCA package build directory.");
     std::string boca_build_dir{CP_TOOLS_BOCA_BUILD_DIR};
 
     auto res_remove = fs::remove(boca_build_dir);
@@ -152,6 +153,8 @@ int execute_genpdf_command(int argc, char *const argv[]) {
 }
 
 int create_description_dir(int argc, char *const argv[]) {
+    cli::write(cli::fmt::ok, "Building the BOCA package `description` directory.");
+
     // optind is a built-in global variable.
     // It is used to control the current position of argv.
 
@@ -164,6 +167,15 @@ int create_description_dir(int argc, char *const argv[]) {
     std::string pdf_file = util::get_from_argv(argc, argv, {"--output", "-o"}, "problem.pdf");
 
     std::string boca_desc_dir{CP_TOOLS_BOCA_BUILD_DIR + std::string("description/")};
+
+    std::string git_keep_file{boca_desc_dir + ".gitkeep"};
+
+    auto removed_result = fs::remove(git_keep_file);
+
+    if (not removed_result.ok) {
+        cli::write(cli::fmt::error, removed_result.error_message);
+        return removed_result.rc;
+    }
 
     // Copy the pdf to boca's build directory
     auto res_cpy = fs::copy(pdf_file, boca_desc_dir, true);
@@ -197,6 +209,7 @@ int create_description_dir(int argc, char *const argv[]) {
 }
 
 int create_io_dir() {
+    cli::write(cli::fmt::ok, "Building the BOCA package `input` and `output` directory.");
     auto pairs = task::generate_io_files("all");
 
     for (const auto &dir : {std::string("input/"), std::string("output/")}) {
@@ -305,6 +318,7 @@ std::pair<int, int> find_optimal_ratio(int timelimit_ms, std::pair<int, int> num
 }
 
 int create_limits_dir(int argc, char *const argv[]) {
+    cli::write(cli::fmt::ok, "Building the BOCA package `limits` directory.");
     auto limit_path{CP_TOOLS_BOCA_BUILD_DIR + std::string("limits/")};
 
     auto config = config::read_config_file();
@@ -419,6 +433,7 @@ int modify_checker_file(std::string checker_file)
  */
 int create_compare_dir()
 {
+    cli::write(cli::fmt::ok, "Building the BOCA package `compare` directory.");
     auto config = config::read_config_file();
 
     auto checker_file = util::get_json_value(
@@ -452,13 +467,6 @@ int create_compare_dir()
         cli::write_trace(bld_retn.output);
         return bld_retn.rc;
     }
-
-    // auto rme_retn = fs::remove(checker_cpy);
-
-    // if (not rme_retn.ok) {
-    //     cli::write(cli::fmt::error, rme_retn.error_message);
-    //     return rme_retn.rc;
-    // }
 
     auto compare_path{ CP_TOOLS_BOCA_BUILD_DIR + std::string("compare/") };
 
@@ -506,8 +514,9 @@ int create_compare_dir()
     return CP_TOOLS_OK;
 }
 
-int zip_boca_package(int argc, char *const argv[]){
-
+int zip_boca_package(int argc, char *const argv[])
+{
+    cli::write(cli::fmt::ok, "Creating a ZIP file of the generated BOCA package.");
     std::string label_name = util::get_from_argv(argc, argv, {"--label", "-b"}, "A");
     std::string default_zip_name = label_name + ".zip";
 
@@ -523,15 +532,6 @@ int zip_boca_package(int argc, char *const argv[]){
         << "&& cd ../../ && mv " << CP_TOOLS_BOCA_BUILD_DIR << zip_name << " .";
 
     std::string cmd = oss.str();
-
-    // Not working
-    // auto zip_retn = sh::execute(cmd, "", "", "");
-
-    // if (zip_retn.rc != CP_TOOLS_OK) {
-    //     cli::write_trace(zip_retn.output);
-    //     return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_ADD_EXECUTION_PERMISSION;
-    // }
-
     std::system(cmd.c_str());
 
     return CP_TOOLS_OK;
@@ -571,6 +571,8 @@ int genboca(int argc, char *const argv[]) {
         cli::write(cli::fmt::error, std::to_string(rnt));
         return CP_TOOLS_ERROR_GENBOCA_FAILURE_TO_MODIFY_CHECKER_FILE;
     }
+
+    cli::write(cli::fmt::ok, "BOCA package successfully generated.");
 
     return CP_TOOLS_OK;
 }
