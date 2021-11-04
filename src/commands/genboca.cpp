@@ -211,7 +211,7 @@ int create_description_dir(int argc, char *const argv[]) {
 int create_io_dir() {
 
     cli::write(cli::fmt::ok, "Building the BOCA package `input` and `output` directory.");
-    auto pairs = task::generate_io_files("all");
+    auto pairs = task::generate_all_io_files(true);
 
     for (const auto &dir : {std::string("input/"), std::string("output/")}) {
 
@@ -415,7 +415,7 @@ int modify_checker_file(std::string checker_file)
 
     std::string error;
 
-    auto result = sh::execute("sed", sed_args, "", "");
+    auto result = sh::execute_program("sed", sed_args, "", "");
 
     if (result.rc != CP_TOOLS_OK) {
         cli::write_trace(result.output);
@@ -497,7 +497,7 @@ int create_compare_dir()
 
         std::string chmod_args = std::string("755 ") + lang_exec_file;
 
-        auto chmod_retn = sh::execute("chmod", chmod_args, "", "");
+        auto chmod_retn = sh::execute_program("chmod", chmod_args, "", "");
 
         if (chmod_retn.rc != CP_TOOLS_OK) {
             cli::write_trace(chmod_retn.output);
