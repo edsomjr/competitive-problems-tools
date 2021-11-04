@@ -4,17 +4,12 @@
 #include <filesystem>
 #include <string>
 
+#include "types/common.h"
+
 namespace cptools::fs {
 
-struct Result {
-    bool ok;
-    int rc;
-    std::string error_message;
-};
-
-const Result make_result(bool res);
-const Result make_result(bool res, int rc, const std::filesystem::filesystem_error &e);
-const Result make_result(bool res, int rc, const std::string err_msg);
+using Result = types::common::Result;
+using types::common::make_result;
 
 const Result create_directory(const std::string &path);
 const Result exists(const std::string &path);

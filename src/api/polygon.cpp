@@ -219,4 +219,15 @@ std::vector<std::string> get_problem_tags(const types::polygon::Credentials &cre
     return tags_json.get<std::vector<std::string>>();
 }
 
+types::polygon::TestsVector get_problem_tests(const types::polygon::Credentials &creds,
+                                              const std::string &problem_id) {
+    httplib::Params params;
+    params.emplace("problemId", problem_id);
+    params.emplace("testset", "tests");
+    auto result = get("problem.tests", creds, params);
+    auto tests_json = nlohmann::json::parse(result->body).at("result");
+    auto tests = tests_json.get<types::polygon::TestsVector>();
+    return tests;
+}
+
 } // namespace cptools::api::polygon

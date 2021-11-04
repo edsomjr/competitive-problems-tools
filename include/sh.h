@@ -3,13 +3,13 @@
 
 #include <string>
 
+#include "types/common.h"
+
 // Functions that emulates shell commands
 namespace cptools::sh {
 
-struct Result {
-    int rc;
-    std::string output;
-};
+using Result = types::common::Result;
+using types::common::make_result;
 
 struct Info {
     int rc;
@@ -17,12 +17,16 @@ struct Info {
     double memory;
 };
 
-Result diff_dirs(const std::string &dirA, const std::string &dirB);
+const Result execute_command(const std::string &command,
+                             int on_error = CP_TOOLS_ERROR_SH_EXEC_ERROR);
 
-Result build(const std::string &output, const std::string &src);
+const Result diff_dirs(const std::string &dirA, const std::string &dirB);
 
-Result execute(const std::string &program, const std::string &args, const std::string &infile = "",
-               const std::string &outfile = "/dev/null", int timeout = 3);
+const Result build(const std::string &output, const std::string &src);
+
+const Result execute_program(const std::string &program, const std::string &args,
+                             const std::string &infile = "",
+                             const std::string &outfile = "/dev/null", int timeout = 3);
 
 Info profile(const std::string &program, const std::string &args, int timeout = 3,
              const std::string &infile = "", const std::string &outfile = "/dev/null");

@@ -82,15 +82,24 @@ int judge(const std::string &solution_path) {
 
     cli::write(cli::fmt::info, "Judging solution '" + solution_path + "'...");
 
-    auto rc = task::build_tools(task::tools::VALIDATOR | task::tools::CHECKER);
-
-    if (rc != CP_TOOLS_OK)
+    auto res = task::build_tool(config::tool_type::checker);
+    if (not res.ok) {
+        cli::write(cli::fmt::error, "Could not build checker: " + res.error_message);
         return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
+    }
 
-    rc = task::gen_exe(solution_path, "sol");
+    res = task::build_tool(config::tool_type::validator);
+    if (not res.ok) {
+        cli::write(cli::fmt::error, "Could not build validator: " + res.error_message);
+        return CP_TOOLS_ERROR_JUDGE_MISSING_TOOL;
+    }
 
-    if (rc != CP_TOOLS_OK)
+    res = task::gen_exe(solution_path, "sol");
+
+    if (not res.ok) {
+        cli::write(cli::fmt::error, "Could not generate executable: " + res.error_message);
         return verdict::CE;
+    }
 
     auto config = cptools::config::read_config_file();
     auto time_limit = cptools::util::get_json_value(config, "problem|time_limit", 1000);
@@ -100,7 +109,7 @@ int judge(const std::string &solution_path) {
     auto program{std::string(CP_TOOLS_BUILD_DIR) + "/sol"};
     auto validator{std::string(CP_TOOLS_BUILD_DIR) + "/validator"};
 
-    auto files = task::generate_io_files("all");
+    auto files = task::generate_all_io_files();
     int ans = verdict::AC, passed = 0;
     double tmax = 0.0, mmax = 0.0;
 
@@ -115,11 +124,11 @@ int judge(const std::string &solution_path) {
         auto number = util::split(input, '/').back();
         auto output{std::string(CP_TOOLS_BUILD_DIR) + "/out"};
 
-        auto res = sh::execute(validator, "", input);
+        auto res = sh::execute_program(validator, "", input);
 
-        if (res.rc != CP_TOOLS_OK) {
+        if (!res.ok) {
             cli::write(cli::fmt::error, "Input file '" + input + "' is invalid");
-            cli::write_trace(res.output);
+            cli::write_trace(res.error_message);
             return CP_TOOLS_ERROR_JUDGE_INVALID_INPUT_FILE;
         }
 
@@ -140,7 +149,7 @@ int judge(const std::string &solution_path) {
         if (ver == verdict::AC) {
             auto args{input + " " + output + " " + answer};
 
-            res = sh::execute(checker, args, "", "/dev/null", 2 * time_limit / 1000.0);
+            res = sh::execute_program(checker, args, "", "/dev/null", 2 * time_limit / 1000.0);
 
             switch (res.rc) {
             case 6:

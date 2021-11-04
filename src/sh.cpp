@@ -38,24 +38,24 @@ static double parse_time_output(const std::string &out) {
     return mbs;
 }
 
-static int execute_command(const std::string &command, std::string &out) {
+const Result execute_command(const std::string &command, int on_error) {
     auto fp = popen(command.c_str(), "r");
 
     if (fp == NULL)
-        return CP_TOOLS_ERROR_SH_POPEN_FAILED;
+        return make_result(false, CP_TOOLS_ERROR_SH_POPEN_FAILED);
 
     std::ostringstream oss;
     char buffer[1024 * 1024];
-
     int amount;
 
     while ((amount = fread(buffer, sizeof(char), 1024 * 1024, fp)) > 0) {
         oss << std::string(buffer, amount);
     }
 
-    out = oss.str();
-
-    return pclose(fp);
+    auto status = pclose(fp);
+    if (status == -1)
+        return make_result(false, on_error, "", oss.str());
+    return make_result(true, status, oss.str());
 }
 
 long int last_modified(const std::string &filepath) {
@@ -67,23 +67,17 @@ long int last_modified(const std::string &filepath) {
     return sb.st_atime;
 }
 
-Result diff_dirs(const std::string &dirA, const std::string &dirB) {
-    std::string command{"diff -r " + dirA + " " + dirB + " 2>&1"}, error;
-
-    auto rc = execute_command(command, error);
-
-    return {rc == 0 ? CP_TOOLS_TRUE : CP_TOOLS_FALSE, error};
+const Result diff_dirs(const std::string &dirA, const std::string &dirB) {
+    std::string command{"diff -r " + dirA + " " + dirB + " 2>&1"};
+    return execute_command(command);
 }
 
-Result compile_cpp(const std::string &output, const std::string &src) {
-    std::string command{"g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src + " 2>&1"}, error;
-
-    auto rc = execute_command(command, error);
-
-    return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR, error};
+const Result compile_cpp(const std::string &output, const std::string &src) {
+    std::string command{"g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src + " 2>&1"};
+    return execute_command(command, CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR);
 }
 
-Result build_py(const std::string &output, const std::string &src) {
+const Result build_py(const std::string &output, const std::string &src) {
     std::vector<std::string> commands{
         "echo '#!/usr/bin/python3' > " + output,
         "cat " + src + " >> " + output,
@@ -91,17 +85,16 @@ Result build_py(const std::string &output, const std::string &src) {
     };
 
     for (auto command : commands) {
-        std::string error;
-        auto rc = execute_command(command, error);
+        auto result = execute_command(command, CP_TOOLS_ERROR_SH_PY_BUILD_ERROR);
 
-        if (rc != CP_TOOLS_OK)
-            return {CP_TOOLS_ERROR_SH_PY_BUILD_ERROR, error};
+        if (!result.ok)
+            return result;
     }
 
-    return {CP_TOOLS_OK, ""};
+    return make_result(true, CP_TOOLS_OK);
 }
 
-Result compile_java(const std::string &output, const std::string &src) {
+const Result compile_java(const std::string &output, const std::string &src) {
     auto dir = util::split(src, '/').front();
     auto filename = util::split(src, '.').front();
     auto name = util::split(filename, '/').back();
@@ -115,16 +108,16 @@ Result compile_java(const std::string &output, const std::string &src) {
 
     for (auto command : commands) {
         std::string error;
-        auto rc = execute_command(command, error);
+        auto res = execute_command(command);
 
-        if (rc != CP_TOOLS_OK)
-            return {CP_TOOLS_ERROR_SH_PY_BUILD_ERROR, error};
+        if (!res.ok)
+            return res;
     }
 
-    return {CP_TOOLS_OK, ""};
+    return make_result(true, CP_TOOLS_OK);
 }
 
-Result build_tex(const std::string &output, const std::string &src) {
+const Result build_tex(const std::string &output, const std::string &src) {
     std::string outdir{"."};
 
     if (output.find('/') != std::string::npos) {
@@ -135,25 +128,22 @@ Result build_tex(const std::string &output, const std::string &src) {
     std::string command{std::string("export TEXINPUTS=\".:") + CP_TOOLS_CLASSES_DIR +
                         ":\" && pdflatex -halt-on-error -output-directory=" + outdir + " " + src};
 
-    std::string error;
-    auto rc = execute_command(command, error);
+    auto res = execute_command(command);
 
-    // Roda duas vezes para garantir que estilos que tenham referências sejam
-    // renderizados corretamente
-    if (rc == CP_TOOLS_OK)
-        rc = execute_command(command, error);
+    if (!res.ok)
+        res = execute_command(command);
 
-    return {rc == 0 ? CP_TOOLS_OK : CP_TOOLS_ERROR_SH_PDFLATEX_ERROR, error};
+    return res;
 }
 
-std::map<std::string, Result (*)(const std::string &, const std::string &)> fs{
+std::map<std::string, const Result (*)(const std::string &, const std::string &)> fs{
     {"cpp", compile_cpp},
     {"java", compile_java},
     {"tex", build_tex},
     {"py", build_py},
 };
 
-Result build(const std::string &output, const std::string &src) {
+const Result build(const std::string &output, const std::string &src) {
     auto tokens = util::split(src, '.');
     auto ext = tokens.back();
     auto it = fs.find(ext);
@@ -162,18 +152,17 @@ Result build(const std::string &output, const std::string &src) {
     auto y = last_modified(output);
 
     if (x <= y) {
-        return {CP_TOOLS_OK, ""};
+        return make_result(true);
     }
 
     if (it == fs.end())
-        return {CP_TOOLS_ERROR_SH_BUILD_EXT_NOT_FOUND, "Extension not found!"};
+        return make_result(false, CP_TOOLS_ERROR_SH_BUILD_EXT_NOT_FOUND, "", "Extension not found");
 
     return it->second(output, src);
 }
 
-Result execute(const std::string &program, const std::string &args, const std::string &infile,
-               const std::string &outfile, int timeout) {
-    // Prepara o comando para o terminal
+const Result execute_program(const std::string &program, const std::string &args,
+                             const std::string &infile, const std::string &outfile, int timeout) {
     std::string command{program + " " + args};
 
     if (not infile.empty())
@@ -186,12 +175,9 @@ Result execute(const std::string &program, const std::string &args, const std::s
 
     if (timeout > 0)
         command = " timeout " + std::to_string(timeout) + "s " + command;
-
-    // Executa o comando
-    std::string output;
-    auto rc = execute_command(command, output);
-
-    return {WEXITSTATUS(rc), output};
+    auto result = execute_command(command);
+    result.rc = WEXITSTATUS(result.rc);
+    return result;
 }
 
 Info profile(const std::string &program, const std::string &args, int timeout,
@@ -221,7 +207,7 @@ Info profile(const std::string &program, const std::string &args, int timeout,
     if (not outfile.empty())
         command += " > " + outfile;
 
-    // Executa o comando
+    // Executes the command
     auto start = timer::now();
 
     auto fp = popen(command.c_str(), "r");

@@ -37,6 +37,9 @@ types::polygon::Information get_problem_information(const types::polygon::Creden
 std::vector<std::string> get_problem_tags(const types::polygon::Credentials &creds,
                                           const std::string &problem_id);
 
+types::polygon::TestsVector get_problem_tests(const types::polygon::Credentials &creds,
+                                              const std::string &problem_id);
+
 } // namespace cptools::api::polygon
 
 #endif

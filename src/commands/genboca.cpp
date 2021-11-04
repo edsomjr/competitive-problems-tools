@@ -209,6 +209,7 @@ int create_description_dir(int argc, char *const argv[]) {
 }
 
 int create_io_dir() {
+
     cli::write(cli::fmt::ok, "Building the BOCA package `input` and `output` directory.");
     auto pairs = task::generate_io_files("all");
 

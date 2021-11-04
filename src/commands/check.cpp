@@ -87,9 +87,9 @@ int validate_checker() {
 
     auto res = cptools::sh::build(validator, source);
 
-    if (res.rc != CP_TOOLS_OK) {
+    if (!res.ok) {
         cli::write(cli::fmt::error, "Can't compile validator '" + source + "'!");
-        cli::write_trace(res.output);
+        cli::write_trace(res.error_message);
         return res.rc;
     }
 
@@ -104,15 +104,15 @@ int validate_checker() {
 
     res = cptools::sh::build(checker, source);
 
-    if (res.rc != CP_TOOLS_OK) {
+    if (!res.ok) {
         cli::write(cli::fmt::error, "Can't compile checker '" + source + "'!");
-        cli::write_trace(res.output);
+        cli::write_trace(res.error_message);
         return res.rc;
     }
 
-    source = cptools::util::get_json_value(config, "solutions|default", std::string("ERROR"));
+    source = config::get_solutions_file_paths("default")[0];
 
-    if (source == "ERROR") {
+    if (source == "") {
         cli::write(cli::fmt::error, "[validate_checker] Default solution file not found!\n");
         return CP_TOOLS_ERROR_CHECK_MISSING_VALIDATOR;
     }
@@ -121,9 +121,9 @@ int validate_checker() {
 
     res = cptools::sh::build(solution, source);
 
-    if (res.rc != CP_TOOLS_OK) {
+    if (!res.ok) {
         cli::write(cli::fmt::error, "Can't compile solution '" + source + "'!");
-        cli::write_trace(res.output);
+        cli::write_trace(res.error_message);
         return res.rc;
     }
 
@@ -146,7 +146,7 @@ int validate_checker() {
             return CP_TOOLS_ERROR_CHECK_INVALID_VEREDICT;
         }
 
-        auto result = sh::execute(validator, "", input, "");
+        auto result = sh::execute_program(validator, "", input, "");
 
         if (result.rc != CP_TOOLS_OK) {
             cli::write(cli::fmt::error, "Input file '" + input + "' is invalid!");
@@ -156,7 +156,7 @@ int validate_checker() {
 
         auto res{std::string(CP_TOOLS_BUILD_DIR) + "/.res"};
 
-        result = sh::execute(solution, "", input, res);
+        result = sh::execute_program(solution, "", input, res);
 
         if (result.rc != CP_TOOLS_OK) {
             cli::write(cli::fmt::error, "Can't generatate output for input '" + input + "'!");
@@ -166,7 +166,7 @@ int validate_checker() {
 
         auto args{input + " " + output + " " + res};
         auto expected = rcodes[verdict];
-        auto got = sh::execute(checker, args, "", "");
+        auto got = sh::execute_program(checker, args, "", "");
 
         if (got.rc != expected) {
             std::ostringstream oss;
@@ -205,9 +205,9 @@ int validate_validator() {
 
     auto res = cptools::sh::build(program, source);
 
-    if (res.rc != CP_TOOLS_OK) {
+    if (!res.ok) {
         cli::write(cli::fmt::error, "Can't compile validator '" + source + "'!");
-        cli::write_trace(res.output);
+        cli::write_trace(res.error_message);
         return res.rc;
     }
 
@@ -223,7 +223,7 @@ int validate_validator() {
                "Testing the validator (" + std::to_string(tests.size()) + " tests) ...");
 
     for (auto [input, verdict] : tests) {
-        auto result = sh::execute(program, "", input, "");
+        auto result = sh::execute_program(program, "", input, "");
 
         std::string res = (result.output.find("FAIL") == std::string::npos ? "OK" : "INVALID");
 
@@ -259,13 +259,13 @@ int validate_tests() {
 
     auto res = cptools::sh::build(program, source);
 
-    if (res.rc != CP_TOOLS_OK) {
+    if (!res.ok) {
         cli::write(cli::fmt::error, "Can't compile validator '" + source + "'!");
-        cli::write_trace(res.output);
+        cli::write_trace(res.error_message);
         return res.rc;
     }
 
-    auto io_files = task::generate_io_files("all", false);
+    auto io_files = task::generate_all_io_files(false);
 
     if (io_files.empty()) {
         cli::write(cli::fmt::error, "There are no io files to validate!");
@@ -276,7 +276,7 @@ int validate_tests() {
                "Validating the input files (" + std::to_string(io_files.size()) + " tests) ...");
 
     for (auto [input, _] : io_files) {
-        auto result = sh::execute(program, "", input, "");
+        auto result = sh::execute_program(program, "", input, "");
 
         if (result.rc != CP_TOOLS_OK) {
             cli::write(cli::fmt::error, "Input file '" + input + "' is invalid!");
