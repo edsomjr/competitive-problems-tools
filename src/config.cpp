@@ -111,6 +111,13 @@ std::vector<std::string> get_tests_file_names(const test_type type) {
     std::ranges::transform(tests, std::back_inserter(file_names),
                            [](const auto &pair) { return pair.first; });
 
+    std::sort(file_names.begin(), file_names.end(), [](const std::string& x, const std::string& y) {
+        auto a = stoi(util::split(x, '/').back());
+        auto b = stoi(util::split(y, '/').back());
+
+        return a < b;
+    });
+
     return file_names;
 }
 
