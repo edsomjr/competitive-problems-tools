@@ -66,7 +66,7 @@ static struct option longopts[] = {{"help", no_argument, NULL, 'h'},
 
 // Auxiliary routines
 std::string usage() {
-    return "Usage: " NAME " gentex [-h] [-o outfile] [-b label] [-c doc_class] "
+    return "Usage: " NAME " genpdf [-h] [-o outfile] [-b label] [-c doc_class] "
            "[-g lang] [-l] [-t] [--no-author] [--no-contest]";
 }
 

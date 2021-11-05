@@ -101,7 +101,7 @@ iovector generate_io_files(const config::test_type &testset, bool gen_output) {
         const auto input_filename = std::filesystem::path(input_path).filename();
         const auto input_dest = dirs::input_dir / input_filename;
 
-        const auto copy_res = fs::copy(input_path, input_dest);
+        const auto copy_res = fs::copy(input_path, input_dest, true);
         if (not copy_res.ok) {
             cli::write(cli::fmt::error, "Failed to copy input file: " + copy_res.error_message);
             throw std::runtime_error("Failed to copy input file");
