@@ -226,7 +226,7 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 
     out_stream << "\\begin{samples}{" << c1_size << "}{" << c2_size << "}\n";
 
-    auto io_files = task::generate_io_files(config::test_type::sample);
+    auto io_files = task::generate_io_files(config::test_type::sample, true);
 
     for (auto [infile, outfile] : io_files)
         out_stream << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" << infile << "}{"
