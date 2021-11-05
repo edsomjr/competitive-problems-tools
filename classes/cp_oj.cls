@@ -24,6 +24,7 @@
 \RequirePackage{lastpage}
 \RequirePackage{tikz}
 \RequirePackage{enumerate}
+\RequirePackage{amsmath}
 
 \hyphenation{cons-tru-ção con-si-de-ra-da com-ple-xi-da-de in-di-vi-du-al-men-te}
 
