@@ -126,6 +126,28 @@
     \end{center}
 }
 
+\newcommand{\variosample}[4]
+{
+    \begin{center}
+	\begin{tabular}{p{0.9\textwidth}}
+	\rowcolor{black} \textbf{\textcolor{white}{\translate{Entrada}{Input}}} \\
+    \begin{minipage}[t]{0.9\textwidth}{ \verbatiminput{#3} }
+    \end{minipage} \\
+    \bottomrule
+    \end{tabular}	
+
+    \vspace*{0.05in}
+
+    \begin{tabular}{p{0.9\textwidth}}
+	\hline
+	\rowcolor{black} \textbf{\textcolor{white}{\translate{Saída}{Output}}} \\
+    \begin{minipage}[t]{0.9\textwidth}{ \verbatiminput{#4} }
+    \end{minipage} \\
+    \bottomrule
+    \end{tabular}	
+    \end{center}
+}
+
 \newenvironment{problemnotes}[1]{
 
 	\begin{flushleft} 
