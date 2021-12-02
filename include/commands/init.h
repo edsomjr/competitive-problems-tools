@@ -3,12 +3,13 @@
 
 #include <iostream>
 
-namespace cptools::commands::init {
+namespace cptools::commands::init
+{
 
-int run(int argc, char *const argv[]);
+    int run(int argc, char *const argv[]);
 
-std::string help();
-std::string usage();
+    std::string help();
+    std::string usage();
 
 } // namespace cptools::commands::init
 

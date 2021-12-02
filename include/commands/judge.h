@@ -3,28 +3,30 @@
 
 #include <iostream>
 
-namespace cptools::commands::judge {
-namespace verdict {
-extern const int AC;
-extern const int WA;
-extern const int PE;
-extern const int CE;
-extern const int TLE;
-extern const int RTE;
-extern const int MLE;
-extern const int FAIL;
-extern const int UNDEF;
-} // namespace verdict
+namespace cptools::commands::judge
+{
+    namespace verdict
+    {
+        extern const int AC;
+        extern const int WA;
+        extern const int PE;
+        extern const int CE;
+        extern const int TLE;
+        extern const int RTE;
+        extern const int MLE;
+        extern const int FAIL;
+        extern const int UNDEF;
+    } // namespace verdict
 
-// Main routine
-int run(int argc, char *const argv[]);
+    // Main routine
+    int run(int argc, char *const argv[]);
 
-// Auxiliary routines
-std::string help();
-std::string usage();
+    // Auxiliary routines
+    std::string help();
+    std::string usage();
 
-// Judge solution
-int judge(const std::string &solution_path);
+    // Judge solution
+    int judge(const std::string &solution_path);
 } // namespace cptools::commands::judge
 
 #endif

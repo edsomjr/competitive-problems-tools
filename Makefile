@@ -77,10 +77,10 @@ LINKER=$(CXX)
 
 # Rules
 .SUFFIXES: .cpp .$(OBJ_EXTENSION)
-.PHONY: all clean build tests format
+.PHONY: all clean build tests # format
 
 
-all: format build tests
+all: build tests # format
 
 
 format:

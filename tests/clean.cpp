@@ -10,22 +10,27 @@
 #include "fs.h"
 #include "sh.h"
 
-SCENARIO("Command clean", "[clean]") {
-    GIVEN("An execution of the command clean with options") {
-        WHEN("There is no option") {
+SCENARIO("Command clean", "[clean]")
+{
+    GIVEN("An execution of the command clean with options")
+    {
+        WHEN("There is no option")
+        {
             int argc = 2;
-            char *const argv[]{(char *)"cp-tools", (char *)"clean"};
+            char *const argv[]{ (char *)"cp-tools", (char *)"clean" };
 
-            THEN("The the auto-generated files in current directory is deleted") {
+            THEN("The the auto-generated files in current directory is deleted")
+            {
                 std::ostringstream out, err;
                 REQUIRE(cptools::commands::run(argc, argv, out, err) == CP_TOOLS_OK);
             }
         }
 
-        WHEN("The option -w is used") {
+        WHEN("The option -w is used")
+        {
             int argc = 4;
-            char *const argv[]{(char *)"cp-tools", (char *)"clean", (char *)"-w",
-                               (char *)CP_TOOLS_TEMP_DIR};
+            char *const argv[]{ (char *)"cp-tools", (char *)"clean", (char *)"-w",
+                                (char *)CP_TOOLS_TEMP_DIR };
 
             auto fs_res = cptools::fs::create_directory(CP_TOOLS_TEMP_DIR);
 
@@ -34,20 +39,23 @@ SCENARIO("Command clean", "[clean]") {
             // getopt library must be reseted between tests
             optind = 1;
 
-            THEN("The subdirectory with the auto-generated files is deleted") {
+            THEN("The subdirectory with the auto-generated files is deleted")
+            {
                 std::ostringstream out, err;
                 REQUIRE(cptools::commands::run(argc, argv, out, err) == CP_TOOLS_OK);
             }
         }
 
-        WHEN("The option -h is used") {
+        WHEN("The option -h is used")
+        {
             int argc = 3;
-            char *const argv[]{(char *)"cp-tools", (char *)"clean", (char *)"-h"};
+            char *const argv[]{ (char *)"cp-tools", (char *)"clean", (char *)"-h" };
 
             // getopt library must be reseted between tests
             optind = 1;
 
-            THEN("The output is the help message") {
+            THEN("The output is the help message")
+            {
                 std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);
@@ -58,14 +66,16 @@ SCENARIO("Command clean", "[clean]") {
             }
         }
 
-        WHEN("The an invalid option is passed") {
+        WHEN("The an invalid option is passed")
+        {
             int argc = 3;
-            char *const argv[]{(char *)"cp-tools", (char *)"clean", (char *)"-x"};
+            char *const argv[]{ (char *)"cp-tools", (char *)"clean", (char *)"-x" };
 
             optind = 1;
             opterr = 0;
 
-            THEN("The error output is the help message") {
+            THEN("The error output is the help message")
+            {
                 std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);

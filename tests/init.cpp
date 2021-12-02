@@ -10,14 +10,18 @@
 #include "fs.h"
 #include "sh.h"
 
-SCENARIO("Command init", "[init]") {
-    GIVEN("An execution of the command init with options") {
-        WHEN("The option -o is used") {
+SCENARIO("Command init", "[init]")
+{
+    GIVEN("An execution of the command init with options")
+    {
+        WHEN("The option -o is used")
+        {
             int argc = 4;
-            char *const argv[]{(char *)"cp-tools", (char *)"init", (char *)"-o",
-                               (char *)CP_TOOLS_TEMP_DIR};
+            char *const argv[]{ (char *)"cp-tools", (char *)"init", (char *)"-o",
+                                (char *)CP_TOOLS_TEMP_DIR };
 
-            THEN("The output directory is initialized with the template files") {
+            THEN("The output directory is initialized with the template files")
+            {
                 auto res = cptools::fs::remove(CP_TOOLS_TEMP_DIR);
                 REQUIRE(res.rc == CP_TOOLS_OK);
 
@@ -25,21 +29,23 @@ SCENARIO("Command init", "[init]") {
                 REQUIRE(cptools::commands::run(argc, argv, out, err) == CP_TOOLS_OK);
                 REQUIRE(err.str().empty());
 
-                auto res_same =
-                    cptools::sh::diff_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_PROBLEM_TEMPLATE_DIR);
+                auto res_same
+                    = cptools::sh::diff_dirs(CP_TOOLS_TEMP_DIR, CP_TOOLS_PROBLEM_TEMPLATE_DIR);
                 REQUIRE(res_same.rc == CP_TOOLS_OK);
                 REQUIRE(res_same.output.empty());
             }
         }
 
-        WHEN("The option -h is used") {
+        WHEN("The option -h is used")
+        {
             int argc = 3;
-            char *const argv[]{(char *)"cp-tools", (char *)"init", (char *)"-h"};
+            char *const argv[]{ (char *)"cp-tools", (char *)"init", (char *)"-h" };
 
             // getopt library must be reseted between tests
             optind = 1;
 
-            THEN("The output is the help message") {
+            THEN("The output is the help message")
+            {
                 std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);
@@ -50,15 +56,17 @@ SCENARIO("Command init", "[init]") {
             }
         }
 
-        WHEN("The an invalid option is passed") {
+        WHEN("The an invalid option is passed")
+        {
             int argc = 3;
-            char *const argv[]{(char *)"cp-tools", (char *)"init", (char *)"-i"};
+            char *const argv[]{ (char *)"cp-tools", (char *)"init", (char *)"-i" };
 
             // getopt library must be reseted between tests
             optind = 1;
             opterr = 0;
 
-            THEN("The error output is the help message") {
+            THEN("The error output is the help message")
+            {
                 std::ostringstream out, err;
 
                 auto rc = cptools::commands::run(argc, argv, out, err);

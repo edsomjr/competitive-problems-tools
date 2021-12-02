@@ -3,14 +3,15 @@
 
 #include <iostream>
 
-namespace cptools::commands::genboca {
+namespace cptools::commands::genboca
+{
 
-// Main routine
-int run(int argc, char *const argv[]);
+    // Main routine
+    int run(int argc, char *const argv[]);
 
-// Auxiliary routines
-std::string help();
-std::string usage();
+    // Auxiliary routines
+    std::string help();
+    std::string usage();
 
 } // namespace cptools::commands::genboca
 

@@ -2,6 +2,8 @@
 
 #include "commands/cptools.h"
 
-int main(int argc, char *const argv[]) {
+int
+main(int argc, char *const argv[])
+{
     return cptools::commands::run(argc, argv, std::cerr, std::cerr);
 }

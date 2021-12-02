@@ -2,4 +2,6 @@
 
 #include "exceptions.h"
 
-namespace cptools::exceptions {} // namespace cptools::exceptions
+namespace cptools::exceptions
+{
+} // namespace cptools::exceptions
