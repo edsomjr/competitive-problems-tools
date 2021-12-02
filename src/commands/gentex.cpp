@@ -228,8 +228,11 @@ int generate_latex(const std::string &doc_class, const std::string &language, in
 
     auto io_files = task::generate_io_files(config::test_type::sample, true);
 
+    auto varsample = util::get_json_value(config, "PDF|varsamples", false);
+    std::string sample_command { varsample ? "\\variosample{" : "\\iosample{" };
+    
     for (auto [infile, outfile] : io_files)
-        out_stream << "    \\iosample{" << c1_size << "}{" << c2_size << "}{" << infile << "}{"
+        out_stream << "    " << sample_command << c1_size << "}{" << c2_size << "}{" << infile << "}{"
                    << outfile << "}\n";
 
     out_stream << "\\end{samples}\n\n";

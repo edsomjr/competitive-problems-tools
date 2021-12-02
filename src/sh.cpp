@@ -62,6 +62,8 @@ namespace cptools::sh
             }
 
         auto status = pclose(fp);
+        cli::Trace(oss.str());
+
         if (status == -1)
         {
             cli::Error("Falha na execução do comando: " + command);
@@ -94,7 +96,9 @@ namespace cptools::sh
     const Result
     compile_cpp(const std::string &output, const std::string &src)
     {
-        std::string command{ "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src + " 2>&1" };
+        //std::string command{ "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src + " 2>&1" };
+        std::string command{ "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src };
+
         return execute_command(command, CP_TOOLS_ERROR_SH_CPP_COMPILATION_ERROR);
     }
 
@@ -158,7 +162,7 @@ namespace cptools::sh
         std::string command{ std::string("export TEXINPUTS=\".:") + CP_TOOLS_CLASSES_DIR
                              + ":\" && pdflatex -halt-on-error -output-directory=" + outdir + " "
                              + src };
-
+cli::Trace(command);
         auto res = execute_command(command);
 
         if (!res.ok)
