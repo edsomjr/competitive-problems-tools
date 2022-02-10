@@ -18,7 +18,6 @@ using timer = std::chrono::high_resolution_clock;
 
 namespace cptools::sh
 {
-
     static double
     parse_time_output(const std::string &out)
     {
