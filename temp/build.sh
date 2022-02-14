@@ -4,5 +4,7 @@ g++ -o default.so -fPIC -shared default.cpp
 
 g++ -std=c++17 -o prog main.cpp pluginmanager.cpp -ldl
 
-export LD_LIBRARY_PATH=. 
-./prog
+mv *.so ./plugins/
+
+export LD_LIBRARY_PATH=.
+# ./prog

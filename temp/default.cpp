@@ -3,29 +3,23 @@
 class Default : public Plugin {
 public:
     Default();
-
-
-    std::string command() const { return _command; }
-
-    std::string brief() const { return _brief; }
-    std::string description() const { return _description; }
-
-private:
-    std::string _command, _brief, _description;
 };
 
-Default::Default() : _command("default"), _brief(""), _description("")
+Default::Default() : Plugin("default", "Default command that runs when user "
+                                       "does not type any subcommands ", "")
 {
     _options.emplace_back('h', "help", false, "");
     _options.emplace_back('v', "version", false, "");
 }
 
+// dynamic function that is called by the plugin manager to build the plugin
 extern "C" Plugin *
 create()
 {
     return new Default();
 }
 
+// dynamic function that is called by the plugin manager to destroy the plugin
 extern "C" void
 destroy(Plugin *p)
 {
