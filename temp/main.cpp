@@ -1,12 +1,11 @@
 #include <iostream>
+
+#include "args.h"
 #include "pluginmanager.h"
 
 const std::string get_subcommand(int argc, char *argv[])
 {
-    if (argc < 2)
-        return "default";
-
-    if(argv[1][0] == '-')
+    if (argc < 2 || argv[1][0] == '-')
         return "default";
 
     return argv[1];
@@ -20,13 +19,8 @@ int main(int argc, char *argv[])
     atexit(PluginManager::release);
 
     auto subcommand = get_subcommand(argc, argv);
-    std::cout << "subcommand: " << subcommand << '\n';
-
     auto plugin = manager->get_plugin(subcommand);
+    auto args = parse_args(argc, argv, plugin->options());
 
-    std::cout << "plugin->command(): " << plugin->command() << '\n';
-
-    std::cout << "Ok\n";
-
-    return 0;
+    return plugin->execute(args);
 }

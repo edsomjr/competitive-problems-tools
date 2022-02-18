@@ -99,7 +99,7 @@ void PluginManager::find_and_load_plugins() {
 
 
 Plugin* PluginManager::get_plugin(const std::string& plugin_name) {
-    for(const auto& [handle, plugin, destroy] : _plugins) {
+    for(const auto& [_, plugin, __] : _plugins) {
         if(plugin->command() == plugin_name)
             return plugin;
     }

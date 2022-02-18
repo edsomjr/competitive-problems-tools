@@ -1,17 +1,32 @@
+#include <iostream>
+
 #include "plugin.h"
 
 class Init : public Plugin {
 public:
     Init();
+
+    int execute(const Args& args);
 };
 
-Init::Init() : Plugin("init", "Generates template files on "
-                              "current directory.", "")
+Init::Init() : Plugin("init", "Initialize an empty directory with template files.", "")
 {
-    _description = _brief + ". If a file already exists, it is not overridden.";
+    _description = _brief + " If a file already exists, it is not overridden.";
 
-    _options.emplace_back('h', "help", false, "");
-    _options.emplace_back('o', "output", true, "output_dir");
+    _options.emplace_back('h', "help", false, "", "Generates this help message.");
+    _options.emplace_back('o', "output", true, "output_dir", "Directory to be initialized.");
+}
+
+int
+Init::execute(const Args& args)
+{
+    if (args.count("help"))
+    {
+        std::cout << help() << '\n';
+        return 0;
+    }
+
+    return 0;
 }
 
 // dynamic function that is called by the plugin manager to build the plugin

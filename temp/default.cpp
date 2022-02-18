@@ -1,15 +1,31 @@
+#include <iostream>
+
 #include "plugin.h"
 
 class Default : public Plugin {
 public:
     Default();
+
+    int execute(const Args& args);
 };
 
 Default::Default() : Plugin("default", "Default command that runs when user "
                                        "does not type any subcommands ", "")
 {
-    _options.emplace_back('h', "help", false, "");
-    _options.emplace_back('v', "version", false, "");
+    _options.emplace_back('h', "help", false, "", "");
+    _options.emplace_back('v', "version", false, "", "");
+}
+
+int
+Default::execute(const Args& args)
+{
+    if (args.count("help"))
+    {
+        std::cout << help() << '\n';
+        return 0;
+    }
+ 
+    return 0;
 }
 
 // dynamic function that is called by the plugin manager to build the plugin

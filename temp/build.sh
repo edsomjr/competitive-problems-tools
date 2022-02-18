@@ -1,8 +1,10 @@
 #!/bin/bash
-g++ -o init.so -fPIC -shared init.cpp
-g++ -o default.so -fPIC -shared default.cpp
+mkdir -p plugins
 
-g++ -std=c++17 -o prog main.cpp pluginmanager.cpp -ldl
+g++ -std=c++17 -o init.so -fPIC -shared init.cpp plugin.cpp
+g++ -std=c++17 -o default.so -fPIC -shared default.cpp plugin.cpp
+
+g++ -std=c++17 -o prog main.cpp pluginmanager.cpp args.cpp plugin.cpp -ldl
 
 mv *.so ./plugins/
 
