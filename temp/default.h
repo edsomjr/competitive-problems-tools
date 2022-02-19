@@ -8,9 +8,11 @@
 class Default : public Plugin {
 public:
     Default();
-    ~Default() {};
+    ~Default() { std::cout << "Default Destrutor\n"; }
 
+    std::string help() const override;
     int execute(const Args& args) override;
+
 };
 
 #endif

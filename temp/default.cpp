@@ -1,14 +1,30 @@
+#include <sstream>
 #include <iostream>
 
 #include "plugin.h"
 #include "default.h"
+#include "pluginmanager.h"
 
 
-Default::Default() : Plugin("default", "Default command that runs when user "
-                                       "does not type any subcommands ", "")
+Default::Default() : Plugin("default", "Format, test and pack competitive programming problems.", "")
 {
     _options.emplace_back('h', "help", false, "", "");
     _options.emplace_back('v', "version", false, "", "");
+}
+
+std::string Default::help() const
+{
+    std::ostringstream oss( Plugin::help() );
+
+    oss << "Commands:\n";
+    auto manager = PluginManager::get_instance();
+
+    // symbol lookup error: ./plugins/default.so: undefined symbol: _ZN13PluginManager12get_instanceEv
+    std::cout << manager->get_plugins_briefs() << '\n';
+
+    oss << manager->get_plugins_briefs();
+
+    return oss.str();
 }
 
 int
