@@ -1,10 +1,13 @@
 #include <iostream>
 #include <dlfcn.h>
 #include <filesystem>
+#include <limits>
+
 
 #include "dirs.h"
 #include "utils.h"
 #include "pluginmanager.h"
+
 
 static PluginManager *instance = nullptr;
 
@@ -46,8 +49,6 @@ PluginManager::~PluginManager()
 void
 PluginManager::load_plugin(const std::string& path)
 {
-    // std::cout << "Carregando o plugin: " << path << "\n";
-
 	auto handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 
 	if (!handle)
@@ -104,13 +105,14 @@ Plugin* PluginManager::get_plugin(const std::string& plugin_name) {
             return plugin;
     }
 
-    std::cerr << "cp-tools: '" << plugin_name << "' is not a cp-tools command. See 'cp-tools --help'.\n";
+    std::cerr << "cp-tools: '" << plugin_name
+              << "' is not a cp-tools command. See 'cp-tools --help'.\n";
 
     auto [command_suggestion, proximity] = get_command_suggestion(plugin_name);
 
+    // TODO: Pegar o valor máximo de proximity do arquivo de configuração
     if(proximity < 3) {
-        std::cerr << "\nThe most similar command is \n\t"
-                  << command_suggestion << "\n";
+        std::cerr << "\nThe most similar command is \n\t" << command_suggestion << "\n";
     }
 
     exit(-1);
@@ -119,14 +121,18 @@ Plugin* PluginManager::get_plugin(const std::string& plugin_name) {
 std::pair<std::string, size_t>
 PluginManager::get_command_suggestion(const std::string& plugin_name) {
     std::string command_suggestion;
-    size_t proximity = 0;
+    size_t proximity = std::numeric_limits<std::size_t>::max();
 
-    for(const auto& [handle, plugin, destroy] : _plugins) {
+    for(const auto& [_, plugin, __] : _plugins) {
         auto command_name = plugin->command();
+
+        // default command is not suggested
+        if(command_name == "default")
+            continue;
 
         auto distance = levenshtein_distance(command_name, plugin_name);
 
-        if(distance < proximity || proximity == 0) {
+        if(distance < proximity) {
             command_suggestion = command_name;
             proximity = distance;
         }

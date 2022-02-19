@@ -49,7 +49,7 @@ parse_args(int argc, char *argv[], const std::vector<Option>& options)
         {
             std::cerr << "Opção inválida: " << c << '\n';
             exit(-1);
-        } 
+        }
 
         auto opt = find_option(c, options);
         args[opt._name] = opt._has_arg ? std::string(optarg) : "";

@@ -22,14 +22,12 @@ public:
         }
 
     virtual int execute(const Args& args) = 0;
-
     virtual std::string help() const;
-    std::string usage() const;
 
+    std::string usage() const;
     std::string command() const { return _command; }
     std::string brief() const { return _brief; }
     std::string description() const { return _description; }
-
 
     std::vector<Option> options() { return _options; };
 
