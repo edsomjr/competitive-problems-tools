@@ -1,13 +1,8 @@
 #include <iostream>
 
 #include "plugin.h"
+#include "default.h"
 
-class Default : public Plugin {
-public:
-    Default();
-
-    int execute(const Args& args);
-};
 
 Default::Default() : Plugin("default", "Default command that runs when user "
                                        "does not type any subcommands ", "")
@@ -24,7 +19,7 @@ Default::execute(const Args& args)
         std::cout << help() << '\n';
         return 0;
     }
- 
+
     return 0;
 }
 

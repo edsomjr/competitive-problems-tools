@@ -2,12 +2,15 @@
 #define CP_TOOLS_DEFAULT_H
 
 #include <iostream>
-#include "command.h"
+#include "plugin.h"
 
-class Default : public Command {
+
+class Default : public Plugin {
 public:
     Default();
-    ~Default() { std::cout << "Default Destrutor\n"; }
+    ~Default() {};
+
+    int execute(const Args& args) override;
 };
 
 #endif
