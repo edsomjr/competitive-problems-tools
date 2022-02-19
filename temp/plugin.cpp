@@ -7,7 +7,7 @@ std::string
 Plugin::usage() const
 {
     std::ostringstream oss;
-    
+
     oss << "Usage: cp-tools " << command();
 
     for (auto [option, _, has_arg, arg_name, __] : _options)
@@ -30,13 +30,13 @@ Plugin::help() const
 
     oss << usage() << '\n';
     oss << description() << "\n\n";
-    oss << "    Option\t\t\tDescription";
+    oss << "Options\t\t\tDescription";
 
     for (auto [option, name, _, __, description] : _options)
     {
         oss << "\n\n";
-        oss << "    -" << option << "\t\t\t" << description << '\n';
-        oss << "    --" << name;
+        oss << "  -" << option << "\t\t\t" << description << '\n';
+        oss << "  --" << name;
     }
 
     oss << '\n';
