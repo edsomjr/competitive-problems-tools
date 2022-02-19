@@ -2,6 +2,7 @@
 #include <dlfcn.h>
 #include <filesystem>
 #include <limits>
+#include <sstream>
 
 
 #include "dirs.h"
@@ -139,4 +140,16 @@ PluginManager::get_command_suggestion(const std::string& plugin_name) {
     }
 
     return std::make_pair(command_suggestion, proximity);
+}
+
+
+std::string
+PluginManager::get_plugins_briefs() const {
+    std::ostringstream oss;
+
+    for(const auto & [_, plugin, __] : _plugins) {
+        oss << "  " << plugin->command() << "\t\t\t" << plugin->brief() << '\n';
+    }
+
+    return oss.str();
 }
