@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+
+
 #include "plugin.h"
 
 
@@ -17,6 +19,8 @@ public:
     void find_and_load_plugins();
 
     Plugin* get_plugin(const std::string& plugin_name);
+
+    std::string get_plugins_briefs() const;
 
     std::pair<std::string, size_t>
     get_command_suggestion(const std::string& plugin_name);

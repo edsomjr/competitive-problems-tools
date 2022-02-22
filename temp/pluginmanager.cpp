@@ -2,6 +2,7 @@
 #include <dlfcn.h>
 #include <filesystem>
 #include <limits>
+#include <sstream>
 
 
 #include "dirs.h"
@@ -14,8 +15,12 @@ static PluginManager *instance = nullptr;
 PluginManager *
 PluginManager::get_instance()
 {
-    if (!instance)
+    if (!instance) {
+        // std::cout << "[THERE SHOULD BE ONLY ONE] - Creating PluginManager instance\n";
         instance = new PluginManager();
+    }
+
+    // std::cout << "Returning PluginManager instance\n";
 
     return instance;
 }
@@ -31,7 +36,7 @@ PluginManager::release()
 
 PluginManager::~PluginManager()
 {
-    // std::cout << "Destrutor\n";
+    // std::cout << "[THERE SHOULD BE ONLY ONE] - Destrutor\n";
 
     for (auto [handle, plugin, destroy] : _plugins)
     {
@@ -85,17 +90,20 @@ PluginManager::load_plugin(const std::string& path)
         exit(-1);
     }
 
+    // std::cout << "      - '" << plugin->command() << "' loaded successfully.\n";
     _plugins.emplace_back(handle, plugin, destroy);
 }
 
 void PluginManager::find_and_load_plugins() {
+    // std::cout << "Founded plugins:\n";
+
     for(const auto& entry : std::filesystem::directory_iterator(CP_TOOLS_PLUGIN_DIR))
     {
         if (entry.path().extension() == ".so") {
+            // std::cout << "  - " << entry.path().filename() << '\n';
             load_plugin(entry.path());
         }
     }
-
 }
 
 
@@ -139,4 +147,29 @@ PluginManager::get_command_suggestion(const std::string& plugin_name) {
     }
 
     return std::make_pair(command_suggestion, proximity);
+}
+
+
+std::string
+PluginManager::get_plugins_briefs() const {
+    std::ostringstream oss;
+
+    size_t start_of_column_brief = 24;
+
+    bool first = true;
+
+    for(const auto & [_, plugin, __] : _plugins) {
+        // Trick to avoid printing the default command. TODO: Think of a smarter way
+        if(!first) oss << "\n\n";
+        else first = false;
+
+        oss << "  " << plugin->command();
+
+        size_t remaining = start_of_column_brief - plugin->command().size() - 2;
+        while(remaining--) oss << ' ';
+
+         oss << plugin->brief();
+    }
+
+    return oss.str();
 }
