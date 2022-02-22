@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "args.h"
+#include "message.h"
 #include "pluginmanager.h"
 
 const std::string get_subcommand(int argc, char *argv[])
@@ -13,6 +14,8 @@ const std::string get_subcommand(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+    std::cout << cptools::message::ok("Teste") << '\n';
+
     auto manager = PluginManager::get_instance();
     manager->find_and_load_plugins();
 
