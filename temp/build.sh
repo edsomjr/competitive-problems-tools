@@ -2,9 +2,9 @@
 mkdir -p plugins
 
 g++ -std=c++17 -o init.so -fPIC -shared init.cpp plugin.cpp
-g++ -std=c++17 -o default.so -fPIC -shared default.cpp plugin.cpp
+g++ -std=c++17 -o default.so -fPIC -shared default.cpp plugin.cpp pluginmanager.cpp
 
-g++ -std=c++17 -o prog main.cpp pluginmanager.cpp args.cpp plugin.cpp -ldl
+g++ -std=c++17 -o prog main.cpp pluginmanager.cpp args.cpp plugin.cpp -ldl -rdynamic
 
 mv *.so ./plugins/
 
