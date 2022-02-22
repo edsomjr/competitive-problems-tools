@@ -3,11 +3,11 @@ PROJECT=cp-tools2
 
 # Compiler and flags variables
 CXX=g++-10
-CPPFLAGS=-W -Wall -Werror
+CPPFLAGS=-W -Wall -Werror -fPIC
 CXXFLAGS=-std=c++20
 RELEASE_CPPFLAGS=-O2
 DEBUG_CPPFLAGS=-g -O0
-DL_FLAGS=-fPIC -shared
+DL_FLAGS=-shared
 
 # Condition to check if is release or debug
 ifeq ($(MAKECMDGOALS),release)
@@ -93,7 +93,7 @@ LINKER=$(CXX)
 # Generetes all plugins
 %.so: %.cpp
 	@echo "Building plugin '$(notdir $<)'..."
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DL_FLAGS) -I. -o $@ $< plugin.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DL_FLAGS) -I. -o $@ $< $(LIBRARY)
 	@cp $@ $(SO_DIR)
 
 #all: build tests # format

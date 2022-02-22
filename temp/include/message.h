@@ -8,6 +8,7 @@ namespace cptools::message
     std::string ok(const std::string& text);
 
     std::string info(const std::string& text);
+    std::string error(const std::string& text);
 }
 
 #endif

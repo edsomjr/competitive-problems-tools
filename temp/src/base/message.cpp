@@ -6,12 +6,13 @@
 
 namespace cptools::message
 {
-    enum ColorAndStyle { BLACK, RED, YELLOW, BLUE, MAGENTA, CYAN, WHITE, VIOLET, BEIGE, ITALIC, UNDERLINE }; 
+    enum ColorAndStyle { BLACK, YELLOW, BLUE, MAGENTA, CYAN, WHITE, VIOLET, BEIGE, ITALIC, UNDERLINE }; 
 
     // Fim da formatação
     constexpr char END[]    { "\033[0m" };
 
     // Cores
+    constexpr char RED[]    { "\033[91m" };
     constexpr char GRAY[]   { "\033[90m" };
     constexpr char GREEN[]  { "\033[92m" };
 
@@ -21,7 +22,6 @@ namespace cptools::message
 
     static std::map<ColorAndStyle, std::string> code {
         { BLACK, "\033[30m" },
-        { RED, "\033[91m" },
 //        { GREEN, "\033[92m" },
         { YELLOW, "\033[93m" },
         { BLUE, "\033[94m" },
@@ -56,6 +56,20 @@ namespace cptools::message
         std::ostringstream oss;
 
         oss << GRAY << text << END;
+
+        return oss.str();
+    }
+
+    std::string error(const std::string& text)
+    {
+        std::ostringstream oss;
+
+        oss << BOLD << RED << "Error!";
+
+        if (not text.empty())
+            oss << NORMAL << ' ' << text;
+
+        oss << END;
 
         return oss.str();
     }
