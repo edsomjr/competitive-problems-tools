@@ -13,6 +13,8 @@ namespace cptools::fs {
     void copy(const std::string &src, const std::string &dst, bool overwrite = false);
     void copy_recursive(const std::string &src, const std::string &dst, bool overwrite = false);
 
+    void remove(const std::string &path);
+
     std::string basename(const std::string& path);
 }
 

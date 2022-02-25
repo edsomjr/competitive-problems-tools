@@ -99,7 +99,6 @@ LINKER=$(CXX)
 #all: build tests # format
 all: build $(PLUGINS_NAMES)
 	@mkdir -p $(SO_DIR)
-	@echo $(SOURCES)
 
 
 format:

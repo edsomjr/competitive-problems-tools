@@ -77,13 +77,26 @@ namespace cptools::fs {
 
         try {
             ok = std::filesystem::is_directory(path);
-        }
-        catch (const std::filesystem::filesystem_error &err)
+        } catch (const std::filesystem::filesystem_error &err)
         {
             std::cout << cptools::message::error(err.what()) << '\n';
             exit(CP_TOOLS_ERROR_FS_IS_DIRECTORY);
         }
 
         return ok;
+    }
+
+    void remove(const std::string &path)
+    {
+        if (not fs::exists(path))
+            return;
+
+        try {
+            std::filesystem::remove_all(path);
+        } catch (const std::filesystem::filesystem_error &err)
+        {
+            std::cout << cptools::message::error(err.what()) << '\n';
+            exit(CP_TOOLS_ERROR_FS_REMOVE);
+        }
     }
 }

@@ -26,8 +26,6 @@ copy_template_files(const std::string &dest)
     std::cout << cptools::message::info("Initializing directory '" + dest + "' ...\n");
 
     cptools::fs::create_directory(dest);
-
-    // Copy templates to the dest
     cptools::fs::copy_recursive(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest);
 
     return 0;
@@ -44,7 +42,11 @@ Init::execute(const Args& args)
 
     std::string dest = args.count("output") ? args.at("output") : std::string(".");
 
-    return copy_template_files(dest);
+    copy_template_files(dest);
+
+    std::cout << cptools::message::ok() << '\n';
+
+    return CP_TOOLS_OK;
 }
 
 // dynamic function that is called by the plugin manager to build the plugin
