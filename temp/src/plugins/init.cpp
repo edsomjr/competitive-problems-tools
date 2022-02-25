@@ -25,8 +25,10 @@ copy_template_files(const std::string &dest)
 {
     std::cout << cptools::message::info("Initializing directory '" + dest + "' ...\n");
 
+    cptools::fs::create_directory(dest);
+
     // Copy templates to the dest
-    cptools::fs::copy(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest, true);
+    cptools::fs::copy_recursive(CP_TOOLS_PROBLEM_TEMPLATE_DIR, dest);
 
     return 0;
 }
