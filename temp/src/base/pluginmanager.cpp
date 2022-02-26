@@ -150,26 +150,11 @@ PluginManager::get_command_suggestion(const std::string& plugin_name) {
 }
 
 
-std::string
+std::vector<std::pair<std::string, std::string>>
 PluginManager::get_plugins_briefs() const {
-    std::ostringstream oss;
-
-    size_t start_of_column_brief = 24;
-
-    bool first = true;
-
-    for(const auto & [_, plugin, __] : _plugins) {
-        // Trick to avoid printing the default command. TODO: Think of a smarter way
-        if(!first) oss << "\n\n";
-        else first = false;
-
-        oss << "  " << plugin->command();
-
-        size_t remaining = start_of_column_brief - plugin->command().size() - 2;
-        while(remaining--) oss << ' ';
-
-         oss << plugin->brief();
+    std::vector<std::pair<std::string, std::string>> plugins_briefs;
+    for(const auto& [_, plugin, __] : _plugins) {
+        plugins_briefs.emplace_back( plugin->command(), plugin->brief() );
     }
-
-    return oss.str();
+    return plugins_briefs;
 }

@@ -10,10 +10,8 @@ public:
     Default();
     ~Default() { }
 
-    std::string help() const override;
+    std::string help() override;
     int execute(const Args& args) override;
-
-    std::string strip_plugin_name_from_message(std::string message) const;
 };
 
 #endif

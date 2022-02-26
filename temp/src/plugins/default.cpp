@@ -1,6 +1,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <iomanip>
 
 #include "plugin.h"
 #include "default.h"
@@ -14,29 +15,33 @@ Default::Default() : Plugin("default", "Format, test and pack competitive progra
 }
 
 std::string
-Default::help() const
+Default::help()
 {
+    auto manager = PluginManager::get_instance();
+    auto plugins_briefs =  manager->get_plugins_briefs();
+
     std::ostringstream oss;
+
+    // Dirty trick to hide plugin original name from help text
+    // TODO: find a better way
+    // To do this I had to take the const out of the help() method
+    std::string tmp;
+    std::swap(tmp, _command);
     oss << Plugin::help();
+    std::swap(tmp, _command);
 
     oss << "\n\nCommands:\n\n";
-    auto manager = PluginManager::get_instance();
 
-    oss << manager->get_plugins_briefs();
+    for (auto [name, description] : plugins_briefs)
+    {
+        if(name == "default") continue;
+        size_t width = 24;
 
-    // Remove qualquer referência ao nome do plugin ("default")
-    return strip_plugin_name_from_message(oss.str());
-}
-
-std::string
-Default::strip_plugin_name_from_message(std::string message) const {
-    const auto it = message.find(_command, 0);
-
-    if(it != std::string::npos) {
-        message.replace(it, _command.length(), "");
+        width -= (name.size() + 1);
+        oss << ' ' << name << std::string(width, ' ') << description << '\n';
     }
 
-    return message;
+    return oss.str();
 }
 
 int

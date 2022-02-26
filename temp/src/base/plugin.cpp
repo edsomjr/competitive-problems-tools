@@ -24,7 +24,7 @@ Plugin::usage() const
 }
 
 std::string
-Plugin::help() const
+Plugin::help()
 {
     std::ostringstream oss;
 
