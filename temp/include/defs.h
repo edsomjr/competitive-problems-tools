@@ -9,4 +9,6 @@
 #define CP_TOOLS_TRUE  1
 #define CP_TOOLS_FALSE 0
 
+#define CONFIG_FILE_NAME "config.json"
+
 #endif
