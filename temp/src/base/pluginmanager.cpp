@@ -138,7 +138,7 @@ PluginManager::get_command_suggestion(const std::string& plugin_name) {
         if(command_name == "default")
             continue;
 
-        auto distance = levenshtein_distance(command_name, plugin_name);
+        auto distance = cptools::utils::levenshtein_distance(command_name, plugin_name);
 
         if(distance < proximity) {
             command_suggestion = command_name;
