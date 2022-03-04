@@ -3,7 +3,7 @@
 
 #include "defs.h"
 
-#define CP_TOOLS_PLUGIN_DIR "./plugins"
+#define CP_TOOLS_PLUGIN_DIR             "/usr/local/lib/" NAME "/plugins"
 
 #define CP_TOOLS_TEMPLATES_DIR          "/usr/local/lib/" NAME "/templates/"
 #define CP_TOOLS_PROBLEM_TEMPLATE_DIR   CP_TOOLS_TEMPLATES_DIR "problem-template/"

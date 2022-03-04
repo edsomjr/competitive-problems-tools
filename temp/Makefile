@@ -40,6 +40,7 @@ SO_DIR=plugins
 INSTALL_BIN_DIR=/usr/local/bin
 INSTALL_MAN_DIR=/usr/share/man/man1
 INSTALL_CLASSES_DIR=/usr/local/lib
+INSTALL_PLUGINS_DIR=/usr/local/lib
 INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
@@ -91,7 +92,7 @@ LINKER=$(CXX)
 .PHONY: all clean build tests # format
 
 # Generetes all plugins
-%.so: %.cpp
+%.so: %.cpp $(LIBRARY)
 	@echo "Building plugin '$(notdir $<)'..."
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(DL_FLAGS) -I. -o $@ $< $(LIBRARY)
 	@cp $@ $(SO_DIR)
@@ -139,7 +140,8 @@ install: $(PROJECT)
 	@cp -r $(CLASSES_DIR) $(INSTALL_CLASSES_DIR)/$(PROJECT)/
 	@cp $(SCRIPTS_DIR)/$(COMPLETION_SCRIPT) $(INSTALL_COMPLETION_DIR)
 	@cp $(MAN_FILE) $(INSTALL_MAN_DIR)
-
+	@mkdir -p $(INSTALL_PLUGINS_DIR)/$(PROJECT)/plugins
+	@cp $(PLUGINS_NAMES) $(INSTALL_PLUGINS_DIR)/$(PROJECT)/plugins
 
 uninstall:
 	@rm -f $(INSTALL_COMPLETION_DIR)/$(COMPLETION_SCRIPT)

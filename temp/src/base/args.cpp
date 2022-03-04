@@ -5,15 +5,13 @@
 
 const int MAX_OPTIONS { 30 };
 
-const Option& find_option(int option, const std::vector<Option>& options)
+std::optional<Option> find_option(int option, const std::vector<Option>& options)
 {
-    size_t i;
-
-    for (i = 0; i < options.size(); ++i)
+    for (size_t i = 0; i < options.size(); ++i)
         if (options[i]._option == option)
-            break;
+            return options.at(i); 
 
-    return options.at(i);
+    return { };
 }
 
 Args
@@ -29,10 +27,13 @@ parse_args(int argc, char *argv[], const std::vector<Option>& options)
 
         longopts[pos] = { options[pos]._name.c_str(), has_arg ? required_argument : no_argument, NULL, option };
 
-        short_opts.push_back(option);
+        if (option)
+        {
+            short_opts.push_back(option);
 
-        if (has_arg)
-            short_opts.push_back(':');
+            if (has_arg)
+                short_opts.push_back(':');
+        }
     }
 
     longopts[pos] = { 0, 0, 0, 0 };
@@ -43,16 +44,15 @@ parse_args(int argc, char *argv[], const std::vector<Option>& options)
 
     while ((c = getopt_long(argc, argv, short_opts.c_str(), longopts, NULL)) != -1)
     {
-        auto i = short_opts.find(c);
+        auto opt = find_option(c, options);
 
-        if (i == std::string::npos)
+        if (opt)
+            args[opt.value()._name] = opt.value()._has_arg ? std::string(optarg) : "";
+        else
         {
             std::cerr << "Opção inválida: " << c << '\n';
             exit(-1);
         }
-
-        auto opt = find_option(c, options);
-        args[opt._name] = opt._has_arg ? std::string(optarg) : "";
     }
 
     return args;

@@ -7,7 +7,7 @@
 
 struct Option {
     Option(
-        char option,
+        int option,
         const std::string& name,
         bool has_arg,
         const std::string& arg_name,
@@ -19,7 +19,7 @@ struct Option {
         _arg_name(arg_name),
         _description(description) { }
 
-    char _option;
+    int _option;
     std::string _name;
     bool _has_arg;
     std::string _arg_name;

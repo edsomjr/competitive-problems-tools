@@ -7,4 +7,6 @@
 #define CP_TOOLS_ERROR_FS_IS_DIRECTORY          4
 #define CP_TOOLS_ERROR_FS_REMOVE                5
 
+#define CP_TOOLS_ERROR_GENTEX_INVALID_LANGUAGE  20
+
 #endif

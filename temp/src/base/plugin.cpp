@@ -10,9 +10,12 @@ Plugin::usage() const
 
     oss << "Usage: cp-tools " << command();
 
-    for (auto [option, _, has_arg, arg_name, __] : _options)
+    for (auto [option, name, has_arg, arg_name, _] : _options)
     {
-        oss << " [-" << option;
+        if (option > 0)
+            oss << " [-" << (char) option;
+        else
+            oss << " [--" << name;
 
         if (has_arg)
             oss << " " << arg_name;
@@ -35,8 +38,13 @@ Plugin::help()
     for (auto [option, name, _, __, description] : _options)
     {
         oss << "\n\n";
-        oss << "  -" << option << "\t\t\t" << description << '\n';
-        oss << "  --" << name;
+
+        if (option > 0)
+        {
+            oss << "  -" << (char) option << "\t\t\t" << description << '\n';
+            oss << "  --" << name;
+        } else
+            oss << "  --" << name << "\t\t" << description << '\n';
     }
 
     oss << '\n';
