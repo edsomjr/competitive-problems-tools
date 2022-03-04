@@ -18,7 +18,7 @@
 static const std::string help_message
 {
     R"message(
-Verify problem files and tools. 
+Verify problem files and tools.
 
     Option          Description
 
@@ -82,6 +82,7 @@ namespace cptools::commands::check
 
             auto validator{ std::string(CP_TOOLS_BUILD_DIR) + "/validator" };
             auto config = cptools::config::read_config_file();
+
             auto source
                 = cptools::util::get_json_value(config, "tools|validator", std::string("ERROR"));
 

@@ -1,36 +1,25 @@
 #ifndef CP_TOOLS_UTILS_H
 #define CP_TOOLS_UTILS_H
 
+#include <string>
 #include <vector>
-#include <algorithm>
 
-size_t levenshtein_distance(const std::string& s, const std::string& t)
-{
-    size_t n = s.length() + 1;
-    size_t m = t.length() + 1;
+#include "json.hpp"
 
-    std::vector<size_t> d(m*n, 0);
 
-    for(size_t i=1, im=0; i<m; ++i, ++im)
-    {
-        for(size_t j=1, jn=0; j<n; ++j, ++jn)
-        {
-            if(s[jn] == t[im])
-            {
-                d[ (i*n)+j ] = d[((i-1)*n) + (j-1)];
-            }
-            else
-            {
-                d[(i * n) + j] = std::min( { d[(i - 1) * n + j] + 1, // A deletion
-                                             d[i * n + (j - 1)] + 1, // An insertion
-                                             d[(i - 1) * n + (j - 1)] + 1} ); // A substitution
-            }
-        }
-    }
+namespace cptools::utils {
 
-    size_t result = d[n * m - 1];
+    size_t levenshtein_distance(const std::string& s, const std::string& t);
 
-    return result;
+    template <typename T>
+    T get_json_value(
+        const nlohmann::json &config,
+        const std::string &fields,
+        T default_value
+    );
+
+    std::vector<std::string>
+    split(const std::string &s, const std::string &delimiter=" ");
 }
 
 #endif

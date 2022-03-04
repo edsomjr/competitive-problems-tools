@@ -38,7 +38,7 @@ Default::help()
         size_t width = 24;
 
         width -= (name.size() + 1);
-        oss << ' ' << name << std::string(width, ' ') << description << '\n';
+        oss << "  " << name << std::string(width, ' ') << description << '\n';
     }
 
     return oss.str();
