@@ -5,6 +5,7 @@
 #include "fs.h"
 #include "message.h"
 #include "plugin.h"
+#include "utils.h"
 
 
 class Check : public Plugin {

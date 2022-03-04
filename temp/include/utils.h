@@ -19,7 +19,7 @@ namespace cptools::utils {
     );
 
     std::vector<std::string>
-    split(const std::string &s, const std::string &delimiter = " ");
+    split(const std::string &s, const std::string &delimiter=" ");
 }
 
 #endif

@@ -35,7 +35,7 @@ namespace cptools::utils {
     }
 
     std::vector<std::string>
-    split(const std::string &s, const std::string &delimiter = " ") {
+    split(const std::string &s, const std::string &delimiter) {
         size_t pos_start = 0;
         size_t pos_end;
         size_t delim_len = delimiter.length();
