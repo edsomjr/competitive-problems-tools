@@ -17,8 +17,8 @@ Default::Default() : Plugin("default", "Format, test and pack competitive progra
 std::string
 Default::help()
 {
-    auto manager = PluginManager::get_instance();
-    auto plugins_briefs =  manager->get_plugins_briefs();
+    auto& manager = PluginManager::get_instance();
+    auto plugins_briefs =  manager.get_plugins_briefs();
 
     std::ostringstream oss;
 
