@@ -44,17 +44,7 @@ Default::help()
     return oss.str();
 }
 
-int
-Default::execute(const Args& args)
-{
-    if (args.count("help"))
-    {
-        std::cout << help() << '\n';
-        return 0;
-    }
-
-    return 0;
-}
+int Default::execute(const Args& args) { return 0; }
 
 // dynamic function that is called by the plugin manager to build the plugin
 extern "C" Plugin *
