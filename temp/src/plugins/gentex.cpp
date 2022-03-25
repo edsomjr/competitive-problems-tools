@@ -82,7 +82,7 @@ generate_latex(const std::string &doc_class, const std::string &language, const 
 
     auto varsample = cptools::utils::get_json_value(config, "PDF|varsamples", false);
     std::string sample_command { varsample ? "\\variosample{" : "\\iosample{" };
-    
+
     for (auto [infile, outfile] : io_files)
         oss << "    " << sample_command << c1_size << "}{" << c2_size << "}{" << infile << "}{"
                    << outfile << "}\n";
@@ -117,12 +117,6 @@ generate_latex(const std::string &doc_class, const std::string &language, const 
 int
 GenTex::execute(const Args& args)
 {
-    if (args.count("help"))
-    {
-        std::cout << help() << '\n';
-        return 0;
-    }
-
     auto doc_class = args.count("class") ? args.at("class") : std::string("cp_modern");
     auto language = args.count("language") ? args.at("language") : std::string("pt_BR");
     auto label = args.count("label") ? args.at("label") : std::string("A");

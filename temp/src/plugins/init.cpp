@@ -34,12 +34,6 @@ copy_template_files(const std::string &dest)
 int
 Init::execute(const Args& args)
 {
-    if (args.count("help"))
-    {
-        std::cout << help() << '\n';
-        return 0;
-    }
-
     std::string dest = args.count("output") ? args.at("output") : std::string(".");
 
     copy_template_files(dest);

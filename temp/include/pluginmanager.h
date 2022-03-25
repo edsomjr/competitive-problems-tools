@@ -10,10 +10,7 @@
 
 class PluginManager {
 public:
-    ~PluginManager();
-
-    static PluginManager * get_instance();
-    static void release();
+    static PluginManager& get_instance();
 
     void load_plugin(const std::string& path);
     void find_and_load_plugins();
@@ -38,7 +35,11 @@ private:
 
     std::vector<PluginInfo> _plugins;
 
-    PluginManager() {}
+    PluginManager() = default;
+    ~PluginManager();
+
+    PluginManager(const PluginManager&) = delete;
+    PluginManager& operator=(const PluginManager&) = delete;
 
     void release_plugin(void *handle);
 };

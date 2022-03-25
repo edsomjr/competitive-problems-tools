@@ -10,28 +10,10 @@
 #include "pluginmanager.h"
 
 
-static PluginManager *instance = nullptr;
-
-PluginManager *
-PluginManager::get_instance()
+PluginManager& PluginManager::get_instance()
 {
-    if (!instance) {
-        // std::cout << "[THERE SHOULD BE ONLY ONE] - Creating PluginManager instance\n";
-        instance = new PluginManager();
-    }
-
-    // std::cout << "Returning PluginManager instance\n";
-
+    static PluginManager instance;
     return instance;
-}
-
-void
-PluginManager::release()
-{
-    if (instance)
-        delete instance;
-
-    instance = nullptr;
 }
 
 PluginManager::~PluginManager()
@@ -51,8 +33,7 @@ PluginManager::~PluginManager()
     }
 }
 
-void
-PluginManager::load_plugin(const std::string& path)
+void PluginManager::load_plugin(const std::string& path)
 {
 	auto handle = dlopen(path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 

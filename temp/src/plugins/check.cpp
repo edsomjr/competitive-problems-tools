@@ -53,12 +53,6 @@ int Check::validate_checker()
 
 int Check::execute(const Args& args)
 {
-    if (args.count("help"))
-    {
-        std::cout << help() << '\n';
-        return 0;
-    }
-
     if(args.count("checker"))
     {
         validate_checker();
