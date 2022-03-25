@@ -3,7 +3,7 @@ PROJECT=cp-tools2
 
 # Compiler and flags variables
 CXX=g++-10
-CPPFLAGS=-W -Wall -Werror -fPIC
+CPPFLAGS=-W -Wall -Werror -fPIC -MMD
 CXXFLAGS=-std=c++20
 RELEASE_CPPFLAGS=-O2
 DEBUG_CPPFLAGS=-g -O0
@@ -153,5 +153,9 @@ uninstall:
 clean:
 	@rm -f *~ $(LIBRARY) $(PROJECT) $(TEST_SUIT)
 	@find . -name '*.o' -exec rm -f {}  \;
+	@find . -name '*.d' -exec rm -f {}  \;
 	@find . -name '*.so' -exec rm -f {}  \;
 	@rm -rf *~ $(CP_TEMP_DIR) $(CP_BUILD_DIR)
+
+-include $(SOURCES:%.cpp=%.d)
+-include $(PROJECT_MAIN:%.cpp=%.d)

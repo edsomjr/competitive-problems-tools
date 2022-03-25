@@ -3,7 +3,7 @@ PROJECT=cp-tools
 
 # Compiler and flags variables
 CXX=g++-10
-CPPFLAGS=-W -Wall -Werror
+CPPFLAGS=-W -Wall -Werror -MMD
 CXXFLAGS=-std=c++20
 RELEASE_CPPFLAGS=-O2
 DEBUG_CPPFLAGS=-g -O0
@@ -134,3 +134,5 @@ clean:
 	@rm -f *~ $(LIBRARY) $(PROJECT) $(TEST_SUIT)
 	@find . -name '*.o' -exec rm -f {}  \;
 	@rm -rf *~ $(CP_TEMP_DIR) $(CP_BUILD_DIR)
+
+-include $(SOURCES:%.cpp=%.d)

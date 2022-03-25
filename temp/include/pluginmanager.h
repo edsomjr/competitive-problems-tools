@@ -41,6 +41,9 @@ private:
     PluginManager(const PluginManager&) = delete;
     PluginManager& operator=(const PluginManager&) = delete;
 
+    PluginManager(const PluginManager&&) = delete;
+    PluginManager&& operator=(const PluginManager&&) = delete;
+
     void release_plugin(void *handle);
 };
 
