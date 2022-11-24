@@ -8,7 +8,10 @@ Plugin::usage() const
 {
     std::ostringstream oss;
 
-    oss << "Usage: cp-tools " << command();
+    oss << "Usage: cp-tools";
+
+    if (command() != "default")
+        oss << ' ' << command();
 
     for (auto [option, name, has_arg, arg_name, _] : _options)
     {
@@ -27,7 +30,7 @@ Plugin::usage() const
 }
 
 std::string
-Plugin::help()
+Plugin::help() const
 {
     std::ostringstream oss;
 

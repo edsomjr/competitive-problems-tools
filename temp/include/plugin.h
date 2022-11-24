@@ -22,7 +22,7 @@ public:
         }
 
     virtual int execute(const Args& args) = 0;
-    virtual std::string help();
+    virtual std::string help() const;
 
     std::string usage() const;
     std::string command() const { return _command; }

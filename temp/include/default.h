@@ -10,8 +10,10 @@ public:
     Default();
     ~Default() { }
 
-    std::string help() override;
+    std::string help() const override;
     int execute(const Args& args) override;
+
+    std::string version();
 };
 
 #endif

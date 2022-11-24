@@ -2,7 +2,7 @@
 PROJECT=cp-tools2
 
 # Compiler and flags variables
-CXX=g++-10
+CXX=g++
 CPPFLAGS=-W -Wall -Werror -fPIC -MMD
 CXXFLAGS=-std=c++20
 RELEASE_CPPFLAGS=-O2

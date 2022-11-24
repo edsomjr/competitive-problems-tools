@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 
     if(args.count("help"))
         std::cout << plugin->help() << '\n';
-
     else
         plugin->execute(args);
 }

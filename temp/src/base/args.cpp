@@ -1,4 +1,5 @@
 #include <iostream>
+#include <optional>
 #include <getopt.h>
 
 #include "args.h"

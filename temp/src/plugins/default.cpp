@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iomanip>
 
+#include "defs.h"
 #include "plugin.h"
 #include "default.h"
 #include "pluginmanager.h"
@@ -15,26 +16,21 @@ Default::Default() : Plugin("default", "Format, test and pack competitive progra
 }
 
 std::string
-Default::help()
+Default::help() const
 {
     auto& manager = PluginManager::get_instance();
     auto plugins_briefs =  manager.get_plugins_briefs();
 
     std::ostringstream oss;
-
-    // Dirty trick to hide plugin original name from help text
-    // TODO: find a better way
-    // To do this I had to take the const out of the help() method
-    std::string tmp;
-    std::swap(tmp, _command);
+   
     oss << Plugin::help();
-    std::swap(tmp, _command);
-
     oss << "\n\nCommands:\n\n";
 
     for (auto [name, description] : plugins_briefs)
     {
-        if(name == "default") continue;
+        if(name == "default")
+            continue;
+
         size_t width = 24;
 
         width -= (name.size() + 1);
@@ -44,7 +40,30 @@ Default::help()
     return oss.str();
 }
 
-int Default::execute(const Args&) { return 0; }
+static const std::string version_header { NAME " " VERSION "\n" };
+
+static const std::string version_body {
+R"body(License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Edson Alves.)body"};
+
+std::string
+Default::version()
+{
+    return version_header + version_body;
+}
+
+int Default::execute(const Args& args)
+{
+    if (args.count("version"))
+        std::cout << version() << '\n';
+    else
+        std::cout << help() << '\n';
+
+    return 0;
+}
 
 // dynamic function that is called by the plugin manager to build the plugin
 extern "C" Plugin *
