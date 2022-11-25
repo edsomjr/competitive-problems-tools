@@ -26,6 +26,9 @@ Plugin::usage() const
         oss << "]";
     }
 
+    if (command() == "default")
+        oss << " command";
+
     return oss.str();
 }
 
