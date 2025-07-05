@@ -1,44 +1,53 @@
-# Project variables
 PROJECT=cp-tools
+CC=g++
 
-# Compiler and flags variables
-CXX=g++-10
-CPPFLAGS=-W -Wall -Werror
-CXXFLAGS=-std=c++20
-RELEASE_CPPFLAGS=-O2
-DEBUG_CPPFLAGS=-g -O0
+# Compiler setup
+CFLAGS=-W -Wall -Werror -std=c++17
 
-# Condition to check if is release or debug
+RELEASE_CFLAGS=-O2
+DEBUG_CFLAGS=-g -O0
+
 ifeq ($(MAKECMDGOALS),release)
-    CPPFLAGS+=$(RELEASE_CPPFLAGS)
+    CFLAGS+=$(RELEASE_CFLAGS)
 else
-    CPPFLAGS+=$(DEBUG_CPPFLAGS)
+    CFLAGS+=$(DEBUG_CFLAGS)
 endif
 
+LDFLAGS=
+INCLUDES=-Iinclude -Ilibs
+
+# Tools
+AR=ar
+AR_FLAGS=rcs
+LINKER=$(CC)
+
 # Environment variables
-INCLUDE_FLAG=-I
+INCLUDES_FLAG=-I
+LIBPATH_FLAG=-L
+EXT_LIBPATH_FLAG=-L
+LIBS_FLAG=-l
+EXT_LIBS_FLAG=-l
+OBJ_OUTPUT_FLAG=-o 
+AR_OUTPUT_FLAG=
 OUTPUT_FLAG=-o 
+GEN_OBJECT_FLAG=-c
 STATIC_LIB_SUFFIX=.a
 STATIC_LIB_PREFIX=lib
 OBJ_EXTENSION=.o
 
 # Directories
 SRC_DIR=src
-LIBS_DIR=${shell find libs -type d}
-INC_DIR=include
+LIBS_DIR=libs
 TESTS_DIR=tests
 CLASSES_DIR=classes
 SCRIPTS_DIR=scripts
 TEMPLATE_DIR=templates
 
-# Installation directories
 INSTALL_BIN_DIR=/usr/local/bin
-INSTALL_MAN_DIR=/usr/share/man/man1
 INSTALL_CLASSES_DIR=/usr/local/lib
 INSTALL_TEMPLATE_DIR=/usr/local/lib
 INSTALL_COMPLETION_DIR=/etc/bash_completion.d
 
-# Temporary directories
 CP_TEMP_DIR=.cp-tmp
 CP_BUILD_DIR=.cp-build
 
@@ -46,64 +55,45 @@ CP_BUILD_DIR=.cp-build
 LIBRARY=$(STATIC_LIB_PREFIX)$(PROJECT)$(STATIC_LIB_SUFFIX)
 TEST_SUIT=cp-run_tests
 
-# Include flags
-LDFLAGS=-lssl -lcrypto
-INCLUDES_DIRS=${addprefix $(INCLUDE_FLAG), $(INC_DIR)} ${addprefix $(INCLUDE_FLAG), $(LIBS_DIR)}
-CPPFLAGS+=$(INCLUDES_DIRS)
+# External libraries
+LIBS=
+
+.PHONY: all clean
 
 # Project source files
+SOURCES=${wildcard $(SRC_DIR)/*.cpp}
+SOURCES:=${filter-out $(SRC_DIR)/main.cpp, $(SOURCES)}
+
+OBJECTS=$(SOURCES:.cpp=$(OBJ_EXTENSION))
+COMPLETION_SCRIPT=$(PROJECT)-completion.sh
+
 PROJECT_MAIN=$(SRC_DIR)/main.cpp
 PROJECT_OBJECT=$(PROJECT_MAIN:.cpp=$(OBJ_EXTENSION))
 
-# Finds all .cpp files and filters src/main.cpp out
-SOURCES=${shell find $(SRC_DIR) -type f -name *.cpp}
-SOURCES:=${filter-out $(PROJECT_MAIN), $(SOURCES)}
-
-# Generates objects file names
-OBJECTS=$(SOURCES:.cpp=$(OBJ_EXTENSION))
-
-# Completion script and manual
-COMPLETION_SCRIPT=$(PROJECT)-completion.sh
-MAN_FILE=cp-tools.1
-
-# Tests source files and objects
 TEST_SOURCES=${wildcard $(TESTS_DIR)/*.cpp}
 TEST_OBJECTS=$(TEST_SOURCES:.cpp=$(OBJ_EXTENSION))
 
-# ar and linker
-AR=ar
-AR_FLAGS=-rs
-LINKER=$(CXX)
-
 # Rules
-.SUFFIXES: .cpp .$(OBJ_EXTENSION)
-.PHONY: all clean build tests format
+.SUFFIXES: .cpp .$(OBJ_EXTENSION) 
 
 
-all: format build tests
+.cpp$(OBJ_EXTENSION):
+	$(CXX) $(GEN_OBJECT_FLAG) $< $(OBJ_OUTPUT_FLAG) $@ $(CFLAGS) $(INCLUDES)
 
 
-format:
-	-clang-format-10 --version
-	@-find $(INC_DIR) $(TESTS_DIR) $(SRC_DIR) -type f -name "*.cpp" -or -name "*.h" | xargs clang-format-10 -i
-
-
-build: $(PROJECT)
-
-
-tests: $(TEST_SUIT)
+all: $(LIBRARY) $(PROJECT) $(TEST_SUIT)
 
 
 $(LIBRARY): $(OBJECTS)
-	$(AR) $(AR_FLAGS) $@ $(OBJECTS)
+	$(AR) $(AR_FLAGS) $(AR_OUTPUT_FLAG) $@ $(OBJECTS) 
 
 
-$(PROJECT): $(LIBRARY) $(PROJECT_OBJECT)
-	$(LINKER) $(PROJECT_OBJECT) $(LIBRARY) $(OUTPUT_FLAG) $@ $(LDFLAGS)
+$(PROJECT): $(OBJECTS) $(PROJECT_OBJECT)
+	$(LINKER) $(OUTPUT_FLAG)$@ $(LDFLAGS) $(PROJECT_OBJECT) $(LIBS) $(EXTRA_LIBS) $(LIBRARY) 
 
 
 $(TEST_SUIT): $(LIBRARY) $(TEST_OBJECTS)
-	$(LINKER) $(TEST_OBJECTS) $(LIBRARY) $(OUTPUT_FLAG) $@ $(LDFLAGS)
+	$(LINKER) $(OUTPUT_FLAG)$@ $(LDFLAGS) $(TEST_OBJECTS) $(LIBRARY) $(LIBS) $(EXTRA_LIBS)
 
 
 update_release:
@@ -120,14 +110,12 @@ install: $(PROJECT)
 	@mkdir -p $(INSTALL_CLASSES_DIR)/$(PROJECT)
 	@cp -r $(CLASSES_DIR) $(INSTALL_CLASSES_DIR)/$(PROJECT)/
 	@cp $(SCRIPTS_DIR)/$(COMPLETION_SCRIPT) $(INSTALL_COMPLETION_DIR)
-	@cp $(MAN_FILE) $(INSTALL_MAN_DIR)
 
 
 uninstall:
 	@rm -f $(INSTALL_COMPLETION_DIR)/$(COMPLETION_SCRIPT)
 	@rm -rf $(INSTALL_TEMPLATE_DIR)/$(PROJECT)
 	@rm -f $(INSTALL_BIN_DIR)/$(PROJECT)
-	@rm -f $(INSTALL_MAN_DIR)/$(MAN_FILE)
 
 
 clean:

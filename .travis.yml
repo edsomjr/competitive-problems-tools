@@ -1,24 +1,22 @@
 language: cpp
-compiler: g++-10
+compiler: g++-8
 os: linux
-dist: focal
-env: CXX=g++-10
+env: CXX=g++-8
 
 addons:
     apt:
-        update: true
+        sources:
+            - ubuntu-toolchain-r-test
         packages:
-            - g++-10
-            - libssl-dev
-            - clang-format-10
+            - g++-8
 
 script:
-    - make -j 8
+    - make
     - sudo make install
     - ./cp-tools -v
     - ./cp-run_tests
 
-after_success:
+after_sucess:
     - echo "Success"
 
 after_failure:

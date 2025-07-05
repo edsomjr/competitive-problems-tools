@@ -49,11 +49,11 @@ $ make uninstall
 
 ## Dependencies
 
+- Command line tools: `diff`, `mkdir`, `test`, `cp`, `rm`
 - pdflatex
-- GCC 10
+- GCC 8
 - Python 3
-- libssl-dev
-- clang-format (optional)
+- openJDK 13
 
 ## Features
 
@@ -96,24 +96,11 @@ To judge a solution, use the command
 $ cp-tools judge solution[.c|.cpp|.java|.py]
 ```
 
-To connect to Polygon API use the command
-
-```
-$ cp-tools polygon
-```
-
 For more information, use the option `-h` (or `--help`), as shown below:
 
 ```
 $ cp-tools -h
 ```
-
-Or read cp-tools man page using
-
-```
-$ man cp-tools
-```
-
 ## Tests
 
 To run the unit test use the commands
@@ -123,14 +110,8 @@ $ make
 $ ./cp-run_tests
 ```
 
-### Polygon connection tests
-
-On a local run of the tests you need to set both environment variables: `POLYGON_KEY` and `POLYGON_SECRET`.
-
-If you are using Travis on your own fork you must add the environment variables `POLYGON_KEY` and `POLYGON_SECRET` following the [official tutorial](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings).
-
 ## Technologies
 
-* C++20
-* GCC v.10.3.0
+* C++17
+* GCC v.10.2.0
 * LaTeX

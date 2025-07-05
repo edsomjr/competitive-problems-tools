@@ -3,33 +3,40 @@
 
 #include <string>
 
-#include "types/common.h"
+using std::string;
 
 // Functions that emulates shell commands
 namespace cptools::sh {
 
-using Result = types::common::Result;
-using types::common::make_result;
+    struct Result {
+        int rc;
+        string output;
+    };
 
-struct Info {
-    int rc;
-    double elapsed;
-    double memory;
-};
+    struct Info {
+        int rc;
+        double elapsed;
+        double memory;
+    };
 
-const Result execute_command(const std::string &command,
-                             int on_error = CP_TOOLS_ERROR_SH_EXEC_ERROR);
+    Result copy_file(const string& dest, const string& src);
+    Result remove_file(const string& path);
 
-const Result diff_dirs(const std::string &dirA, const std::string &dirB);
+    Result make_dir(const string& path);
+    Result copy_dir(const string& dest, const string& src);
+    Result remove_dir(const string& path);
+    Result same_dirs(const string& dirA, const string& dirB);
 
-const Result build(const std::string &output, const std::string &src);
+    Result is_dir(const string& path);
+    Result is_file(const string& path);
 
-const Result execute_program(const std::string &program, const std::string &args,
-                             const std::string &infile = "",
-                             const std::string &outfile = "/dev/null", int timeout = 3);
+    Result build(const string& output, const string& src);
 
-Info profile(const std::string &program, const std::string &args, int timeout = 3,
-             const std::string &infile = "", const std::string &outfile = "/dev/null");
-} // namespace cptools::sh
+    Result execute(const string& program, const string& args, const string& infile = "", 
+        const string& outfile = "/dev/null", int timeout = 3);
+   
+    Info profile(const string& program, const string& args, int timeout = 3, 
+        const string& infile = "", const string& outfile = "/dev/null");
+}
 
 #endif

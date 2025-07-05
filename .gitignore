@@ -37,13 +37,7 @@ cp-run_tests
 *.swp
 *.deb
 build
-.cp-tmp
 
 # Python
 __py-cache__
 *.pyc
-
-# Visual Code configurations
-.vscode
-
-.devcontainer

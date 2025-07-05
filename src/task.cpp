@@ -1,183 +1,253 @@
 #include <algorithm>
-#include <filesystem>
 
-#include "cli/cli.h"
-#include "config.h"
-#include "error.h"
-#include "fs.h"
 #include "sh.h"
 #include "task.h"
-#include "util.h"
+#include "dirs.h"
+#include "error.h"
+#include "config.h"
+#include "message.h"
+
+using std::to_string;
 
 namespace cptools::task {
 
-const Result build_default_solution() {
-    const auto solution_src = config::get_solutions_file_paths("default")[0];
-    const auto dest_file = std::string(CP_TOOLS_BUILD_DIR) + "/solution";
-    const auto build_res = sh::build(dest_file, solution_src);
-    return build_res;
-}
+    std::vector<std::pair<std::string, std::string>> generate_io_files(const std::string& testset,
+        std::ostream&, std::ostream& err, bool gen_output)    
+    {
+        std::vector<std::string> sets { "samples", "manual", "random" };
 
-iovector generate_all_io_files(bool gen_output) {
-    iovector results;
-    for (const auto &type : config::all_test_types) {
-        const auto res = generate_io_files(type, gen_output);
-        results.insert(results.end(), res.begin(), res.end());
-    }
-    return results;
-}
+        auto it = std::find(sets.begin(), sets.end(), testset);
 
-void create_io_dirs() {
-    const auto dirs = {std::string(CP_TOOLS_BUILD_DIR) + "/input",
-                       std::string(CP_TOOLS_BUILD_DIR) + "/output"};
-
-    for (const auto &dir : dirs) {
-        const auto res = fs::create_directory(dir);
-        if (not res.ok) {
-            cli::write(cli::fmt::error, "Could not create directory: " + res.error_message);
-            throw std::runtime_error("Could not create directory");
+        if (it != sets.end())
+        {
+            sets.clear();
+            sets.push_back(testset);
         }
-    }
-}
 
-iovector generate_random_io_files(bool gen_output) {
-    create_io_dirs();
+        auto input_dir { std::string(CP_TOOLS_BUILD_DIR) + "/input/" };
+        auto output_dir { std::string(CP_TOOLS_BUILD_DIR) + "/output/" };
+        auto program { std::string(CP_TOOLS_BUILD_DIR) + "/solution" };
 
-    const auto tests_filenames = config::get_all_tests_file_names();
-    int start = 0;
-    for (const auto &path : tests_filenames) {
-        const auto filename = std::filesystem::path(path).filename();
-        start = std::max(start, std::stoi(filename));
-    }
-    start++;
+        auto config = cptools::config::read("config.json");
+        auto source = "solutions/" + cptools::config::get(config, "solutions|default", 
+            std::string("ERROR"));
 
-    iovector results;
-    const auto random_inputs = config::get_random_tests_inputs();
+        auto res = cptools::sh::make_dir(input_dir);
 
-    int test_number = start;
-    for (const auto &input : random_inputs) {
-        const auto input_file = dirs::input_dir / std::to_string(test_number++);
-        fs::overwrite_file(input_file, input);
-        results.emplace_back(input_file, "");
-    }
+        if (res.rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Can't create '" + input_dir + "'\n");
+            return { };
+        }
 
-    if (not gen_output)
-        return results;
+        res = cptools::sh::make_dir(output_dir);
 
-    const auto generator_path = config::get_tool_file_name(config::tool_type::generator);
-    const auto build_res = build_tool(config::tool_type::generator);
-    if (not build_res.ok) {
-        cli::write(cli::fmt::error, "Failed to build generator");
-        cli::write_trace(build_res.error_message);
-        throw std::runtime_error("Failed to build generator");
-    }
+        if (res.rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Can't create '" + output_dir + "'\n");
+            return { };
+        }
 
-    test_number = start;
-    for (const auto &input : random_inputs) {
-        const auto input_file = dirs::input_dir / std::to_string(test_number);
-        const auto output_file = dirs::output_dir / std::to_string(test_number);
-        sh::execute_program(files::generator_executable, input, "", output_file);
-        for (auto &p : results) {
-            if (p.first == input_file) {
-                p.second = output_file.string();
-                break;
+        if (source == "solutions/ERROR")
+        {
+            err << message::failure("Default solution file not found!\n");
+            return { };
+        }
+
+        res = cptools::sh::build(program, source);
+
+        if (res.rc != CP_TOOLS_OK)
+        {
+            err << message::failure("Can't compile solution '" + source + "'!") << "\n";
+            err << message::trace(res.output) << '\n';
+            return { };
+        }
+
+        std::vector<std::pair<std::string, std::string>> io_files;
+        int next = 1;
+
+        for (auto s : sets)
+        {
+            if (s == "random")
+            {
+                source = cptools::config::get(config, "tools|generator", std::string("ERROR"));
+
+                if (source == "tools/ERROR")
+                {
+                    err << message::failure("Generator file not found!\n");
+                    return { };
+                }
+
+                auto generator = std::string(CP_TOOLS_BUILD_DIR) + "/generator";
+
+                res = cptools::sh::build(generator, source);
+
+                if (res.rc != CP_TOOLS_OK)
+                {
+                    err << message::failure("Can't compile generator '" + source + "'!") << "\n";
+                    err << message::trace(res.output) << '\n';
+                    return { };
+                }
+
+                auto inputs = cptools::config::get(config, "tests|random", 
+                    std::vector<std::string> {});
+
+                for (auto parameters : inputs)
+                {
+                    std::string dest { input_dir + std::to_string(next++) };
+
+                    auto res = sh::execute(generator, parameters, "", dest);
+
+                    if (res.rc != CP_TOOLS_OK)
+                    {
+                        err << message::failure("Error generating '" + dest + "' with parameters "
+                            + parameters) << "\n";
+                        err << message::trace(res.output) << '\n';
+                        return { };
+                    }
+
+                    io_files.emplace_back(std::make_pair(dest, ""));
+                }
+            } else
+            {
+                auto inputs = cptools::config::get(config, "tests|" + s, 
+                    std::map<std::string, std::string> {});
+
+                for (auto [input, comment] : inputs)
+                {
+                    std::string dest { input_dir + std::to_string(next++) };
+
+                    auto res = cptools::sh::copy_file(dest, input);
+
+                    if (res.rc != CP_TOOLS_OK)
+                    {
+                        err << message::failure("Can't copy input '" + input + "' on " 
+                            + dest + "!") << "\n";
+                        err << message::trace(res.output) << '\n';
+
+                        return { };
+                    }
+
+                    io_files.emplace_back(std::make_pair(dest, ""));
+                }
             }
         }
-        test_number++;
-    }
 
-    return results;
-}
+        if (gen_output)
+        {
+            for (int i = 1; i < next; ++i)
+            {
+                std::string input { io_files[i - 1].first };
+                std::string output { output_dir + std::to_string(i) };
 
-iovector generate_io_files(const config::test_type &testset, bool gen_output) {
-    create_io_dirs();
+                auto res = cptools::sh::execute(program, "", input, output);
 
-    if (testset == config::test_type::random)
-        return generate_random_io_files(gen_output);
+                if (res.rc != CP_TOOLS_OK)
+                {
+                    err << message::failure("Can't generate output for input '" + input 
+                        + "'!") << "\n";
+                    err << message::trace(res.output) << '\n';
+                    return { };
+                }
 
-    iovector results;
-    const auto inputs = config::get_tests_file_names(testset);
-    for (const auto &input_path : inputs) {
-        const auto input_filename = std::filesystem::path(input_path).filename();
-        const auto input_dest = dirs::input_dir / input_filename;
-
-        const auto copy_res = fs::copy(input_path, input_dest, true);
-        if (not copy_res.ok) {
-            cli::write(cli::fmt::error, "Failed to copy input file: " + copy_res.error_message);
-            throw std::runtime_error("Failed to copy input file");
+                io_files[i - 1].second = output;
+            }
         }
 
-        results.emplace_back(input_dest.string(), "");
+        return io_files;
     }
 
-    if (not gen_output)
-        return results;
+    int build_tools(string& error, int tools, const string& where)
+    {
+        auto dest_dir { where + "/" + CP_TOOLS_BUILD_DIR + "/" };
 
-    auto res = build_default_solution();
-    if (not res.ok) {
-        cli::write(cli::fmt::error, "Failed to build default solution");
-        cli::write_trace(res.error_message);
-        throw std::runtime_error("Failed to build default solution");
-    }
+        auto res = sh::make_dir(dest_dir);
 
-    for (auto &it : results) {
-        const auto input_file = it.first;
-        const auto filename = std::filesystem::path(input_file).filename();
-        const auto output_dest = dirs::output_dir / filename;
+        if (res.rc != CP_TOOLS_OK)
+            return res.rc;
 
-        auto solution_res =
-            sh::execute_program(files::solution_executable, "", input_file, output_dest);
-        if (not solution_res.ok) {
-            cli::write(cli::fmt::error, "Failed to run solution");
-            cli::write_trace(solution_res.error_message);
-            throw std::runtime_error("Failed to run solution");
+        auto config = cptools::config::read("config.json");
+
+        for (int mask = 1; mask <= tools; mask <<= 1)
+        {
+            int tool = tools & mask;
+            string program = "";
+
+            switch (tool) {
+            case tools::VALIDATOR:
+                program = "validator";
+                break;
+
+            case tools::CHECKER:
+                program = "checker";
+                break;
+
+            case tools::GENERATOR:
+                program = "generator";
+                break;
+
+            case tools::INTERACTOR:
+                program = "interactor";
+                break;
+
+            default:
+                error = "Invalid tool required: (" + to_string(tools) + ")";
+                return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
+            }
+
+            auto source = cptools::config::get(config, "tools|" + program, std::string(""));
+
+            if (source.empty())
+            {
+                error = "Can't find source for '" + program + "' in config file";
+                return CP_TOOLS_ERROR_TASK_INVALID_TOOL;
+            }
+
+            auto dest = dest_dir + program;
+
+            auto res = cptools::sh::build(dest, source);
+
+            if (res.rc != CP_TOOLS_OK)
+            {
+                error = message::failure(string("Can't compile '") + source + "'!") + "\n";
+                error += message::trace(res.output) + "\n";
+                return res.rc;
+            }
         }
-        it.second = output_dest.string();
+
+        return CP_TOOLS_OK;
     }
 
-    return results;
-}
+    int gen_exe(string& error, const string& source, const string& dest, const string& where)
+    {
+        auto dest_dir { where + "/" + CP_TOOLS_BUILD_DIR + "/" };
 
-const Result build_tool(config::tool_type tool_type) {
-    auto program = config::tool_type_tag.at(tool_type);
-    auto dest_dir = std::filesystem::path(CP_TOOLS_BUILD_DIR);
-    auto dest = dest_dir / program;
+        auto res = sh::make_dir(dest_dir);
 
-    auto fs_res = fs::create_directory(dest_dir);
-    if (not fs_res.ok)
-        return fs_res;
+        if (res.rc != CP_TOOLS_OK)
+            return res.rc;
 
-    auto src_file = config::get_tool_file_name(tool_type);
-    if (src_file.empty()) {
-        auto err = "Can't find source for '" + program + "' in config file";
-        return make_result(false, CP_TOOLS_ERROR_TASK_INVALID_TOOL, "", err);
+        auto program { dest_dir + dest };
+
+        res = sh::remove_file(program);
+
+        if (res.rc != CP_TOOLS_OK)
+        {
+            error += message::failure("Can't remove file '" + program + "'!") + "\n";
+            error += message::trace(res.output) + '\n';
+            return res.rc;
+        }
+
+        res = sh::build(program, source);
+
+        if (res.rc != CP_TOOLS_OK)
+        {
+            error += message::failure("Can't build solution '" + source + "'!") + "\n";
+            error += message::trace(res.output) + '\n';
+            return res.rc;
+        }
+
+        return CP_TOOLS_OK;
+
     }
-
-    auto res = sh::build(dest, src_file);
-    return res;
 }
-
-const Result gen_exe(const std::string &source, const std::string &dest) {
-    auto dest_dir = std::filesystem::path(CP_TOOLS_BUILD_DIR);
-
-    auto fs_res = fs::create_directory(dest_dir);
-    if (not fs_res.ok)
-        return fs_res;
-
-    auto program = dest_dir / dest;
-
-    auto removed_result = fs::remove(program);
-    if (not removed_result.ok)
-        return removed_result;
-
-    auto res = sh::build(program, source);
-
-    if (!res.ok) {
-        cli::write(cli::fmt::error, "Can't build solution '" + source + "'!");
-        cli::write_trace(res.error_message);
-        return res;
-    }
-
-    return res;
-}
-} // namespace cptools::task

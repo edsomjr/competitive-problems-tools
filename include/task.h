@@ -5,39 +5,28 @@
 #include <string>
 #include <vector>
 
-#include "config.h"
-#include "dirs.h"
-#include "types/common.h"
+using std::pair;
+using std::string;
+using std::vector;
+using std::ostream;
 
 // Problem preparation related tasks
 namespace cptools::task {
 
-namespace dirs {
-const std::filesystem::path input_dir(std::string(CP_TOOLS_BUILD_DIR) + "/input");
-const std::filesystem::path output_dir(std::string(CP_TOOLS_BUILD_DIR) + "/output");
-} // namespace dirs
+    namespace tools {
+        constexpr int CHECKER = 1;
+        constexpr int VALIDATOR = 2;
+        constexpr int GENERATOR = 4;
+        constexpr int INTERACTOR = 8;
+        constexpr int ALL = CHECKER | VALIDATOR | GENERATOR | INTERACTOR;
+    }
 
-namespace files {
-const std::filesystem::path solution_executable(std::string(CP_TOOLS_BUILD_DIR) + "/solution");
-const std::filesystem::path generator_executable(std::string(CP_TOOLS_BUILD_DIR) + "/generator");
-} // namespace files
+    vector<pair<string, string>> generate_io_files(const string& testset, ostream& out, 
+        ostream& err, bool gen_output = true);    
 
-using Result = types::common::Result;
-using types::common::make_result;
+    int build_tools(string& error, int tools = tools::ALL, const string& where = ".");
+    int gen_exe(string& error, const string& source, const string& dest, const string& where = ".");
 
-using iovector = std::vector<std::pair<std::string, std::string>>;
-
-const Result build_tool(config::tool_type tool_type);
-const Result build_default_solution();
-
-void create_io_dirs();
-
-iovector generate_io_files(const config::test_type &testset, bool gen_output = true);
-iovector generate_all_io_files(bool gen_output = true);
-iovector generate_random_io_files(bool gen_output = true);
-
-const Result gen_exe(const std::string &source, const std::string &dest);
-
-} // namespace cptools::task
+}
 
 #endif

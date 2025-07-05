@@ -23,7 +23,6 @@
 \RequirePackage{booktabs}
 \RequirePackage{tikz}
 \RequirePackage{enumerate}
-\RequirePackage{amsmath}
 
 \hyphenation{cons-tru-ção con-si-de-ra-da com-ple-xi-da-de in-di-vi-du-al-men-te}
 
@@ -134,17 +133,6 @@
     \par 
 
     \input{#1}
-}
-{
-}
-
-\newenvironment{customnotes}[3]{
-	\bigskip
-	\begin{flushleft}
-		\textbf{\translate{#1}{#2}} \\
-	\end{flushleft}
-
-    \input{#3}
 }
 {
 }

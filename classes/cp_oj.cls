@@ -24,7 +24,6 @@
 \RequirePackage{lastpage}
 \RequirePackage{tikz}
 \RequirePackage{enumerate}
-\RequirePackage{amsmath}
 
 \hyphenation{cons-tru-ção con-si-de-ra-da com-ple-xi-da-de in-di-vi-du-al-men-te}
 
@@ -115,17 +114,6 @@
 	\end{flushleft}
 
     \input{#1}
-}
-{
-}
-
-\newenvironment{customnotes}[3]{
-
-	\begin{flushleft}
-		\textcolor{red}{\textbf{\translate{#1}{#2}}} \\
-	\end{flushleft}
-
-    \input{#3}
 }
 {
 }
