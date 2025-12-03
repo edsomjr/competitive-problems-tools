@@ -154,7 +154,7 @@ namespace cptools::sh {
 
     Result compile_cpp(const string& output, const string& src)
     {
-        string command { "g++ -o " + output + " -O2 -std=c++17 -W -Wall " + src + " 2>&1" }, error;
+        string command { "g++ -o " + output + " -O2 -std=c++20 -W -Wall " + src + " 2>&1" }, error;
 
         auto rc = execute_command(command, error); 
 
